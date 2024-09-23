@@ -65,9 +65,52 @@ int main() {
         // Input validation and conditions
         if(sInput != "clear" && sInput != "exit")
         {
-            if(sInput == "initialize" || sInput == "screen" || sInput == "scheduler-test" || sInput == "scheduler-stop" || sInput == "report-util")
+            if(sInput == "initialize" || sInput == "scheduler-test" || sInput == "scheduler-stop" || sInput == "report-util")
             {
                 std::cout << "'" + sInput + "'" + " command recognized. Doing something.\n\n";
+            }
+            else if(sInput.find("screen -s"))
+            {
+                system("CLS");
+                std::string sCommand = "screen -s";
+                std::string processName;
+                int currentLine;
+                int totalLine;
+                time_t time;
+                struct tm * date;
+
+                // Get the process name
+                int pos = sInput.find(sCommand);
+                processName = sInput.substr(pos + 1);
+
+                // Get the current line of instruction
+                currentLine = rand() % 1000;
+                
+                // Get the total line of instruction
+                do {
+                    totalLine = rand() % 1000;
+                } while (totalLine < currentLine);
+
+
+                // Instantiate the process object
+                process newProcess(processName, currentLine, totalLine);
+
+
+                // Print the process name
+                std::cout << "Process Name: " + newProcess.processName + "\n\n";
+                
+                // Print the current line of instruction
+                std::cout << "Current instruction line: " << newProcess.currentLineOfInstruction << "\n";
+
+                // Print the total lines of code
+                std::cout << "Lines of code: " << newProcess.totalLineOfInstruction << "\n";
+
+                // Print the timestamp
+                std::cout << "Timestamp: " << newProcess.getFormattedDate() << "\n\n";
+
+
+                // TODO: Asking for text input/commands within screen -s console (Matthew)
+
             }
             else 
             {

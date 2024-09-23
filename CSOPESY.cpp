@@ -3,6 +3,45 @@
 #include <stdlib.h>
 #include <cstdlib>
 #include <string>
+#include <ctime>
+
+class process {
+    public:
+        std::string processName;
+        int currentLineOfInstruction;
+        int totalLineOfInstruction;
+        time_t timestamp;
+        struct tm * date;
+    
+        process(std::string processName, int currentLineOfInstruction, int totalLineOfInstruction){
+            this->processName = processName;
+            this->currentLineOfInstruction = currentLineOfInstruction;
+            this->totalLineOfInstruction = totalLineOfInstruction;
+            time(&this->timestamp);
+        }
+
+        std::string getTimePeriod(int hour){
+            if(hour > 12){
+                return " PM";
+            } else {
+                return " AM";
+            }
+        }
+        
+        std::string getFormattedDate(){
+
+            std::string formattedDate;
+
+            this->date = localtime(&this->timestamp);
+            // (MM/DD/YYYY, HH:MM:SS AM/PM) format
+            formattedDate = std::to_string(date->tm_mon + 1) + "/" + std::to_string(date->tm_mday) + "/" + std::to_string(date->tm_year + 1900) + ", " + 
+                            std::to_string(date->tm_hour) + ":" + std::to_string(date->tm_min) + ":" + std::to_string(date->tm_sec) +
+                            this->getTimePeriod(date->tm_hour);
+
+            return formattedDate;
+        }
+};
+
 
 int main() {
     int nClear = 0;

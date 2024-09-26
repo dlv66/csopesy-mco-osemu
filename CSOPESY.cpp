@@ -50,21 +50,21 @@ class process {
 int main() {
     int nClear = 0;
     
-    // Header text
-    std::cout << "  __  ___   __  ___  ___  ___  _  _ \n";
-    std::cout << " / _)/ __) /  \\(  ,\\(  _)/ __)( \\/ ) \n";
-    std::cout << "( (_ \\__ \\( () )) _/ ) _)\\__ \\ \\  / \n";
-    std::cout << " \\__)(___/ \\__/(_)  (___)(___/(__/ \n\n";
-
-    std::cout << "By MP Group 10: Dela Cruz, Estrera, Fernandez, Villamiel\n\n";
-    
     while (nClear == 0) {
+        // Header text
+        std::cout << "  __  ___   __  ___  ___  ___  _  _ \n";
+        std::cout << " / _)/ __) /  \\(  ,\\(  _)/ __)( \\/ ) \n";
+        std::cout << "( (_ \\__ \\( () )) _/ ) _)\\__ \\ \\  / \n";
+        std::cout << " \\__)(___/ \\__/(_)  (___)(___/(__/ \n\n";
+
+        std::cout << "By MP Group 10: Dela Cruz, Estrera, Fernandez, Villamiel\n\n";
+        
         // Write C++ code here
         std::string sInput = "test";
                                 
         // Asking for text input
         std::cout << "Please type in a command: ";
-        std::cin >> sInput;
+        std::getline(std::cin, sInput); // changed to getline to capture the entire input including spaces
         
         // Input validation and conditions
         if(sInput != "clear" && sInput != "exit")
@@ -73,7 +73,7 @@ int main() {
             {
                 std::cout << "'" + sInput + "'" + " command recognized. Doing something.\n\n";
             }
-            else if(sInput.find("screen -s"))
+            else if(sInput.find("screen -s") == 0)
             {
                 system("CLS");
                 std::string sCommand = "screen -s";
@@ -85,7 +85,7 @@ int main() {
 
                 // Get the process name
                 int pos = sInput.find(sCommand);
-                processName = sInput.substr(pos + 1);
+                processName = sInput.substr(pos + 10); //changed 1 to 10
 
                 // Get the current line of instruction
                 currentLine = rand() % 1000;
@@ -112,9 +112,19 @@ int main() {
                 // Print the timestamp
                 std::cout << "Timestamp: " << newProcess.getFormattedDate() << "\n\n";
 
+                // Asking for text input/commands within screen -s console 
+                std::string screenInput;
+                while (true) {
+                    std::cout << "Enter a command ('exit' to return to the main menu): ";
+                    std::getline(std::cin, screenInput);
+                    if (screenInput == "exit") {
+                        break;  // Break out of the inner loop to return to the main menu
+                    } else {
+                        std::cout << "'" << screenInput << "' command is not recognized.\n";
+                    }
+                }
 
-                // TODO: Asking for text input/commands within screen -s console (Matthew)
-
+                system("CLS");
             }
             else 
             {
@@ -131,7 +141,7 @@ int main() {
             nClear = 1;
         }
     };
-     
+        
     if(nClear == 1){
         exit(0); 
     }

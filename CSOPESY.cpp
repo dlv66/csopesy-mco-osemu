@@ -32,13 +32,17 @@ class process {
 
             std::string formattedDate;
 
-            this->date = localtime(&this->timestamp);
-            // (MM/DD/YYYY, HH:MM:SS AM/PM) format
-            formattedDate = std::to_string(date->tm_mon + 1) + "/" + std::to_string(date->tm_mday) + "/" + std::to_string(date->tm_year + 1900) + ", " + 
-                            std::to_string(date->tm_hour) + ":" + std::to_string(date->tm_min) + ":" + std::to_string(date->tm_sec) +
-                            this->getTimePeriod(date->tm_hour);
+            if((&this->timestamp) == nullptr) {
+                return "Error: Unable to get local time";
+            } else {
+                this->date = localtime(&this->timestamp);
+                // (MM/DD/YYYY, HH:MM:SS AM/PM) format
+                formattedDate = std::to_string(date->tm_mon + 1) + "/" + std::to_string(date->tm_mday) + "/" + std::to_string(date->tm_year + 1900) + ", " + 
+                                std::to_string(date->tm_hour) + ":" + std::to_string(date->tm_min) + ":" + std::to_string(date->tm_sec) +
+                                this->getTimePeriod(date->tm_hour);
 
-            return formattedDate;
+                return formattedDate;
+            }
         }
 };
 

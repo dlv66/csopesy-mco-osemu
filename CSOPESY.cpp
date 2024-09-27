@@ -52,15 +52,16 @@ std::unordered_map<std::string, process> processMap; // To store active processe
 int main() {
     int nClear = 0;
 
+    // Header text
+    std::cout << "  __  ___   __  ___  ___  ___  _  _ \n";
+    std::cout << " / _)/ __) /  \\(  ,\\(  _)/ __)( \\/ ) \n";
+    std::cout << "( (_ \\__ \\( () )) _/ ) _)\\__ \\ \\  / \n";
+    std::cout << " \\__)(___/ \\__/(_)  (___)(___/(__/ \n\n";
+
+    std::cout << "By MP Group 10: Dela Cruz, Estrera, Fernandez, Villamiel\n\n";
+
+
     while (nClear == 0) {
-        // Header text
-        std::cout << "  __  ___   __  ___  ___  ___  _  _ \n";
-        std::cout << " / _)/ __) /  \\(  ,\\(  _)/ __)( \\/ ) \n";
-        std::cout << "( (_ \\__ \\( () )) _/ ) _)\\__ \\ \\  / \n";
-        std::cout << " \\__)(___/ \\__/(_)  (___)(___/(__/ \n\n";
-
-        std::cout << "By MP Group 10: Dela Cruz, Estrera, Fernandez, Villamiel\n\n";
-
         // Asking for text input
         std::string sInput;
         std::cout << "Please type in a command: ";

@@ -117,6 +117,7 @@ int main() {
                 system("CLS");
             }
             else if (sInput.find("screen -r") == 0) {
+                system("CLS");
                 std::string sCommand = "screen -r";
                 std::string processName;
 
@@ -133,6 +134,21 @@ int main() {
                     std::cout << "Process Name: " + existingProcess.processName + "\n";
                     std::cout << "Current instruction line: " << existingProcess.currentLineOfInstruction << " / " << existingProcess.totalLineOfInstruction << "\n";
                     std::cout << "Timestamp: " << existingProcess.getFormattedDate() << "\n\n";
+                    
+                    // Command loop for the screen session
+                    std::string screenInput;
+                    while (true) {
+                        std::cout << "Enter a command ('exit' to return to the main menu): ";
+                        std::getline(std::cin, screenInput);
+                        if (screenInput == "exit") {
+                            system("CLS");
+                            main();
+                            break;  // Break out of the inner loop to return to the main menu
+                        }
+                        else {
+                            std::cout << "'" << screenInput << "' command is not recognized.\n";
+                        }
+                    }
                 }
                 else {
                     std::cout << "No detached screen process found with the name '" << processName << "'.\n\n";

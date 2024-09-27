@@ -107,12 +107,12 @@ int main() {
                     std::getline(std::cin, screenInput);
                     if (screenInput == "exit") {
                         break;  // Break out of the inner loop to return to the main menu
+                        main();
                     }
                     else {
                         std::cout << "'" << screenInput << "' command is not recognized.\n";
                     }
                 }
-
                 system("CLS");
             }
             else if (sInput.find("screen -r") == 0) {

@@ -106,8 +106,8 @@ int main() {
                     std::cout << "Enter a command ('exit' to return to the main menu): ";
                     std::getline(std::cin, screenInput);
                     if (screenInput == "exit") {
-                        break;  // Break out of the inner loop to return to the main menu
                         main();
+                        break;  // Break out of the inner loop to return to the main menu
                     }
                     else {
                         std::cout << "'" << screenInput << "' command is not recognized.\n";

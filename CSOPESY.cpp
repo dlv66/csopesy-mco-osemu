@@ -5,6 +5,25 @@
 #include <ctime>
 #include <unordered_map>
 
+class FCFSScheduler {
+    private:
+        int nCores;
+        std::vector<std::vector<process>> processQueues; // One queue for each core
+
+    public:
+        // Constructor
+        FCFSScheduler(int nCores) {
+            this->nCores = nCores;
+            this->processQueues = std::vector<std::vector<process>>(nCores);
+        }
+
+        // TODO: Add a process to the queue
+
+        // TODO: Sort process based on remaining instructions
+
+        // TODO: Run scheduler
+};
+
 class process {
 public:
     std::string processName;

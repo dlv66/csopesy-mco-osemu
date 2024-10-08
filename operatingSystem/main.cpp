@@ -1,74 +1,20 @@
+// main.cpp : This file contains the 'main' function. Program execution begins and ends there.
+//
+
 #include <iostream>
 #include <stdlib.h>
 #include <cstdlib>
 #include <string>
 #include <ctime>
 #include <unordered_map>
+#include "Process.h"
 
-class FCFSScheduler {
-    private:
-        int nCores;
-        std::vector<std::vector<process>> processQueues; // One queue for each core
+using namespace std;
 
-    public:
-        // Constructor
-        FCFSScheduler(int nCores) {
-            this->nCores = nCores;
-            this->processQueues = std::vector<std::vector<process>>(nCores);
-        }
+std::unordered_map<std::string, Process> processMap; // To store active processes
 
-        // TODO: Add a process to the queue
-
-        // TODO: Sort process based on remaining instructions
-
-        // TODO: Run scheduler
-};
-
-class process {
-public:
-    std::string processName;
-    int currentLineOfInstruction;
-    int totalLineOfInstruction;
-    time_t timestamp;
-    struct tm* date;
-
-    // Default constructor
-    process() : processName("Unnamed Process"), currentLineOfInstruction(0), totalLineOfInstruction(0) {
-        time(&this->timestamp);
-    }
-
-    // Custom constructor
-    process(std::string processName, int currentLineOfInstruction, int totalLineOfInstruction) {
-        this->processName = processName;
-        this->currentLineOfInstruction = currentLineOfInstruction;
-        this->totalLineOfInstruction = totalLineOfInstruction;
-        time(&this->timestamp);
-    }
-
-    std::string getTimePeriod(int hour) {
-        return (hour >= 12) ? " PM" : " AM";
-    }
-
-    std::string getFormattedDate() {
-        std::string formattedDate;
-
-        if ((&this->timestamp) == nullptr) {
-            return "Error: Unable to get local time";
-        }
-        else {
-            this->date = localtime(&this->timestamp);
-            // (MM/DD/YYYY, HH:MM:SS AM/PM) format
-            formattedDate = std::to_string(date->tm_mon + 1) + "/" + std::to_string(date->tm_mday) + "/" + std::to_string(date->tm_year + 1900) + ", " +
-                std::to_string(date->tm_hour % 12) + ":" + std::to_string(date->tm_min) + ":" + std::to_string(date->tm_sec) +
-                this->getTimePeriod(date->tm_hour);
-            return formattedDate;
-        }
-    }
-};
-
-std::unordered_map<std::string, process> processMap; // To store active processes
-
-int main() {
+int main()
+{
     int nClear = 0;
 
     // Header text
@@ -110,7 +56,7 @@ int main() {
                 } while (totalLine < currentLine);
 
                 // Instantiate the process object
-                process newProcess(processName, currentLine, totalLine);
+                Process newProcess(processName, currentLine, totalLine);
                 processMap[processName] = newProcess; // Store the process in the map
 
                 // Print the process details
@@ -146,14 +92,14 @@ int main() {
 
                 // Check if the process exists
                 if (processMap.find(processName) != processMap.end()) {
-                    process existingProcess = processMap[processName];
+                    Process existingProcess = processMap[processName];
 
                     // Print the process details
                     std::cout << "Reattaching to process:\n";
                     std::cout << "Process Name: " + existingProcess.processName + "\n";
                     std::cout << "Current instruction line: " << existingProcess.currentLineOfInstruction << " / " << existingProcess.totalLineOfInstruction << "\n";
                     std::cout << "Timestamp: " << existingProcess.getFormattedDate() << "\n\n";
-                    
+
                     // Command loop for the screen session
                     std::string screenInput;
                     while (true) {
@@ -188,5 +134,16 @@ int main() {
 
     if (nClear == 1) {
         exit(0);
-    }
+    }  
 }
+
+// Run program: Ctrl + F5 or Debug > Start Without Debugging menu
+// Debug program: F5 or Debug > Start Debugging menu
+
+// Tips for Getting Started: 
+//   1. Use the Solution Explorer window to add/manage files
+//   2. Use the Team Explorer window to connect to source control
+//   3. Use the Output window to see build output and other messages
+//   4. Use the Error List window to view errors
+//   5. Go to Project > Add New Item to create new code files, or Project > Add Existing Item to add existing code files to the project
+//   6. In the future, to open this project again, go to File > Open > Project and select the .sln file

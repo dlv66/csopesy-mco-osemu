@@ -14,16 +14,19 @@ bool Core::setProcess(Process process) {
 	}
 }
 
-void Core::checkProcessStatus() {
+void Core::startProcess() {
+
 	while(true)
 	{
-		// TODO: Run the process command
-		if(this->process.state == Process::State::RUNNING)
+		if (this->process.state == Process::State::READY)
+		{
+			this->process.executeCommands();
+		}
+
+		if(this->process.state == Process::State::TERMINATED)
 		{
 			this->isBusy = false;
 			break;
 		}
-
-		Sleep(10);
 	}
 }

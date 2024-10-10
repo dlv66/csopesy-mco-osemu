@@ -132,6 +132,7 @@
     <ClCompile Include="FCFSScheduler.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Process.cpp" />
+    <ClCompile Include="Screen.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Core.h">
@@ -139,6 +140,7 @@
     </ClInclude>
     <ClInclude Include="FCFSScheduler.h" />
     <ClInclude Include="Process.h" />
+    <ClInclude Include="Screen.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

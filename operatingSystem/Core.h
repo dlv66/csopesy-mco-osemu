@@ -10,6 +10,6 @@ class Core
 		Core() {}
 
 		bool setProcess(Process process);
-		void checkProcessStatus();
+		void startProcess();
 };
 

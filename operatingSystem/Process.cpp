@@ -18,3 +18,13 @@ std::string Process::getFormattedDate() {
 		return formattedDate;
 	}
 }
+
+void Process::executeCommands() {
+	this->state = Process::State::RUNNING;
+	time(&this->timestampStart);
+
+	// TODO: Run the process commands
+
+	//once done
+	this->state = Process::State::TERMINATED;
+}

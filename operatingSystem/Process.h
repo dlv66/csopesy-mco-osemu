@@ -40,6 +40,8 @@ class Process
 
 		std::string		getFormattedDate();
 		std::string		getTimePeriod(int hour);
+
+		void executeCommands();
 };
 
 

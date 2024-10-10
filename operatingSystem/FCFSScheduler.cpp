@@ -1,5 +1,7 @@
 #include "FCFSScheduler.h"
 #include <iostream>
+#include <thread>
+#include <chrono>
 
 FCFSScheduler::FCFSScheduler(int nCores) {
     this->nCores = nCores;
@@ -34,13 +36,43 @@ void FCFSScheduler::sortProcesses() {
 
 // TODO: Run scheduler
 // STATUS: For testing
+// Simulate FCFS Scheduler with threads (1 thread per core)
 void FCFSScheduler::runFCFS() {
-    while(!processQueues.empty()){
-        for(int i = 0; i < nCores; i++) { // for all the cores
-            if(coreList[i].setProcess(processQueues[0]) == true) {
-                coreList[i].startProcess(); // start the process
-                processQueues.erase(processQueues.begin()); // pop the process from the front of the queue
+    std::vector<std::thread> coreThreads;  // Thread for each core
+    int currentTime = 0;  // Simulating the current time
+
+    // Iterate over the available cores and run each in a separate thread
+    while (!processQueues.empty()) {
+        for (int i = 0; i < nCores; i++) {
+            if (coreList[i].isBusy == false && !processQueues.empty()) {  // Check if core is free
+                Process process = processQueues.front();  // Get the first process in the queue
+                
+                // Check if process has arrived
+                if (currentTime >= process.arrivalTime) {
+                    if (coreList[i].setProcess(process)) {
+                        processQueues.erase(processQueues.begin());  // Remove process from the queue
+
+                        // Create a new thread to start the process on the core
+                        coreThreads.push_back(std::thread([this, i]() {
+                            coreList[i].startProcess();
+                        }));
+
+                        // Increment the simulated time
+                        currentTime += process.burstTime;
+                    }
+                }
             }
+        }
+
+        // Simulate time passing (e.g., 1-second steps)
+        std::this_thread::sleep_for(std::chrono::seconds(1));
+        currentTime++;
+    }
+
+    // Join all the threads to ensure they complete
+    for (std::thread &t : coreThreads) {
+        if (t.joinable()) {
+            t.join();
         }
     }
 }

@@ -14,6 +14,10 @@ class Process
 			TERMINATED // Process is done
 		};
 
+		// Attributes for scheduling
+		int arrivalTime; // time when the process arrives in the queue   
+        int burstTime;	// how long the process will take to execute
+
 	    std::string processName;
 	    int currentLineOfInstruction;
 	    int totalLineOfInstruction;
@@ -26,15 +30,17 @@ class Process
 		
 
 	    // Default constructor
-	    Process() : processName("Unnamed Process"), currentLineOfInstruction(0), totalLineOfInstruction(0) {
+	    Process() : processName("Unnamed Process"), currentLineOfInstruction(0), totalLineOfInstruction(0), arrivalTime(0), burstTime(0) {
 	        time(&this->timestampCurrent); // Not sure if timestampCurrent is the correct timestamp to add, but it's a placeholder for now
 	    }
 
 	    // Custom constructor
-	    Process(std::string processName, int currentLineOfInstruction, int totalLineOfInstruction) {
+	    Process(std::string processName, int currentLineOfInstruction, int totalLineOfInstruction, int arrival, int burst) {
 	        this->processName = processName;
 	        this->currentLineOfInstruction = currentLineOfInstruction;
 	        this->totalLineOfInstruction = totalLineOfInstruction;
+			this->arrivalTime = arrival;
+            this->burstTime = burst;
 	        time(&this->timestampCurrent);
 	    }
 

@@ -17,7 +17,9 @@ class Process
 	    std::string processName;
 	    int currentLineOfInstruction;
 	    int totalLineOfInstruction;
-	    time_t timestamp;
+	    time_t timestampCurrent; // current system time
+		time_t timestampStart; // time when process started being executed
+		time_t timestampFinish; // time when process finished execution
 	    struct tm date;
 		State state = State::NEW;
 

@@ -7,6 +7,7 @@ bool Core::setProcess(Process process) {
 	}
 	else
 	{
+		process.state = Process::State::TERMINATED;
 		this->process = process;
 		this->isBusy = true;
 		return true;
@@ -16,7 +17,7 @@ bool Core::setProcess(Process process) {
 void Core::checkProcessStatus() {
 	while(true)
 	{
-		// Run the process command
+		// TODO: Run the process command
 		if(this->process.state == Process::State::RUNNING)
 		{
 			this->isBusy = false;

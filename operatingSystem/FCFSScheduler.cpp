@@ -33,8 +33,9 @@ void FCFSScheduler::runFCFS() {
     while(!processQueues.empty()){
         for(int i = 0; i < nCores; i++) { // for all the cores
             if(coreList[i].setProcess(processQueues[0]) == true) {
+                processQueues[0].state = Process::State::RUNNING; // set the process state to running
                 processQueues.erase(processQueues.begin()); // pop the process from the front of the queue
-            } 
+            }
         }
     }
 }

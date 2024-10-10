@@ -1,6 +1,11 @@
 #include "FCFSScheduler.h"
 #include <iostream>
 
+FCFSScheduler::FCFSScheduler(int nCores) {
+    this->nCores = nCores;
+    this->processQueues = std::vector<Process>(nCores);
+}
+
 // TODO: Instantiates core list based on given number of cores
 // STATUS: For testing
 void FCFSScheduler::instantiateCoreList() {

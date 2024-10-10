@@ -27,7 +27,7 @@ class Process
 
 	    // Default constructor
 	    Process() : processName("Unnamed Process"), currentLineOfInstruction(0), totalLineOfInstruction(0) {
-	        time(&this->timestamp);
+	        time(&this->timestampCurrent); // Not sure if timestampCurrent is the correct timestamp to add, but it's a placeholder for now
 	    }
 
 	    // Custom constructor
@@ -35,7 +35,7 @@ class Process
 	        this->processName = processName;
 	        this->currentLineOfInstruction = currentLineOfInstruction;
 	        this->totalLineOfInstruction = totalLineOfInstruction;
-	        time(&this->timestamp);
+	        time(&this->timestampCurrent);
 	    }
 
 		std::string		getFormattedDate();

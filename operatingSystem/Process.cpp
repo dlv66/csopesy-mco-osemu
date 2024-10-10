@@ -7,7 +7,7 @@ std::string Process::getTimePeriod(int hour) {
 std::string Process::getFormattedDate() {
 	std::string formattedDate;
 
-	if (localtime_s(&this->date, &this->timestamp) != 0) {
+	if (localtime_s(&this->date, &this->timestampCurrent) != 0) {
 		return "Error: Unable to get local time";
 	}
 	else {

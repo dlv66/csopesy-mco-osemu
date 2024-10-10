@@ -14,10 +14,7 @@ class FCFSScheduler
 
 	public:
 	    // Constructor
-	    FCFSScheduler(int nCores) {
-	        this->nCores = nCores;
-	        this->processQueues = std::vector<Process>(nCores);
-	    }
+	    FCFSScheduler(int nCores);
 
 		// Instantiates core list based on given number of cores
 		void instantiateCoreList();
@@ -26,7 +23,7 @@ class FCFSScheduler
 		void addProcess(const Process& process);
 
 	    // Sorts process based on remaining instructions
-		void sortProcesses();
+		// void sortProcesses();
 
 	    // Runs scheduler
 		void runFCFS();

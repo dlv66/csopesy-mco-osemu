@@ -3,7 +3,7 @@
 #include <cstdlib> // For system()
 #include <ctime>   // For rand()
 
-// TODO: Make lines of code for constructor
+Screen::Screen() {};
 
 void Screen::handleScreenS(const std::string& sInput, std::unordered_map<std::string, Process>& processMap) {
     system("CLS");
@@ -40,7 +40,7 @@ void Screen::handleScreenS(const std::string& sInput, std::unordered_map<std::st
         std::getline(std::cin, screenInput);
         if (screenInput == "exit") {
             system("CLS");
-            main(); // TODO: Fix (no longer in main, but needs to instantiate main)
+            // main(); // TODO: Fix (no longer in main, but needs to instantiate main)
             break;  // Break out of the inner loop to return to the main menu
         }
         else {
@@ -76,7 +76,7 @@ void Screen::handleScreenR(const std::string& sInput, std::unordered_map<std::st
             std::getline(std::cin, screenInput);
             if (screenInput == "exit") {
                 system("CLS");
-                main(); // TODO: Fix (no longer in main, but needs to instantiate main)
+                // main(); // TODO: Fix (no longer in main, but needs to instantiate main)
                 break;  // Break out of the inner loop to return to the main menu
             }
             else {

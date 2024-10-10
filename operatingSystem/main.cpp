@@ -40,10 +40,10 @@ int main()
                 std::cout << "'" + sInput + "'" + " command recognized. Doing something.\n\n";
             }
             else if (sInput.find("screen -s") == 0) {
-                // TODO: FIX: handleScreenS(sInput, processMap); // Call the function for "screen -s"
+                screen.handleScreenS(sInput, processMap); // Call the function for "screen -s"
             }
             else if (sInput.find("screen -r") == 0) {
-                // TODO: FIX: screen::handleScreenR(sInput, processMap); // Call the function for "screen -s"
+                screen.handleScreenR(sInput, processMap); // Call the function for "screen -r"
             }
             else {
                 std::cout << "'" + sInput + "'" + " command NOT recognized. Please try again.\n\n";

@@ -10,6 +10,7 @@ class Process
 	    int totalLineOfInstruction;
 	    time_t timestamp;
 	    struct tm date;
+		bool isRunning = false; // if its currently running the commands (true) or not(false)
 
 	    // Default constructor
 	    Process() : processName("Unnamed Process"), currentLineOfInstruction(0), totalLineOfInstruction(0) {

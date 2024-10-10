@@ -128,11 +128,15 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Core.cpp" />
     <ClCompile Include="FCFSScheduler.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Process.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Core.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
+    </ClInclude>
     <ClInclude Include="FCFSScheduler.h" />
     <ClInclude Include="Process.h" />
   </ItemGroup>

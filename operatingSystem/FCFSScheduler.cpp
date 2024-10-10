@@ -1,17 +1,21 @@
 #include "FCFSScheduler.h"
-#include "Process.h"
 #include <iostream>
 
-// TODO: Add a process to the queue
-// STATUS: For testing; incomplete (why the need to state nCore?)
-void FCFSScheduler::addProcess(const Process& process, int nCore = 0) {
-    if(nCore >= 0 && nCore < nCores) { // if core number is valid
-        processQueues[nCore].push_back(process); // add process to queue
-    } else {
-        std::cerr << "Invalid core number.\n";
+// TODO: Instantiates core list based on given number of cores
+// STATUS: For testing
+void FCFSScheduler::instantiateCoreList() {
+    for(int i = 0; i < nCores; i++) { // for all the cores
+        coreList.push_back(Core()); // add core to the list
     }
 }
 
+// TODO: Add a process to the queue
+// STATUS: For testing
+void FCFSScheduler::addProcess(const Process& process) {
+    processQueues.push_back(process); // add process to queue
+}
+
+/* Commented out for now since no need to sort
 // TODO: Sort process based on remaining instructions
 // STATUS: Wrong (no sorting needed, just when processes are pushed at the same time. In which case, choose random?)
 void FCFSScheduler::sortProcesses() {
@@ -21,11 +25,16 @@ void FCFSScheduler::sortProcesses() {
         });
     }
 }
+*/
 
-// TODO: Run scheduler (check each core if they have a process. If not, pop the next process from the queue and start work)
-// STATUS: Incomplete
+// TODO: Run scheduler
+// STATUS: For testing
 void FCFSScheduler::runFCFS() {
-    while(!processQueues[0].empty()){
-
+    while(!processQueues.empty()){
+        for(int i = 0; i < nCores; i++) { // for all the cores
+            if(coreList[i].setProcess(processQueues[0]) == true) {
+                processQueues.erase(processQueues.begin()); // pop the process from the front of the queue
+            } 
+        }
     }
 }

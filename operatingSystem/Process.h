@@ -5,12 +5,23 @@
 class Process
 {
 	public:
+		// new, running, waiting, ready, terminated
+		enum class State {
+			NEW, // Process has been created
+			RUNNING, // Process is currently running
+			WAITING, // Process is waiting for an event to occur
+			READY, // Process is ready to be executed and is waiting to be assigned to a core
+			TERMINATED // Process is done
+		};
+
 	    std::string processName;
 	    int currentLineOfInstruction;
 	    int totalLineOfInstruction;
 	    time_t timestamp;
 	    struct tm date;
-		bool isRunning = false; // if its currently running the commands (true) or not(false)
+		State state = State::NEW;
+
+		
 
 	    // Default constructor
 	    Process() : processName("Unnamed Process"), currentLineOfInstruction(0), totalLineOfInstruction(0) {

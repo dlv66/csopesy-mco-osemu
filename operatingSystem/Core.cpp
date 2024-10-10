@@ -17,7 +17,7 @@ void Core::checkProcessStatus() {
 	while(true)
 	{
 		// Run the process command
-		if(!this->process.isRunning)
+		if(this->process.state == Process::State::RUNNING)
 		{
 			this->isBusy = false;
 			break;

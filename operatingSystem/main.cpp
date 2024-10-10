@@ -18,6 +18,7 @@ std::unordered_map<std::string, Process> processMap; // To store active processe
 int main()
 {
     int nClear = 0;
+    Screen screen;
 
     // Header text
     std::cout << "  __  ___   __  ___  ___  ___  _  _ \n";
@@ -44,6 +45,10 @@ int main()
             }
             else if (sInput.find("screen -r") == 0) {
                 screen.handleScreenR(sInput, processMap); // Call the function for "screen -r"
+            }
+            else if(sInput == "screen -ls")
+            {
+                screen.handleScreenLS(processMap);
             }
             else {
                 std::cout << "'" + sInput + "'" + " command NOT recognized. Please try again.\n\n";

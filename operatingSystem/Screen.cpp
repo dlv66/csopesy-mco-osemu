@@ -2,8 +2,24 @@
 #include <iostream>
 #include <cstdlib> // For system()
 #include <ctime>   // For rand()
+#include <iomanip>
+#include <chrono>
+#include <sstream>
 
 Screen::Screen() {};
+
+std::string printCurrentTimestamp() {
+    std::ostringstream oss;
+    // Get the current time
+    auto now = std::chrono::system_clock::now();
+    std::time_t now_time = std::chrono::system_clock::to_time_t(now);
+
+    std::tm* local_time = std::localtime(&now_time);
+
+    oss << std::put_time(local_time, "%Y-%m-%d %H:%M:%S");
+
+    return oss.str();
+}
 
 void Screen::handleScreenS(const std::string& sInput, std::unordered_map<std::string, Process>& processMap) {
     system("CLS");
@@ -87,4 +103,14 @@ void Screen::handleScreenR(const std::string& sInput, std::unordered_map<std::st
     else {
         std::cout << "No detached screen process found with the name '" << processName << "'.\n\n";
     }
+};
+
+void Screen::handleScreenLS(std::unordered_map<std::string, Process>& processMap) {
+	system("CLS");
+	std::cout << "Active processes:\n";
+	// TODO: Print all active processes
+
+	std::cout << "Finished processes:\n";
+	// TODO: Print all finished processes
+
 };

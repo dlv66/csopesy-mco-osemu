@@ -1,13 +1,14 @@
 #pragma once
 #include <vector>
 #include "Process.h"
+#include <iostream>
+
 
 class FCFSScheduler
 {
 	private:
 	    int nCores;
 	    std::vector<std::vector<Process>> processQueues; // One queue for each core
-
 	public:
 	    // Constructor
 	    FCFSScheduler(int nCores) {
@@ -15,12 +16,13 @@ class FCFSScheduler
 	        this->processQueues = std::vector<std::vector<Process>>(nCores);
 	    }
 
+	    // Adds a process to the queue
+		void addProcess(const Process& process, int nCore = 0);
 
-		// NOTE: All functions are defined here but implented in the .cpp file
-	    // TODO: Add a process to the queue
+	    // Sorts process based on remaining instructions
+		void sortProcesses();
 
-	    // TODO: Sort process based on remaining instructions
-
-	    // TODO: Run scheduler
+	    // Runs scheduler
+		void runFCFS();
 };
 

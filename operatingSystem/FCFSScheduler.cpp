@@ -29,7 +29,7 @@ void FCFSScheduler::addProcess(const Process& process) {
 void FCFSScheduler::runFCFS() {
     std::vector<std::thread> coreThreads;  // Thread for each core
     int currentTime = 0;  // Simulating the current time
-
+    long numProcesses = processQueues.size();
     // Iterate over the available cores and run each in a separate thread
     while (!processQueues.empty()) {
         for (int i = 0; i < nCores; i++) {
@@ -45,7 +45,7 @@ void FCFSScheduler::runFCFS() {
 
                         terminatedProcess.state = Process::State::TERMINATED; // set the state of the old process to 'TERMINATED'
 
-                        if(terminatedProcess.processName != "Unnamed Process"){
+                        if (terminatedProcess.processName != "Unnamed Process") {
                             terminatedProcess.finishTimet = getCurrentTimestampString(); // set the finish time of the old process
                             terminatedProcesses.push_back(terminatedProcess); // add the old process to the terminatedProcesses list
                         }
@@ -74,6 +74,21 @@ void FCFSScheduler::runFCFS() {
             }
         }
     }
+
+    /*
+    while (terminatedProcesses.size() != numProcesses)
+    {
+        for (int i = 0; i < nCores; i++) {
+            if (coreList[i].process.currentLineOfInstruction == coreList[i].process.totalLineOfInstruction) {
+				Process terminatedProcess = coreList[i].process;
+				terminatedProcess.finishTimet = getCurrentTimestampString();
+				terminatedProcess.state = Process::State::TERMINATED;
+				terminatedProcesses.push_back(terminatedProcess);
+				coreList[i].process = Process();
+            }
+        }
+    }
+	*/
 }
 
 void FCFSScheduler::printActiveProcesses() {
@@ -83,7 +98,7 @@ void FCFSScheduler::printActiveProcesses() {
        if(core.process.processName == "Unnamed Process"){
             std::cout << "NO PROCESS     (NO TIME)     Core: " << core.coreID << "\n";
        } else {
-            std::cout << core.process.processName << "     (" << core.process.executeTimet << ")     Core: " << core.coreID << "     " << core.process.currentLineOfInstruction << " / " << core.process.totalLineOfInstruction << "\n";
+            std::cout << core.process.processName << "     (" << getCurrentTimestampString() << ")     Core: " << core.coreID << "     " << core.process.currentLineOfInstruction << " / " << core.process.totalLineOfInstruction << "\n";
        }
     }
 }

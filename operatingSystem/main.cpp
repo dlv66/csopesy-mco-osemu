@@ -59,7 +59,7 @@ int main()
 
         // Input validation and conditions
         if (sInput != "clear" && sInput != "exit") {
-            if (sInput == "initialize" || sInput == "scheduler-test" || sInput == "scheduler-stop" || sInput == "report-util") {
+            if (sInput == "initialize" || sInput == "scheduler-stop" || sInput == "report-util") {
                 std::cout << "'" + sInput + "'" + " command recognized. Doing something.\n\n";
             }
             else if (sInput.find("screen -s") == 0) {

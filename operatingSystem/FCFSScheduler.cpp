@@ -49,10 +49,12 @@ void FCFSScheduler::runFCFS() {
                 
                 // Check if process has arrived
                 if (currentTime >= process.arrivalTime) {
-                    if (coreList[i].setProcess(process)) {
-                        processQueues.erase(processQueues.begin());  // Remove process from the queue
+                    if(!coreList[i].isBusy)
+                    {
+						Process terminatedProcess = coreList[i].setProcess(process);
+						terminatedProcess.state = Process::State::TERMINATED;
+						processQueues.erase(processQueues.begin());
 
-                        // Create a new thread to start the process on the core
                         coreThreads.push_back(std::thread([this, i]() {
                             coreList[i].startProcess();
                         }));

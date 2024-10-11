@@ -1,16 +1,13 @@
 #include "Core.h"
 #include <Windows.h>
 
-bool Core::setProcess(Process process) {
-	if (this->isBusy) {
-		return false;
-	}
-	else
-	{
-		process.state = Process::State::TERMINATED;
+// Sets the new process to the core and returns the terminated process
+Process Core::setProcess(Process process) {
+	if (!this->isBusy) {
+		Process terminatedProcess = this->process;
 		this->process = process;
 		this->isBusy = true;
-		return true;
+		return terminatedProcess;
 	}
 }
 

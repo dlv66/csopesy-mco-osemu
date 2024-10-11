@@ -1,7 +1,6 @@
 #pragma once
 #include <ctime>
 #include <string>
-#include <vector>
 
 class Process
 {
@@ -18,6 +17,8 @@ class Process
 		// Attributes for scheduling
 		int arrivalTime; // time when the process arrives in the queue   
         int burstTime;	// how long the process will take to execute
+		int executeTime; // time when the process starts executing
+		int finishTime; // time when the process finishes executing
 
 	    std::string processName;
 	    int currentLineOfInstruction;
@@ -26,30 +27,15 @@ class Process
 		time_t timestampStart; // time when process started being executed
 		time_t timestampFinish; // time when process finished execution
 	    struct tm date;
-		State state;
-		std::vector<std::string> output; // To store printed output
-
+		State state = State::NEW;
 
 		
 
-		int coreNumber;  // New attribute to store the core number processing this process
+	    // Default constructor
+	    Process() : processName("Unnamed Process"), currentLineOfInstruction(0), totalLineOfInstruction(0), arrivalTime(0), burstTime(0) {
+	        time(&this->timestampCurrent); // Not sure if timestampCurrent is the correct timestamp to add, but it's a placeholder for now
+	    }
 
-		// Default constructor
-		Process() : processName("Unnamed Process"), currentLineOfInstruction(0), totalLineOfInstruction(0),
-			arrivalTime(0), burstTime(0), coreNumber(-1) {  // Initialize to -1 or some invalid value
-			time(&this->timestampCurrent);
-		}
-
-		// Custom constructor
-		Process(std::string processName, int currentLineOfInstruction, int totalLineOfInstruction,
-			int arrival, int burst, int coreNum = -1)
-			: processName(processName), currentLineOfInstruction(currentLineOfInstruction),
-			totalLineOfInstruction(totalLineOfInstruction), arrivalTime(arrival),
-			burstTime(burst), coreNumber(coreNum) {
-			time(&this->timestampCurrent);
-		}
-
-		/*
 	    // Custom constructor
 	    Process(std::string processName, int currentLineOfInstruction, int totalLineOfInstruction, int arrival, int burst) {
 	        this->processName = processName;
@@ -59,10 +45,9 @@ class Process
             this->burstTime = burst;
 	        time(&this->timestampCurrent);
 	    }
-		*/
-		std::string getTimePeriod(int hour) const;
-		std::string getFormattedDate() const;
 
+		std::string		getFormattedDate();
+		std::string		getTimePeriod(int hour);
 
 		void executeCommands();
 };

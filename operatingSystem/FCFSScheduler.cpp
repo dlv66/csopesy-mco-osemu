@@ -5,7 +5,7 @@
 
 FCFSScheduler::FCFSScheduler(int nCores) {
     this->nCores = nCores;
-    this->processQueues = std::vector<Process>();
+    this->processQueues = std::vector<Process>(nCores);
 }
 
 // TODO: Instantiates core list based on given number of cores
@@ -32,12 +32,7 @@ void FCFSScheduler::runFCFS() {
     // Iterate over the available cores and run each in a separate thread
     while (!processQueues.empty()) {
         for (int i = 0; i < nCores; i++) {
-            if (i >= coreList.size()) {
-                std::cout << "Core index out of bounds: " << i << "\n";
-                continue; // Skip this iteration
-            }
-
-            if (!coreList[i].isBusy && !processQueues.empty()) {  // Check if core is free
+            if (coreList[i].isBusy == false && !processQueues.empty()) {  // Check if core is free
                 Process process = processQueues.front();  // Get the first process in the queue
 
                 // Check if process has arrived
@@ -76,7 +71,6 @@ void FCFSScheduler::runFCFS() {
     }
 }
 
-
 void FCFSScheduler::printActiveProcesses() {
 
     for (auto core : coreList)
@@ -97,4 +91,3 @@ void FCFSScheduler::printTerminatedProcesses() {
         std::cout << terminatedProcesses[i].processName << "\n";
     }
 }
-

@@ -30,7 +30,7 @@ void Screen::handleScreenS(const std::string& sInput, std::unordered_map<std::st
 
     // Get the process name
     int pos = sInput.find(sCommand);
-    processName = sInput.substr(pos + 10); // Extracting process name
+    // commented temporary for demo processName = sInput.substr(pos + 10); // Extracting process name
 
     // Get the current line of instruction
     int currentLine = rand() % 1000;
@@ -55,7 +55,9 @@ void Screen::handleScreenS(const std::string& sInput, std::unordered_map<std::st
     std::cout << "Process Name: " + newProcess.processName + "\n\n";
     std::cout << "Current instruction line: " << newProcess.currentLineOfInstruction << "\n";
     std::cout << "Lines of code: " << newProcess.totalLineOfInstruction << "\n";
-    std::cout << "Timestamp: " << newProcess.getFormattedDate() << "\n\n";
+    std::cout << "Timestamp: " << newProcess.getFormattedDate() << "\n";
+    std::cout << "Burst Time: " << newProcess.burstTime << "\n";
+    std::cout << "Arrival Time: " << newProcess.arrivalTime << "\n\n";
 
     // Command loop for the screen session
     std::string screenInput;
@@ -93,6 +95,7 @@ void Screen::handleScreenR(const std::string& sInput, std::unordered_map<std::st
         std::cout << "Current instruction line: " << existingProcess.currentLineOfInstruction << " / " << existingProcess.totalLineOfInstruction << "\n";
         std::cout << "Timestamp: " << existingProcess.getFormattedDate() << "\n\n";
 
+
         // Command loop for the screen session
         std::string screenInput;
         while (true) {
@@ -114,11 +117,31 @@ void Screen::handleScreenR(const std::string& sInput, std::unordered_map<std::st
 };
 
 void Screen::handleScreenLS(std::unordered_map<std::string, Process>& processMap) {
-	system("CLS");
-	std::cout << "Active processes:\n";
-	// TODO: Print all active processes
+    system("CLS");
+    std::cout << "Active processes:\n";
 
-	std::cout << "Finished processes:\n";
-	// TODO: Print all finished processes
+    // Display active processes
+    for (const auto& entry : processMap) {
+        const Process& process = entry.second;
+        if (process.state != Process::State::TERMINATED) {
+            std::cout << "Process Name: " << process.processName << ", Core Number: "
+                << process.coreNumber << ", Current Line: "
+                << process.currentLineOfInstruction << "\n";
+        }
+    }
 
-};
+    std::cout << "Finished processes:\n";
+
+    // Display finished processes
+    for (const auto& entry : processMap) {
+        const Process& process = entry.second;
+        if (process.state == Process::State::TERMINATED) {
+            std::cout << "Process Name: " << process.processName << ", Core Number: "
+                << process.coreNumber << ", Total Lines: "
+                << process.totalLineOfInstruction << "\n";
+        }
+    }
+}
+
+
+

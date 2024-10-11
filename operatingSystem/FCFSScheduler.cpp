@@ -5,7 +5,7 @@
 
 FCFSScheduler::FCFSScheduler(int nCores) {
     this->nCores = nCores;
-    this->processQueues = std::vector<Process>(nCores);
+    this->processQueues = std::vector<Process>();
 }
 
 // TODO: Instantiates core list based on given number of cores
@@ -44,24 +44,34 @@ void FCFSScheduler::runFCFS() {
     // Iterate over the available cores and run each in a separate thread
     while (!processQueues.empty()) {
         for (int i = 0; i < nCores; i++) {
-            if (coreList[i].isBusy == false && !processQueues.empty()) {  // Check if core is free
+            if (i >= coreList.size()) {
+                std::cout << "Core index out of bounds: " << i << "\n";
+                continue; // Skip this iteration
+            }
+
+            if (!coreList[i].isBusy && !processQueues.empty()) {  // Check if core is free
                 Process process = processQueues.front();  // Get the first process in the queue
-                
+
                 // Check if process has arrived
                 if (currentTime >= process.arrivalTime) {
-                    if(!coreList[i].isBusy)
-                    {
-						Process terminatedProcess = coreList[i].setProcess(process);
-						terminatedProcess.state = Process::State::TERMINATED;
-						processQueues.erase(processQueues.begin());
+                    // Set the core number here
+                    process.coreNumber = i;
 
-                        coreThreads.push_back(std::thread([this, i]() {
-                            coreList[i].startProcess();
+
+                   // std::cout << "Core " << i << " is processing: " << process.processName << "\n";  // Print the core number and process name
+                    //process.executeCommands();
+                    process.state = Process::State::READY;
+
+                    // Set the process and update the state
+                    Process terminatedProcess = coreList[i].setProcess(process);
+                    terminatedProcess.state = Process::State::TERMINATED;
+                    processQueues.erase(processQueues.begin()); // Remove the process from the queue
+                    coreThreads.push_back(std::thread([this, i]() {
+                        coreList[i].startProcess();
                         }));
 
-                        // Increment the simulated time
-                        currentTime += process.burstTime;
-                    }
+                    // Increment the simulated time
+                    currentTime += process.burstTime;
                 }
             }
         }
@@ -72,9 +82,13 @@ void FCFSScheduler::runFCFS() {
     }
 
     // Join all the threads to ensure they complete
-    for (std::thread &t : coreThreads) {
+    for (std::thread& t : coreThreads) {
         if (t.joinable()) {
             t.join();
         }
     }
 }
+
+
+
+

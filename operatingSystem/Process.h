@@ -18,6 +18,8 @@ class Process
 		// Attributes for scheduling
 		int arrivalTime; // time when the process arrives in the queue   
         int burstTime;	// how long the process will take to execute
+		int executeTime; // time when the process starts executing
+		int finishTime; // time when the process finishes executing
 
 	    std::string processName;
 	    int currentLineOfInstruction;

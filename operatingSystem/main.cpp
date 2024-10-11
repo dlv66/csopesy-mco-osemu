@@ -20,7 +20,6 @@ int main()
 {
     int nClear = 0;
     Screen screen;
-    FCFSScheduler scheduler(4); // 4 cores
 
     // Header text
     std::cout << "  __  ___   __  ___  ___  ___  _  _ \n";

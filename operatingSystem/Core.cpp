@@ -1,6 +1,11 @@
 #include "Core.h"
 #include <Windows.h>
 
+//Constructor
+Core::Core(int coreID) {
+	this->coreID = coreID;
+}
+
 // Sets the new process to the core and returns the terminated process
 Process Core::setProcess(Process process) {
 	if (!this->isBusy) {

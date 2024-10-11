@@ -12,7 +12,7 @@ FCFSScheduler::FCFSScheduler(int nCores) {
 // STATUS: For testing
 void FCFSScheduler::instantiateCoreList() {
     for(int i = 0; i < nCores; i++) { // for all the cores
-        coreList.push_back(Core()); // add core to the list
+        coreList.push_back(Core(i)); // add core to the list
     }
 }
 
@@ -42,50 +42,53 @@ void FCFSScheduler::runFCFS() {
 
                 // Check if process has arrived
                 if (currentTime >= process.arrivalTime) {
-                    if(!coreList[i].isBusy)
+                    if (!coreList[i].isBusy)
                     {
-						Process terminatedProcess = coreList[i].setProcess(process); // set Core to new process, return the old process
+                        Process terminatedProcess = coreList[i].setProcess(process); // set Core to new process, return the old process
                         processQueues.erase(processQueues.begin()); // remove the new process from the waiting queue
 
-						terminatedProcess.state = Process::State::TERMINATED; // set the state of the old process to 'TERMINATED'
+                        terminatedProcess.state = Process::State::TERMINATED; // set the state of the old process to 'TERMINATED'
                         terminatedProcesses.push_back(terminatedProcess); // add the old process to the terminatedProcesses list
-                        
+
                         coreThreads.push_back(std::thread([this, i]() {
                             coreList[i].process.state = Process::State::READY;
                             coreList[i].startProcess();
 
-                        }));
+                            }));
 
-                    // Increment the simulated time
-                    currentTime += process.burstTime;
+                        // Increment the simulated time
+                        currentTime += process.burstTime;
+                    }
                 }
             }
+
+            // Simulate time passing (e.g., 1-second steps)
+            std::this_thread::sleep_for(std::chrono::seconds(1));
+            currentTime++;
         }
 
-        // Simulate time passing (e.g., 1-second steps)
-        std::this_thread::sleep_for(std::chrono::seconds(1));
-        currentTime++;
-    }
-
-    // Join all the threads to ensure they complete
-    for (std::thread& t : coreThreads) {
-        if (t.joinable()) {
-            t.join();
+        // Join all the threads to ensure they complete
+        for (std::thread& t : coreThreads) {
+            if (t.joinable()) {
+                t.join();
+            }
         }
     }
 }
 
 
 void FCFSScheduler::printActiveProcesses() {
-    for (int i = 0; i < coreList.size(); i++) {
-        if (coreList[i].isBusy) {
-            activeProcesses[i] = coreList[i].process;
-        } else {
-            activeProcesses[i] = Process(); // should be N/A
-        }
-    }
-    for (int i = 0; i < activeProcesses.size(); i++) {
-        std::cout << activeProcesses[i].processName << "\n";
+
+    for (auto core : coreList)
+    {
+		if (!core.isBusy)
+		{
+			std::cout << "Core " << core.coreID << core.process.processName << "\n";
+		}
+		else if (core.isBusy)
+		{
+			std::cout << "Core " << core.coreID << ":" << core.process.processName << "\n";
+		}
     }
 }
 

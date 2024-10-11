@@ -46,12 +46,13 @@ void Process::executeCommands(int coreID) {
 
 	for (int i = 0; i < this->totalLineOfInstruction; i++)
 	{
+		this->currentLineOfInstruction++;
 		outFile << "(" << getCurrentTimestampString() << ")" << "Core: " << coreID << ":" << "Hello world from " << this->processName << "!" << std::endl;
 	}
 
 	outFile.close();
 
-	Sleep(5000);
+	Sleep(1500);
 	//once done
 	this->state = Process::State::TERMINATED;
 }

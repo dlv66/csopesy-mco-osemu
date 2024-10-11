@@ -24,9 +24,6 @@ class FCFSScheduler
 	    // Adds a process to the queue
 		void addProcess(const Process& process);
 
-	    // Sorts process based on remaining instructions
-		// void sortProcesses();
-
 	    // Runs scheduler
 		void runFCFS();
 

@@ -81,7 +81,7 @@ void FCFSScheduler::printActiveProcesses() {
 		}
 		else if (core.isBusy)
 		{
-			std::cout << "Core " << core.coreID << ":" << core.process.processName << "\n";
+			std::cout << core.process.processName << "     (" << core.process.executeTime << ")     Core: " << core.coreID << "     " << core.process.currentLineOfInstruction << " / " << core.process.totalLineOfInstruction << "\n";
 		}
     }
 }

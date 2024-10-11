@@ -116,12 +116,16 @@ void Screen::handleScreenR(const std::string& sInput, std::unordered_map<std::st
 
 void Screen::handleScreenLS(std::unordered_map<std::string, Process>& processMap, FCFSScheduler scheduler) {
     system("CLS");
+    std::cout << "------------------------------------------\n";
     std::cout << "Running processes:\n";
     // TODO: Print all active processes
     scheduler.printActiveProcesses();
 
+    std::cout << "\n";
+
     std::cout << "Finished processes:\n";
     // TODO: Print all finished processes
     scheduler.printTerminatedProcesses();
+    std::cout << "------------------------------------------\n";
 }
 

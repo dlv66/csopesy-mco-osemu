@@ -43,7 +43,7 @@ void Process::executeCommands(int coreID) {
 
 	for (int i = 0; i < this->totalLineOfInstruction; i++)
 	{
-		outFile << "(" << getCurrentTimestampString() << ")" << "Core:" << coreID << ":" << "Hello world from " << this->processName << "!" << std::endl;
+		outFile << "(" << getCurrentTimestampString() << ")" << "Core: " << coreID << ":" << "Hello world from " << this->processName << "!" << std::endl;
 	}
 
 	outFile.close();

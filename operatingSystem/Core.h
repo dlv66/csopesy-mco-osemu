@@ -6,6 +6,7 @@ class Core
 	public:
 		Process process;
 		bool isBusy = false;
+		
 		// Constructor
 		Core() {}
 

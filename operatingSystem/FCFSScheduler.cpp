@@ -22,18 +22,6 @@ void FCFSScheduler::addProcess(const Process& process) {
     processQueues.push_back(process); // add process to queue
 }
 
-/* Commented out for now since no need to sort
-// TODO: Sort process based on remaining instructions
-// STATUS: Wrong (no sorting needed, just when processes are pushed at the same time. In which case, choose random?)
-void FCFSScheduler::sortProcesses() {
-    for(int i = 0; i < processQueues.size(); i++) { // for all the processes in the queue
-        std::sort(processQueues[i].begin(), processQueues[i].end(), [](const Process& a, const Process& b) {
-            return a.totalLineOfInstruction - a.currentLineOfInstruction > b.totalLineOfInstruction - b.currentLineOfInstruction;
-        });
-    }
-}
-*/
-
 // TODO: Run scheduler
 // STATUS: For testing
 // Simulate FCFS Scheduler with threads (1 thread per core)
@@ -54,20 +42,18 @@ void FCFSScheduler::runFCFS() {
 
                 // Check if process has arrived
                 if (currentTime >= process.arrivalTime) {
-                    // Set the core number here
-                    process.coreNumber = i;
+                    if(!coreList[i].isBusy)
+                    {
+						Process terminatedProcess = coreList[i].setProcess(process); // set Core to new process, return the old process
+                        processQueues.erase(processQueues.begin()); // remove the new process from the waiting queue
 
+						terminatedProcess.state = Process::State::TERMINATED; // set the state of the old process to 'TERMINATED'
+                        terminatedProcesses.push_back(terminatedProcess); // add the old process to the terminatedProcesses list
+                        
+                        coreThreads.push_back(std::thread([this, i]() {
+                            coreList[i].process.state = Process::State::READY;
+                            coreList[i].startProcess();
 
-                   // std::cout << "Core " << i << " is processing: " << process.processName << "\n";  // Print the core number and process name
-                    //process.executeCommands();
-                    process.state = Process::State::READY;
-
-                    // Set the process and update the state
-                    Process terminatedProcess = coreList[i].setProcess(process);
-                    terminatedProcess.state = Process::State::TERMINATED;
-                    processQueues.erase(processQueues.begin()); // Remove the process from the queue
-                    coreThreads.push_back(std::thread([this, i]() {
-                        coreList[i].startProcess();
                         }));
 
                     // Increment the simulated time
@@ -90,5 +76,22 @@ void FCFSScheduler::runFCFS() {
 }
 
 
+void FCFSScheduler::printActiveProcesses() {
+    for (int i = 0; i < coreList.size(); i++) {
+        if (coreList[i].isBusy) {
+            activeProcesses[i] = coreList[i].process;
+        } else {
+            activeProcesses[i] = Process(); // should be N/A
+        }
+    }
+    for (int i = 0; i < activeProcesses.size(); i++) {
+        std::cout << activeProcesses[i].processName << "\n";
+    }
+}
 
+void FCFSScheduler::printTerminatedProcesses() {
+    for (int i = 0; i < terminatedProcesses.size(); i++) {
+        std::cout << terminatedProcesses[i].processName << "\n";
+    }
+}
 

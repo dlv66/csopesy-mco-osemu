@@ -1,5 +1,6 @@
 #pragma warning(disable : 4996)
 #include "Screen.h"
+#include "FCFSScheduler.h"
 #include <iostream>
 #include <cstdlib> // For system()
 #include <ctime>   // For rand()
@@ -7,7 +8,7 @@
 #include <chrono>
 #include <sstream>\
 
-Screen::Screen() {};
+Screen::Screen() {}; // Instantiate the FCFS scheduler
 
 std::string printCurrentTimestamp() {
     std::ostringstream oss;
@@ -116,32 +117,15 @@ void Screen::handleScreenR(const std::string& sInput, std::unordered_map<std::st
     }
 };
 
-void Screen::handleScreenLS(std::unordered_map<std::string, Process>& processMap) {
-    system("CLS");
-    std::cout << "Active processes:\n";
 
-    // Display active processes
-    for (const auto& entry : processMap) {
-        const Process& process = entry.second;
-        if (process.state != Process::State::TERMINATED) {
-            std::cout << "Process Name: " << process.processName << ", Core Number: "
-                << process.coreNumber << ", Current Line: "
-                << process.currentLineOfInstruction << "\n";
-        }
-    }
+void Screen::handleScreenLS(std::unordered_map<std::string, Process>& processMap, FCFSScheduler scheduler) {
+	system("CLS");
+	std::cout << "Running processes:\n";
+	// TODO: Print all active processes
+    scheduler.printActiveProcesses();
 
-    std::cout << "Finished processes:\n";
-
-    // Display finished processes
-    for (const auto& entry : processMap) {
-        const Process& process = entry.second;
-        if (process.state == Process::State::TERMINATED) {
-            std::cout << "Process Name: " << process.processName << ", Core Number: "
-                << process.coreNumber << ", Total Lines: "
-                << process.totalLineOfInstruction << "\n";
-        }
-    }
-}
-
+	std::cout << "Finished processes:\n";
+	// TODO: Print all finished processes
+    scheduler.printTerminatedProcesses();
 
 

@@ -20,6 +20,7 @@ int main()
 {
     int nClear = 0;
     Screen screen;
+    FCFSScheduler scheduler(4); // 4 cores
 
     // Header text
     std::cout << "  __  ___   __  ___  ___  ___  _  _ \n";
@@ -50,6 +51,7 @@ int main()
     std::thread schedulerThread(&FCFSScheduler::runFCFS, &scheduler);
 
 
+
     while (nClear == 0) {
         // Asking for text input
         std::string sInput;
@@ -67,8 +69,9 @@ int main()
             else if (sInput.find("screen -r") == 0) {
                 screen.handleScreenR(sInput, processMap); // Call the function for "screen -r"
             }
-            else if(sInput == "screen -ls"){
-                screen.handleScreenLS(processMap);
+            else if(sInput == "screen -ls")
+            {
+                screen.handleScreenLS(processMap, scheduler); // Call the function for "screen -ls"
             }
             else {
                 std::cout << "'" + sInput + "'" + " command NOT recognized. Please try again.\n\n";
@@ -87,14 +90,3 @@ int main()
         exit(0);
     }  
 }
-
-// Run program: Ctrl + F5 or Debug > Start Without Debugging menu
-// Debug program: F5 or Debug > Start Debugging menu
-
-// Tips for Getting Started: 
-//   1. Use the Solution Explorer window to add/manage files
-//   2. Use the Team Explorer window to connect to source control
-//   3. Use the Output window to see build output and other messages
-//   4. Use the Error List window to view errors
-//   5. Go to Project > Add New Item to create new code files, or Project > Add Existing Item to add existing code files to the project
-//   6. In the future, to open this project again, go to File > Open > Project and select the .sln file

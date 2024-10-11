@@ -15,9 +15,10 @@ std::string printCurrentTimestamp() {
     auto now = std::chrono::system_clock::now();
     std::time_t now_time = std::chrono::system_clock::to_time_t(now);
 
-    std::tm* local_time = std::localtime(&now_time);
+    std::tm local_time;
+    localtime_s(&local_time, &now_time);
 
-    oss << std::put_time(local_time, "%Y-%m-%d %H:%M:%S");
+    oss << std::put_time(&local_time, "%Y-%m-%d %H:%M:%S");
 
     return oss.str();
 }

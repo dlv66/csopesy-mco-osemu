@@ -9,7 +9,7 @@ class Core
 		// Constructor
 		Core() {}
 
-		bool setProcess(Process process);
+		Process setProcess(Process process);
 		void startProcess();
 };
 

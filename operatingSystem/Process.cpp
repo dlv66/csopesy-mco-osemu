@@ -36,7 +36,8 @@ void Process::executeCommands(int coreID) {
 	{
 		currentLineOfInstruction = totalLineOfInstruction;
 		this->state = Process::State::TERMINATED;
-	} else
+	} 
+	else
 	{
 		std::ofstream outFile(this->processName + ".txt");
 
@@ -46,12 +47,13 @@ void Process::executeCommands(int coreID) {
 		}
 
 		outFile << getCurrentTimestampString() << std::endl;
-		outFile << "Process Name: " << this->processName << std::endl;
+		outFile << "Process name: " << this->processName << std::endl;
+		outFile << "Logs: \n\n" << std::endl;
 
 		for (int i = 0; i < this->totalLineOfInstruction; i++)
 		{
 			this->currentLineOfInstruction++;
-			outFile << "(" << getCurrentTimestampString() << ")" << "Core: " << coreID << ":" << "Hello world from " << this->processName << "!" << std::endl;
+			outFile << "(" << getCurrentTimestampString() << ")" << " Core:" << coreID << " 'Hello world from " << this->processName << "!'" << std::endl;
 			Sleep(20);
 		}
 

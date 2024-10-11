@@ -28,7 +28,7 @@ void FCFSScheduler::runFCFS() {
     // Iterate over the available cores and run each in a separate thread
     while (terminatedProcesses.size() != 10) {
         for (int i = 0; i < nCores; i++) {
-            if (coreList[i].isBusy == false) {
+            if (coreList[i].isBusy == false) { // if the current core is empty/finished
                 Process terminatedProcess = coreList[i].process;
                 if (terminatedProcess.processName != "Unnamed Process" && terminatedProcess.processName != "EMPTY") {
                     terminatedProcess.finishTimet = getCurrentTimestampString();
@@ -41,7 +41,7 @@ void FCFSScheduler::runFCFS() {
 
                     // Check if process has arrived
                     if (currentTime >= process.arrivalTime) {
-                        if (!coreList[i].isBusy)
+                        if (coreList[i].isBusy == false)
                         {
 
                             Process process_2 = coreList[i].setProcess(process);
@@ -52,7 +52,7 @@ void FCFSScheduler::runFCFS() {
                                 coreList[i].process.state = Process::State::READY;
                                 coreList[i].startProcess();
 
-                                }));
+                            }));
 
                             // Increment the simulated time
                             currentTime += process.burstTime;

@@ -45,10 +45,8 @@ void Process::executeCommands(int coreID) {
 			std::cerr << "Error: Could not open the file for writing." << std::endl;
 			return;
 		}
-
-		outFile << getCurrentTimestampString() << std::endl;
 		outFile << "Process name: " << this->processName << std::endl;
-		outFile << "Logs: \n\n" << std::endl;
+		outFile << "Logs: \n" << std::endl;
 
 		for (int i = 0; i < this->totalLineOfInstruction; i++)
 		{

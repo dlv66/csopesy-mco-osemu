@@ -5,7 +5,7 @@
 
 FCFSScheduler::FCFSScheduler(int nCores) {
     this->nCores = nCores;
-    this->processQueues = std::vector<Process>(nCores);
+    this->processQueues = std::vector<Process>();
 }
 
 // TODO: Instantiates core list based on given number of cores
@@ -32,9 +32,14 @@ void FCFSScheduler::runFCFS() {
     // Iterate over the available cores and run each in a separate thread
     while (!processQueues.empty()) {
         for (int i = 0; i < nCores; i++) {
-            if (coreList[i].isBusy == false && !processQueues.empty()) {  // Check if core is free
+            if (i >= coreList.size()) {
+                std::cout << "Core index out of bounds: " << i << "\n";
+                continue; // Skip this iteration
+            }
+
+            if (!coreList[i].isBusy && !processQueues.empty()) {  // Check if core is free
                 Process process = processQueues.front();  // Get the first process in the queue
-                
+
                 // Check if process has arrived
                 if (currentTime >= process.arrivalTime) {
                     if(!coreList[i].isBusy)
@@ -48,11 +53,11 @@ void FCFSScheduler::runFCFS() {
                         coreThreads.push_back(std::thread([this, i]() {
                             coreList[i].process.state = Process::State::READY;
                             coreList[i].startProcess();
+
                         }));
 
-                        // Increment the simulated time
-                        currentTime += process.burstTime;
-                    }
+                    // Increment the simulated time
+                    currentTime += process.burstTime;
                 }
             }
         }
@@ -63,12 +68,13 @@ void FCFSScheduler::runFCFS() {
     }
 
     // Join all the threads to ensure they complete
-    for (std::thread &t : coreThreads) {
+    for (std::thread& t : coreThreads) {
         if (t.joinable()) {
             t.join();
         }
     }
 }
+
 
 void FCFSScheduler::printActiveProcesses() {
     for (int i = 0; i < coreList.size(); i++) {
@@ -88,3 +94,4 @@ void FCFSScheduler::printTerminatedProcesses() {
         std::cout << terminatedProcesses[i].processName << "\n";
     }
 }
+

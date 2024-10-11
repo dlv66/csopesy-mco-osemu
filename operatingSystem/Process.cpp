@@ -32,28 +32,36 @@ void Process::executeCommands(int coreID) {
 	this->executeTimet = getCurrentTimestampString();
 	time(&this->timestampStart);
 
-	// TODO: Run the process commands
-	// STATUS: For testing
-	std::ofstream outFile(this->processName + ".txt");
-
-	if (!outFile) {
-		std::cerr << "Error: Could not open the file for writing." << std::endl;
-		return;
-	}
-
-	outFile << getCurrentTimestampString() << std::endl;
-	outFile << "Process Name: " << this->processName << std::endl;
-
-	for (int i = 0; i < this->totalLineOfInstruction; i++)
+	if (this->processName == "EMPTY" || this->processName == "Unnamed Process")
 	{
-		this->currentLineOfInstruction++;
-		outFile << "(" << getCurrentTimestampString() << ")" << "Core: " << coreID << ":" << "Hello world from " << this->processName << "!" << std::endl;
-		Sleep(200);
+		currentLineOfInstruction = totalLineOfInstruction;
+		this->state = Process::State::TERMINATED;
+	} else
+	{
+		std::ofstream outFile(this->processName + ".txt");
+
+		if (!outFile) {
+			std::cerr << "Error: Could not open the file for writing." << std::endl;
+			return;
+		}
+
+		outFile << getCurrentTimestampString() << std::endl;
+		outFile << "Process Name: " << this->processName << std::endl;
+
+		for (int i = 0; i < this->totalLineOfInstruction; i++)
+		{
+			this->currentLineOfInstruction++;
+			outFile << "(" << getCurrentTimestampString() << ")" << "Core: " << coreID << ":" << "Hello world from " << this->processName << "!" << std::endl;
+			Sleep(20);
+		}
+
+		outFile.close();
+		this->state = Process::State::TERMINATED;
+
+		Sleep(20);
+		//once done
 	}
 
-	outFile.close();
-	this->state = Process::State::TERMINATED;
-
-	Sleep(200);
-	//once done
+		
+	
 }

@@ -79,8 +79,8 @@ void FCFSScheduler::printActiveProcesses() {
 
     for (auto core : coreList)
     {
-       if(core.process.processName == "Unnamed Process"){
-            std::cout << "NO PROCESS     (NO TIME)     Core: " << core.coreID << "\n";
+       if(core.process.processName == "Unnamed Process" || core.process.processName == "EMPTY"){
+            std::cout << "N/A     N/A     Core: N/A     N/A " << "\n";
        } else {
             std::cout << core.process.processName << "     (" << getCurrentTimestampString() << ")     Core: " << core.coreID << "     " << core.process.currentLineOfInstruction << " / " << core.process.totalLineOfInstruction << "\n";
        }

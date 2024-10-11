@@ -29,7 +29,6 @@ int main()
 
     std::cout << "By MP Group 10: Dela Cruz, Estrera, Fernandez, Villamiel\n\n";
 
-
     while (nClear == 0) {
         // Asking for text input
         std::string sInput;
@@ -68,6 +67,3 @@ int main()
         exit(0);
     }  
 }
-
-// Run program: Ctrl + F5 or Debug > Start Without Debugging menu
-// Debug program: F5 or Debug > Start Debugging menu

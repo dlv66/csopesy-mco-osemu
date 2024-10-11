@@ -78,3 +78,15 @@ void FCFSScheduler::runFCFS() {
         }
     }
 }
+
+void FCFSScheduler::printActiveProcesses() {
+    for (int i = 0; i < activeProcesses.size(); i++) {
+        std::cout << activeProcesses[i].processName << "\n";
+    }
+}
+
+void FCFSScheduler::printTerminatedProcesses() {
+    for (int i = 0; i < terminatedProcesses.size(); i++) {
+        std::cout << terminatedProcesses[i].processName << "\n";
+    }
+}

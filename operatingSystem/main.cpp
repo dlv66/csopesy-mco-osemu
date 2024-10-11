@@ -19,6 +19,7 @@ int main()
 {
     int nClear = 0;
     Screen screen;
+    FCFSScheduler scheduler(4); // 4 cores
 
     // Header text
     std::cout << "  __  ___   __  ___  ___  ___  _  _ \n";
@@ -48,7 +49,7 @@ int main()
             }
             else if(sInput == "screen -ls")
             {
-                screen.handleScreenLS(processMap);
+                screen.handleScreenLS(processMap, scheduler);
             }
             else {
                 std::cout << "'" + sInput + "'" + " command NOT recognized. Please try again.\n\n";

@@ -1,4 +1,5 @@
 #include "Screen.h"
+#include "FCFSScheduler.h"
 #include <iostream>
 #include <cstdlib> // For system()
 #include <ctime>   // For rand()
@@ -6,7 +7,7 @@
 #include <chrono>
 #include <sstream>
 
-Screen::Screen() {};
+Screen::Screen() {}; // Instantiate the FCFS scheduler
 
 std::string printCurrentTimestamp() {
     std::ostringstream oss;
@@ -41,7 +42,7 @@ void Screen::handleScreenS(const std::string& sInput, std::unordered_map<std::st
     } while (totalLine < currentLine);
 
     // Instantiate the process object
-    Process newProcess(processName, currentLine, totalLine);
+    Process newProcess(processName, currentLine, totalLine, , ); // TODO: Add last two parameters
     processMap[processName] = newProcess; // Store the process in the map
 
     // Print the process details
@@ -106,12 +107,14 @@ void Screen::handleScreenR(const std::string& sInput, std::unordered_map<std::st
     }
 };
 
-void Screen::handleScreenLS(std::unordered_map<std::string, Process>& processMap) {
+void Screen::handleScreenLS(std::unordered_map<std::string, Process>& processMap, FCFSScheduler scheduler) {
 	system("CLS");
-	std::cout << "Active processes:\n";
+	std::cout << "Running processes:\n";
 	// TODO: Print all active processes
+    scheduler.printActiveProcesses();
 
 	std::cout << "Finished processes:\n";
 	// TODO: Print all finished processes
+    scheduler.printTerminatedProcesses();
 
 };

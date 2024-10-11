@@ -7,12 +7,14 @@
 
 class FCFSScheduler
 {
-	private:
+	public:
 	    int nCores;
-	    std::vector<Process> processQueues; // One queue for each core
 		std::vector<Core> coreList; // List of cores based on nCores
 
-	public:
+		std::vector<Process> processQueues; // One queue for each core
+		std::vector<Process> activeProcesses; // List of active processes
+		std::vector<Process> terminatedProcesses; // List of terminated processes
+
 	    // Constructor
 	    FCFSScheduler(int nCores);
 
@@ -27,5 +29,11 @@ class FCFSScheduler
 
 	    // Runs scheduler
 		void runFCFS();
+
+		// Prints the active processes
+		void printActiveProcesses();
+
+		// Prints the finished processes
+		void printTerminatedProcesses();
 };
 

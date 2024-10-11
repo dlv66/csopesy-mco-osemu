@@ -47,7 +47,7 @@ int main()
     }
 
     // Run the FCFS scheduling in a separate thread
-    //std::thread schedulerThread(&FCFSScheduler::runFCFS, &scheduler);
+    std::thread schedulerThread(&FCFSScheduler::runFCFS, &scheduler);
 
 
 
@@ -74,7 +74,7 @@ int main()
             }
             else if(sInput == "scheduler-test")
             {
-                std::thread schedulerThread(&FCFSScheduler::runFCFS, &scheduler);
+                //std::thread schedulerThread(&FCFSScheduler::runFCFS, &scheduler);
             }
             else {
                 std::cout << "'" + sInput + "'" + " command NOT recognized. Please try again.\n\n";

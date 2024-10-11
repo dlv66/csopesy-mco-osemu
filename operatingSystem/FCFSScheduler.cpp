@@ -54,28 +54,10 @@ void FCFSScheduler::runFCFS() {
                             coreList[i].process.state = Process::State::READY;
                             coreList[i].startProcess();
 
-                            // Simulate process execution
-                            while (coreList[i].process.currentLineOfInstruction < coreList[i].process.totalLineOfInstruction) {
-                                std::this_thread::sleep_for(std::chrono::milliseconds(100)); // Simulate instruction execution time
-                                coreList[i].process.currentLineOfInstruction++;
-                            }
-
-                            // Process has completed execution
-                            coreList[i].process.state = Process::State::TERMINATED;
-                            coreList[i].process.finishTimet = getCurrentTimestampString();
-                            terminatedProcesses.push_back(coreList[i].process);
-                            coreList[i].isBusy = false;
-                        }));
+                            }));
 
                         // Increment the simulated time
                         currentTime += process.burstTime;
-                    }
-
-                    // Join all the threads to ensure they complete
-                    for (std::thread& t : coreThreads) {
-                        if (t.joinable()) {
-                            t.join();
-                        }
                     }
                 }
             }

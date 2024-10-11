@@ -31,6 +31,7 @@ void FCFSScheduler::runFCFS() {
             if (coreList[i].isBusy == false) {
                 Process terminatedProcess = coreList[i].process;
                 if (terminatedProcess.processName != "Unnamed Process" && terminatedProcess.processName != "EMPTY") {
+                    terminatedProcess.finishTimet = getCurrentTimestampString();
                     terminatedProcesses.push_back(terminatedProcess); // add the old process to the terminatedProcesses list
                     coreList[i].process.processName = "EMPTY";
                 }
@@ -44,7 +45,6 @@ void FCFSScheduler::runFCFS() {
                         {
 
                             Process process_2 = coreList[i].setProcess(process);
-                            //Process terminatedProcess = coreList[i].setProcess(process); // set Core to new process, return the old process
                             processQueues.erase(processQueues.begin()); // remove the new process from the waiting queue
 
 

@@ -1,4 +1,5 @@
 #include "FCFSScheduler.h"
+#include "Utils.h"
 #include <iostream>
 #include <thread>
 #include <chrono>
@@ -45,7 +46,7 @@ void FCFSScheduler::runFCFS() {
                         terminatedProcess.state = Process::State::TERMINATED; // set the state of the old process to 'TERMINATED'
 
                         if(terminatedProcess.processName != "Unnamed Process"){
-                            terminatedProcess.finishTimet = currentTime; // set the finish time of the old process
+                            terminatedProcess.finishTimet = getCurrentTimestampString(); // set the finish time of the old process
                             terminatedProcesses.push_back(terminatedProcess); // add the old process to the terminatedProcesses list
                         }
 

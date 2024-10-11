@@ -39,7 +39,7 @@ void Process::executeCommands() {
         output.push_back(commandOutput);
 
         // Optionally print to the console (you can remove this if you don't want console output)
-        std::cout << commandOutput << "\n";
+        //std::cout << commandOutput << "\n";
 
         std::this_thread::sleep_for(std::chrono::milliseconds(50));  // Small delay for each command
     }

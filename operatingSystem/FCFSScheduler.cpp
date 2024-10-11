@@ -92,7 +92,7 @@ void FCFSScheduler::printActiveProcesses() {
        if(core.process.processName == "Unnamed Process"){
             std::cout << "NO PROCESS     (NO TIME)     Core: " << core.coreID << "\n";
        } else {
-            std::cout << core.process.processName << "     (" << core.process.executeTime << ")     Core: " << core.coreID << "     " << core.process.currentLineOfInstruction << " / " << core.process.totalLineOfInstruction << "\n";
+            std::cout << core.process.processName << "     (" << core.process.executeTimet << ")     Core: " << core.coreID << "     " << core.process.currentLineOfInstruction << " / " << core.process.totalLineOfInstruction << "\n";
        }
     }
 }

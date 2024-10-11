@@ -6,7 +6,7 @@
 #include <ctime>   // For rand()
 #include <iomanip>
 #include <chrono>
-#include <sstream>\
+#include <sstream>
 
 Screen::Screen() {}; // Instantiate the FCFS scheduler
 

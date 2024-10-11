@@ -45,9 +45,9 @@ void FCFSScheduler::runFCFS() {
                         terminatedProcess.state = Process::State::TERMINATED; // set the state of the old process to 'TERMINATED'
 
                         if(terminatedProcess.processName != "Unnamed Process"){
+                            terminatedProcess.finishTimet = currentTime; // set the finish time of the old process
                             terminatedProcesses.push_back(terminatedProcess); // add the old process to the terminatedProcesses list
                         }
-                        //terminatedProcesses.push_back(terminatedProcess); // add the old process to the terminatedProcesses list
 
                         coreThreads.push_back(std::thread([this, i]() {
                             coreList[i].process.state = Process::State::READY;
@@ -79,26 +79,16 @@ void FCFSScheduler::printActiveProcesses() {
 
     for (auto core : coreList)
     {
-        /*
-		if (!core.isBusy)
-		{
-			std::cout << "Core " << core.coreID << core.process.processName << "\n";
-		}
-		else if (core.isBusy)
-		{
-			std::cout << core.process.processName << "     (" << core.process.executeTime << ")     Core: " << core.coreID << "     " << core.process.currentLineOfInstruction << " / " << core.process.totalLineOfInstruction << "\n";
-		}
-        */
        if(core.process.processName == "Unnamed Process"){
             std::cout << "NO PROCESS     (NO TIME)     Core: " << core.coreID << "\n";
        } else {
-            std::cout << core.process.processName << "     (" << core.process.executeTime << ")     Core: " << core.coreID << "     " << core.process.currentLineOfInstruction << " / " << core.process.totalLineOfInstruction << "\n";
+            std::cout << core.process.processName << "     (" << core.process.executeTimet << ")     Core: " << core.coreID << "     " << core.process.currentLineOfInstruction << " / " << core.process.totalLineOfInstruction << "\n";
        }
     }
 }
 
 void FCFSScheduler::printTerminatedProcesses() {
     for (int i = 0; i < terminatedProcesses.size(); i++) {
-        std::cout << terminatedProcesses[i].processName << "\n";
+        std::cout << terminatedProcesses[i].processName << "     (" << terminatedProcesses[i].finishTimet << ")     FINISHED     " << terminatedProcesses[i].currentLineOfInstruction << " / " << terminatedProcesses[i].totalLineOfInstruction << "\n";
     }
 }

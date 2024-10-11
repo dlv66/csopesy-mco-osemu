@@ -50,7 +50,6 @@ int main()
     std::thread schedulerThread(&FCFSScheduler::runFCFS, &scheduler);
 
 
-
     while (nClear == 0) {
         // Asking for text input
         std::string sInput;
@@ -74,7 +73,7 @@ int main()
             }
             else if(sInput == "scheduler-test")
             {
-                //std::thread schedulerThread(&FCFSScheduler::runFCFS, &scheduler);
+                // std::thread schedulerThread(&FCFSScheduler::runFCFS, &scheduler);
             }
             else {
                 std::cout << "'" + sInput + "'" + " command NOT recognized. Please try again.\n\n";

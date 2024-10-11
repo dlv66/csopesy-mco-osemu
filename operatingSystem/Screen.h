@@ -1,6 +1,8 @@
 #pragma once
 #include <string>
 #include <unordered_map>
+
+#include "FCFSScheduler.h"
 #include "Process.h"
 
 class Screen {

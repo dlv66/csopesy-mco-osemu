@@ -22,10 +22,10 @@ class Process
 		int finishTime; // time when the process finishes executing
 
 		// TIME_T versions
-		time_t arrivalTimet; // time when the process arrives in the queue   
-        time_t burstTimet;	// how long the process will take to execute
-		time_t executeTimet; // time when the process starts executing
-		time_t finishTimet; // time when the process finishes executing
+		std::string arrivalTimet; // time when the process arrives in the queue   
+		std::string burstTimet;	// how long the process will take to execute
+		std::string executeTimet; // time when the process starts executing
+		std::string finishTimet; // time when the process finishes executing
 
 	    std::string processName;
 	    int currentLineOfInstruction;

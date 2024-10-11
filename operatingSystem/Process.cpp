@@ -4,6 +4,8 @@
 #include <iostream>
 #include <thread>
 #include <fstream>
+#include <Windows.h>
+
 #include "Utils.h"
 
 std::string Process::getTimePeriod(int hour) {
@@ -27,7 +29,7 @@ std::string Process::getFormattedDate() {
 
 void Process::executeCommands(int coreID) {
 	this->state = Process::State::RUNNING;
-    this->executeTimet = getCurrentTimestamp();
+	this->executeTimet = getCurrentTimestampString();
 	time(&this->timestampStart);
 
 	// TODO: Run the process commands
@@ -49,6 +51,7 @@ void Process::executeCommands(int coreID) {
 
 	outFile.close();
 
+	Sleep(5000);
 	//once done
 	this->state = Process::State::TERMINATED;
 }

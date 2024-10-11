@@ -1,5 +1,11 @@
 #include "Process.h"
 
+#include <chrono>
+#include <iostream>
+#include <thread>
+#include <fstream>
+#include "Utils.h"
+
 std::string Process::getTimePeriod(int hour) {
 	return (hour >= 12) ? " PM" : " AM";
 }
@@ -19,11 +25,28 @@ std::string Process::getFormattedDate() {
 	}
 }
 
-void Process::executeCommands() {
+void Process::executeCommands(int coreID) {
 	this->state = Process::State::RUNNING;
 	time(&this->timestampStart);
 
 	// TODO: Run the process commands
+	// STATUS: For testing
+	std::ofstream outFile(this->processName + ".txt");
+
+	if (!outFile) {
+		std::cerr << "Error: Could not open the file for writing." << std::endl;
+		return;
+	}
+
+	outFile << getCurrentTimestampString() << std::endl;
+	outFile << "Process Name: " << this->processName << std::endl;
+
+	for (int i = 0; i < this->totalLineOfInstruction; i++)
+	{
+		outFile << "(" << getCurrentTimestampString() << ")" << "Core:" << coreID << ":" << "Hello world from " << this->processName << "!" << std::endl;
+	}
+
+	outFile.close();
 
 	//once done
 	this->state = Process::State::TERMINATED;

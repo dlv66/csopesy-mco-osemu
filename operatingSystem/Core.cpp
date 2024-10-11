@@ -22,7 +22,7 @@ void Core::startProcess() {
 	{
 		if (this->process.state == Process::State::READY)
 		{
-			this->process.executeCommands();
+			this->process.executeCommands(this->coreID);
 		}
 
 		if(this->process.state == Process::State::TERMINATED)

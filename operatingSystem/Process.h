@@ -1,6 +1,7 @@
 #pragma once
 #include <ctime>
 #include <string>
+#include <vector>
 
 class Process
 {
@@ -28,7 +29,6 @@ class Process
 		time_t timestampFinish; // time when process finished execution
 	    struct tm date;
 		State state = State::NEW;
-
 		
 
 	    // Default constructor
@@ -49,7 +49,7 @@ class Process
 		std::string		getFormattedDate();
 		std::string		getTimePeriod(int hour);
 
-		void executeCommands();
+		void executeCommands(int coreID);
 };
 
 

@@ -49,7 +49,7 @@ int main()
             }
             else if(sInput == "screen -ls")
             {
-                screen.handleScreenLS(processMap, scheduler);
+                screen.handleScreenLS(processMap, scheduler); // Call the function for "screen -ls"
             }
             else {
                 std::cout << "'" + sInput + "'" + " command NOT recognized. Please try again.\n\n";

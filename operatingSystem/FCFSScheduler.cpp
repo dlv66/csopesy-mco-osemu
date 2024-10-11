@@ -51,11 +51,14 @@ void FCFSScheduler::runFCFS() {
                 if (currentTime >= process.arrivalTime) {
                     if(!coreList[i].isBusy)
                     {
-						Process terminatedProcess = coreList[i].setProcess(process);
-						terminatedProcess.state = Process::State::TERMINATED;
-						processQueues.erase(processQueues.begin());
+						Process terminatedProcess = coreList[i].setProcess(process); // set Core to new process, return the old process
+                        processQueues.erase(processQueues.begin()); // remove the new process from the waiting queue
 
+						terminatedProcess.state = Process::State::TERMINATED; // set the state of the old process to 'TERMINATED'
+                        terminatedProcesses.push_back(terminatedProcess); // add the old process to the terminatedProcesses list
+                        
                         coreThreads.push_back(std::thread([this, i]() {
+                            coreList[i].process.state = Process::State::READY;
                             coreList[i].startProcess();
                         }));
 
@@ -80,6 +83,13 @@ void FCFSScheduler::runFCFS() {
 }
 
 void FCFSScheduler::printActiveProcesses() {
+    for (int i = 0; i < coreList.size(); i++) {
+        if (coreList[i].isBusy) {
+            activeProcesses[i] = coreList[i].process;
+        } else {
+            activeProcesses[i] = Process(); // should be N/A
+        }
+    }
     for (int i = 0; i < activeProcesses.size(); i++) {
         std::cout << activeProcesses[i].processName << "\n";
     }

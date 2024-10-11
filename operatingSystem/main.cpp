@@ -46,8 +46,7 @@ int main()
             else if (sInput.find("screen -r") == 0) {
                 screen.handleScreenR(sInput, processMap); // Call the function for "screen -r"
             }
-            else if(sInput == "screen -ls")
-            {
+            else if(sInput == "screen -ls"){
                 screen.handleScreenLS(processMap);
             }
             else {

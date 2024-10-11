@@ -17,47 +17,46 @@ void FCFSScheduler::instantiateCoreList() {
     }
 }
 
-// TODO: Add a process to the queue
-// STATUS: For testing
 void FCFSScheduler::addProcess(const Process& process) {
-    processQueues.push_back(process); // add process to queue
+	processQueues.push_back(process);
 }
 
-// TODO: Run scheduler
-// STATUS: For testing
-// Simulate FCFS Scheduler with threads (1 thread per core)
 void FCFSScheduler::runFCFS() {
     std::vector<std::thread> coreThreads;  // Thread for each core
     int currentTime = 0;  // Simulating the current time
-    long numProcesses = processQueues.size();
+
     // Iterate over the available cores and run each in a separate thread
-    while (!processQueues.empty()) {
+    while (terminatedProcesses.size() != 10) {
         for (int i = 0; i < nCores; i++) {
-            if (coreList[i].isBusy == false && !processQueues.empty()) {  // Check if core is free
-                Process process = processQueues.front();  // Get the first process in the queue
+            if (coreList[i].isBusy == false) {
+                Process terminatedProcess = coreList[i].process;
+                if (terminatedProcess.processName != "Unnamed Process" && terminatedProcess.processName != "EMPTY") {
+                    terminatedProcesses.push_back(terminatedProcess); // add the old process to the terminatedProcesses list
+                    coreList[i].process.processName = "EMPTY";
+                }
 
-                // Check if process has arrived
-                if (currentTime >= process.arrivalTime) {
-                    if (!coreList[i].isBusy)
-                    {
-                        Process terminatedProcess = coreList[i].setProcess(process); // set Core to new process, return the old process
-                        processQueues.erase(processQueues.begin()); // remove the new process from the waiting queue
+                if (!processQueues.empty()) {
+                    Process process = processQueues.front();  // Get the first process in the queue
 
-                        terminatedProcess.state = Process::State::TERMINATED; // set the state of the old process to 'TERMINATED'
+                    // Check if process has arrived
+                    if (currentTime >= process.arrivalTime) {
+                        if (!coreList[i].isBusy)
+                        {
 
-                        if (terminatedProcess.processName != "Unnamed Process") {
-                            terminatedProcess.finishTimet = getCurrentTimestampString(); // set the finish time of the old process
-                            terminatedProcesses.push_back(terminatedProcess); // add the old process to the terminatedProcesses list
+                            Process process_2 = coreList[i].setProcess(process);
+                            //Process terminatedProcess = coreList[i].setProcess(process); // set Core to new process, return the old process
+                            processQueues.erase(processQueues.begin()); // remove the new process from the waiting queue
+
+
+                            coreThreads.push_back(std::thread([this, i]() {
+                                coreList[i].process.state = Process::State::READY;
+                                coreList[i].startProcess();
+
+                                }));
+
+                            // Increment the simulated time
+                            currentTime += process.burstTime;
                         }
-
-                        coreThreads.push_back(std::thread([this, i]() {
-                            coreList[i].process.state = Process::State::READY;
-                            coreList[i].startProcess();
-
-                            }));
-
-                        // Increment the simulated time
-                        currentTime += process.burstTime;
                     }
                 }
             }
@@ -74,21 +73,6 @@ void FCFSScheduler::runFCFS() {
             }
         }
     }
-
-    /*
-    while (terminatedProcesses.size() != numProcesses)
-    {
-        for (int i = 0; i < nCores; i++) {
-            if (coreList[i].process.currentLineOfInstruction == coreList[i].process.totalLineOfInstruction) {
-				Process terminatedProcess = coreList[i].process;
-				terminatedProcess.finishTimet = getCurrentTimestampString();
-				terminatedProcess.state = Process::State::TERMINATED;
-				terminatedProcesses.push_back(terminatedProcess);
-				coreList[i].process = Process();
-            }
-        }
-    }
-	*/
 }
 
 void FCFSScheduler::printActiveProcesses() {

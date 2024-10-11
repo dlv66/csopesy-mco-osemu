@@ -52,13 +52,6 @@ class Process
 	        time(&this->timestampCurrent);
 	    }
 
-	/*
-		// Custom constructor for end
-		Process(std::string processName)
-	    {
-			this->processName = processName;
-	    }
-	*/
 
 		std::string		getFormattedDate();
 		std::string		getTimePeriod(int hour);

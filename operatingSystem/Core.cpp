@@ -23,6 +23,7 @@ void Core::startProcess() {
 		if (this->process.state == Process::State::READY)
 		{
 			this->process.executeCommands(this->coreID);
+			this->isBusy = true;
 		}
 
 		if(this->process.state == Process::State::TERMINATED)

@@ -43,7 +43,11 @@ void FCFSScheduler::runFCFS() {
                         processQueues.erase(processQueues.begin()); // remove the new process from the waiting queue
 
                         terminatedProcess.state = Process::State::TERMINATED; // set the state of the old process to 'TERMINATED'
-                        terminatedProcesses.push_back(terminatedProcess); // add the old process to the terminatedProcesses list
+
+                        if(terminatedProcess.processName != "Unnamed Process"){
+                            terminatedProcesses.push_back(terminatedProcess); // add the old process to the terminatedProcesses list
+                        }
+                        //terminatedProcesses.push_back(terminatedProcess); // add the old process to the terminatedProcesses list
 
                         coreThreads.push_back(std::thread([this, i]() {
                             coreList[i].process.state = Process::State::READY;
@@ -75,6 +79,7 @@ void FCFSScheduler::printActiveProcesses() {
 
     for (auto core : coreList)
     {
+        /*
 		if (!core.isBusy)
 		{
 			std::cout << "Core " << core.coreID << core.process.processName << "\n";
@@ -83,6 +88,12 @@ void FCFSScheduler::printActiveProcesses() {
 		{
 			std::cout << core.process.processName << "     (" << core.process.executeTime << ")     Core: " << core.coreID << "     " << core.process.currentLineOfInstruction << " / " << core.process.totalLineOfInstruction << "\n";
 		}
+        */
+       if(core.process.processName == "Unnamed Process"){
+            std::cout << "NO PROCESS     (NO TIME)     Core: " << core.coreID << "\n";
+       } else {
+            std::cout << core.process.processName << "     (" << core.process.executeTime << ")     Core: " << core.coreID << "     " << core.process.currentLineOfInstruction << " / " << core.process.totalLineOfInstruction << "\n";
+       }
     }
 }
 

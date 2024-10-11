@@ -1,3 +1,4 @@
+#pragma warning(disable : 4996)
 #include "Screen.h"
 #include "FCFSScheduler.h"
 #include <iostream>
@@ -5,7 +6,7 @@
 #include <ctime>   // For rand()
 #include <iomanip>
 #include <chrono>
-#include <sstream>
+#include <sstream>\
 
 Screen::Screen() {}; // Instantiate the FCFS scheduler
 
@@ -41,9 +42,15 @@ void Screen::handleScreenS(const std::string& sInput, std::unordered_map<std::st
         totalLine = rand() % 1000;
     } while (totalLine < currentLine);
 
-    // Instantiate the process object
-    Process newProcess(processName, currentLine, totalLine, , ); // TODO: Add last two parameters
-    processMap[processName] = newProcess; // Store the process in the map
+    // Generate arrivalTime and burstTime
+    int arrivalTime = rand() % 100; // Placeholder for arrival time (can be changed)
+    int burstTime = rand() % 50 + 1; // Placeholder for burst time, ensure non-zero
+
+    // Instantiate the process object with the correct parameters
+    Process newProcess(processName, currentLine, totalLine, arrivalTime, burstTime);
+
+    // Store the process in the map
+    processMap[processName] = newProcess;
 
     // Print the process details
     std::cout << "Process Name: " + newProcess.processName + "\n\n";

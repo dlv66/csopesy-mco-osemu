@@ -69,7 +69,7 @@ void FCFSScheduler::runFCFS() {
         // Join all the threads to ensure they complete
         for (std::thread& t : coreThreads) {
             if (t.joinable()) {
-                t.join();
+                t.detach();
             }
         }
     }

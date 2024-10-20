@@ -27,6 +27,7 @@ class Process
 		std::string executeTimet; // time when the process starts executing
 		std::string finishTimet; // time when the process finishes executing
 
+		int pid;
 	    std::string processName;
 	    int currentLineOfInstruction;
 	    int totalLineOfInstruction;
@@ -43,7 +44,8 @@ class Process
 	    }
 
 	    // Custom constructor
-	    Process(std::string processName, int currentLineOfInstruction, int totalLineOfInstruction, int arrival, int burst) {
+	    Process(int pid, std::string processName, int currentLineOfInstruction, int totalLineOfInstruction, int arrival, int burst) {
+			this->pid = pid;
 	        this->processName = processName;
 	        this->currentLineOfInstruction = currentLineOfInstruction;
 	        this->totalLineOfInstruction = totalLineOfInstruction;

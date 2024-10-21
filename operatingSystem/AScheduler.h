@@ -1,45 +1,45 @@
 #pragma once
 
 #include <string>
-#include <IETThread.h>
-#include <Process.h>
-#include <TypedefRepo.h>
 #include <unordered_map>
 #include <sstream>
 
-static const std::string DEBUG_SCHEDULER_NAME = "DebugScheduler";
+#include "IThread.h"
+#include "Process.h"
+
 static const std::string FCFS_SCHEDULER_NAME = "FCFSScheduler";
-static const std::string SJF_NONPREEMPTIVE_SCHEDULER_NAME = "SJF-NonPreempt-Scheduler";
-static const std::string SJF_PREEMPTIVE_SCHEDULER_NAME = "SJF-Preempt-Scheduler";
+static const std::string RR_SCHEDULER_NAME = "RRScheduler";
 
-class AScheduler : public IETTHread {
+// do we make a thread class?
+class AScheduler : public IThread {
 
-	public:	
-		enum SchedulingAlgorithm {
-			DEBUG,
-			FCFS,
-			SHORTEST_JOB_FIRST_NONPREEMPTIVE,
-			SHORTEST_JOB_FIRST_PREEMPTIVE,
-			ROUND_ROBIN
-		};
+public:
 
-		AScheduler(SchedulingAlgorithm schedulingAlgo, int pid, std::string processName);
+	enum SchedulingAlgorithm {
+		FCFS,
+		ROUND_ROBIN
+	};
 
-		void addProcess(std::shared_ptr<Process> process);
-		std::shared_ptr<Process> findProcess(std::string processName);
-		void run() override;
-		void stop();
+	// a scheduler is instantiated with an initial process
+	AScheduler(SchedulingAlgorithm schedulingAlgo, int pid, std::string processName);
 
-		virtual void init() = 0;
-		virtual void execute() = 0;
+	void addProcess(std::shared_ptr<Process> process);
+	std::shared_ptr<Process> findProcess(std::string processName);
+	void run() override;
+	void stop();
 
-		struct ProcessInfo {
-			int pid;
-			std::string name;
-			int cpuID;
-			int currentLine; // originally lineCounter
-			int linesOfCode; // for total lines
-			int remainingTime; // for burst time
-		};
+	virtual void init() = 0; // the initializations of the algorithm
+	virtual void execute() = 0; // the algorithm
+
+	struct ProcessInfo {
+		int pid;
+		std::string name;
+		int cpuID;
+		int currentLine; // originally lineCounter
+		int linesOfCode; // for total lines
+		int remainingTime; // for burst time
+	};
+
+	friend class GlobalScheduler;
 
 };

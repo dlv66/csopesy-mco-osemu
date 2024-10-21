@@ -13,10 +13,11 @@
 #include <thread>
 
 #include "ConsoleManager.h"
+#include "GlobalScheduler.h"
 
 int main()
 {
-
+    GlobalScheduler::initialize();
 	ConsoleManager::initialize();
 
 	bool running = true;

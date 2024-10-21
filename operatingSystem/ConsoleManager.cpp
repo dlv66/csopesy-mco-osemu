@@ -35,7 +35,6 @@ void ConsoleManager::destroy()
 	delete sharedInstance;
 }
 
-// TODO: Implement this function
 void ConsoleManager::drawConsole() const
 {
 	this->currentConsole->display();

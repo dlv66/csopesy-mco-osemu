@@ -27,10 +27,10 @@ void BaseScreen::display()
 	this->process();
 }
 // TODO: Implement this function
-//void BaseScreen::printProcessInfo() const
-//{
-//	std::cout << "Process Name: " << this->attachedProcess->getName() << std::endl;
-//	std::cout << "Process ID: " << this->attachedProcess->getID() << std::endl;
-//	std::cout << "Process Memory: " << this->attachedProcess->getMemory() << std::endl;
-//}
+void BaseScreen::printProcessInfo() const
+{
+	std::cout << "Process Name: " << this->attachedProcess->getName() << std::endl;
+	std::cout << "Process ID: " << this->attachedProcess->getID() << std::endl;
+	std::cout << "Process Memory: " << this->attachedProcess->getMemory() << std::endl;
+}
 

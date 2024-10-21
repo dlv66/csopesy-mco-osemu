@@ -12,8 +12,16 @@ class Process
 			RUNNING, // Process is currently running
 			WAITING, // Process is waiting for an event to occur
 			READY, // Process is ready to be executed and is waiting to be assigned to a core
-			TERMINATED // Process is done
+			TERMINATED // Process is done executing
 		};
+
+		bool isFinished() const
+		int getRemainingTime() const
+		int getCommandCounter() const
+		int getLinesOfCode() const
+		int getPID() const
+		int getCPUCoreID() const
+		State getState() const
 
 		// Int attributes for scheduling
 		int arrivalTime; // time when the process arrives in the queue   
@@ -56,6 +64,20 @@ class Process
 		std::string	getTimePeriod(int hour);
 
 		void executeCommands(int coreID);
+
+	private:
+		int pid;
+		std::string processName;
+
+		int currentLineOfInstruction;
+		int totalLineOfInstruction;
+		struct tm date;
+		int cpuCoreID = -1; // the cpu core where a process is assigned
+		State state = State::NEW;
+
+		time_t timestampCurrent; // current system time
+		time_t timestampStart; // time when process started being executed
+		time_t timestampFinish; // time when process finished execution
 };
 
 

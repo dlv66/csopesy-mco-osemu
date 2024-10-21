@@ -1,6 +1,7 @@
 #include "MainConsole.h"
 
 #include <iostream>
+#include "ConsoleManager.h"
 
 MainConsole::MainConsole() : AConsole("MainConsole")
 {
@@ -40,7 +41,11 @@ void MainConsole::process()
             std::cout << "'" + sInput + "'" + " command recognized. Doing something.\n\n";
         }
         else if (sInput.find("screen -s") == 0) {
-            std::cout << "'" + sInput + "'" + " command recognized. Doing something.\n\n";
+            //std::cout << "'" + sInput + "'" + " command recognized. Doing something.\n\n";
+            std::shared_ptr<Process> process = std::make_shared<Process>();
+            std::shared_ptr <BaseScreen> screen = std::make_shared <BaseScreen>(process, "samplescreen");
+			ConsoleManager::getInstance()->registerScreen(screen);
+			ConsoleManager::getInstance()->switchConsole("samplescreen");
         }
         else if (sInput.find("screen -r") == 0) {
             std::cout << "'" + sInput + "'" + " command recognized. Doing something.\n\n";

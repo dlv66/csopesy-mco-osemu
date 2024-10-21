@@ -9,18 +9,19 @@ FCFSScheduler::FCFSScheduler(int nCores) {
     this->processQueues = std::vector<Process>(nCores);
 }
 
-// TODO: Instantiates core list based on given number of cores
-// STATUS: For testing
+// Instantiates core list based on given number of cores
 void FCFSScheduler::instantiateCoreList() {
     for(int i = 0; i < nCores; i++) { // for all the cores
         coreList.push_back(Core(i)); // add core to the list
     }
 }
 
+// Adds a process to the queue
 void FCFSScheduler::addProcess(const Process& process) {
 	processQueues.push_back(process);
 }
 
+// Runs the actual scheduler
 void FCFSScheduler::runFCFS() {
     std::vector<std::thread> coreThreads;  // Thread for each core
     int currentTime = 0;  // Simulating the current time
@@ -29,22 +30,21 @@ void FCFSScheduler::runFCFS() {
     while (terminatedProcesses.size() != 10) {
         for (int i = 0; i < nCores; i++) {
             if (coreList[i].isBusy == false) { // if the current core is empty/finished
-                Process terminatedProcess = coreList[i].process;
+                Process terminatedProcess = coreList[i].process; // get the old finished process from the core
                 if (terminatedProcess.processName != "Unnamed Process" && terminatedProcess.processName != "EMPTY") {
                     terminatedProcess.finishTimet = getCurrentTimestampString();
                     terminatedProcesses.push_back(terminatedProcess); // add the old process to the terminatedProcesses list
-                    coreList[i].process.processName = "EMPTY";
+                    coreList[i].process.processName = "EMPTY"; // set the core to empty
                 }
 
-                if (!processQueues.empty()) {
-                    Process process = processQueues.front();  // Get the first process in the queue
+                if (!processQueues.empty()) { // if there are processes in the waiting queue
+                    Process process = processQueues.front();  // Get the process from in front of the queue
 
-                    // Check if process has arrived
+                    // Double-check if process has arrived
                     if (currentTime >= process.arrivalTime) {
-                        if (coreList[i].isBusy == false)
+                        if (coreList[i].isBusy == false) // Double-check if core is empty
                         {
-
-                            Process process_2 = coreList[i].setProcess(process);
+                            Process process_2 = coreList[i].setProcess(process); // set the new process to the core
                             processQueues.erase(processQueues.begin()); // remove the new process from the waiting queue
 
 
@@ -75,6 +75,7 @@ void FCFSScheduler::runFCFS() {
     }
 }
 
+// Helper function to print all active processes being executed on all cores
 void FCFSScheduler::printActiveProcesses() {
 
     for (auto core : coreList)
@@ -87,6 +88,7 @@ void FCFSScheduler::printActiveProcesses() {
     }
 }
 
+// Helper function to print all terminated processes that have completed execution
 void FCFSScheduler::printTerminatedProcesses() {
     for (int i = 0; i < terminatedProcesses.size(); i++) {
         std::cout << terminatedProcesses[i].processName << "     (" << terminatedProcesses[i].finishTimet << ")     FINISHED     " << terminatedProcesses[i].currentLineOfInstruction << " / " << terminatedProcesses[i].totalLineOfInstruction << "\n";

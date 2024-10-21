@@ -27,6 +27,8 @@ std::string Process::getFormattedDate() {
 	}
 }
 
+
+
 void Process::executeCommands(int coreID) {
 	this->state = Process::State::RUNNING;
 	this->executeTimet = getCurrentTimestampString();
@@ -62,6 +64,4 @@ void Process::executeCommands(int coreID) {
 		//once done
 	}
 
-		
-	
 }

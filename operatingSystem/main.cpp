@@ -14,7 +14,7 @@
 
 using namespace std;
 
-std::unordered_map<std::string, Process> processMap; // To store active processes
+std::unordered_map<std::string, Process> processMap; // To store active processes, GLOBAL VARIABLE AT THE MOMENT
 
 int main()
 {
@@ -36,12 +36,13 @@ int main()
 
     // Create 10 processes with 100 print commands each
     for (int i = 0; i < 10; i++) {
+        int pid = i;
         std::string processName = "Process_" + std::to_string(i + 1);
         int arrivalTime = rand() % 10;  // Random arrival time within the first 10 time units
         int burstTime = 5;              // Fixed burst time for simplicity
         int totalLines = 100;           // 100 print commands
 
-        Process newProcess(processName, 0, totalLines, arrivalTime, burstTime);
+        Process newProcess(pid, processName, 0, totalLines, arrivalTime, burstTime);
         processMap[processName] = newProcess;
         scheduler.addProcess(newProcess);
     }
@@ -54,7 +55,7 @@ int main()
         // Asking for text input
         std::string sInput;
         std::cout << "Please type in a command: ";
-        std::getline(std::cin, sInput); // changed to getline to capture the entire input including spaces
+        std::getline(std::cin, sInput);
 
         // Input validation and conditions
         if (sInput != "clear" && sInput != "exit") {

@@ -15,15 +15,12 @@ class Process
 			TERMINATED // Process is done
 		};
 
-		// Attributes for scheduling
+		// Int attributes for scheduling
 		int arrivalTime; // time when the process arrives in the queue   
         int burstTime;	// how long the process will take to execute
 		int executeTime; // time when the process starts executing
-		int finishTime; // time when the process finishes executing
 
-		// TIME_T versions
-		std::string arrivalTimet; // time when the process arrives in the queue   
-		std::string burstTimet;	// how long the process will take to execute
+		// Time attributes for scheduling
 		std::string executeTimet; // time when the process starts executing
 		std::string finishTimet; // time when the process finishes executing
 
@@ -39,7 +36,7 @@ class Process
 		
 
 	    // Default constructor
-	    Process() : processName("Unnamed Process"), currentLineOfInstruction(0), totalLineOfInstruction(0), arrivalTime(0), burstTime(0) {
+	    Process() : pid(0), processName("Unnamed Process"), currentLineOfInstruction(0), totalLineOfInstruction(0), arrivalTime(0), burstTime(0) {
 	        time(&this->timestampCurrent); // Not sure if timestampCurrent is the correct timestamp to add, but it's a placeholder for now
 	    }
 
@@ -55,8 +52,8 @@ class Process
 	    }
 
 
-		std::string		getFormattedDate();
-		std::string		getTimePeriod(int hour);
+		std::string	getFormattedDate();
+		std::string	getTimePeriod(int hour);
 
 		void executeCommands(int coreID);
 };

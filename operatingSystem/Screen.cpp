@@ -29,6 +29,15 @@ void Screen::handleScreenS(const std::string& sInput, std::unordered_map<std::st
     std::string sCommand = "screen -s";
     std::string processName;
 
+    // Get the process id (pid)
+    if (processMap.empty()) {
+        int pid = 0;
+		return;
+    }
+    else {
+        int pid = processMap.size();
+    }
+
     // Get the process name
     int pos = sInput.find(sCommand);
     processName = sInput.substr(pos + 10); // Extracting process name
@@ -47,7 +56,7 @@ void Screen::handleScreenS(const std::string& sInput, std::unordered_map<std::st
     int burstTime = rand() % 50 + 1; // Placeholder for burst time, ensure non-zero
 
     // Instantiate the process object with the correct parameters
-    Process newProcess(processName, currentLine, totalLine, arrivalTime, burstTime);
+    Process newProcess(pid, processName, currentLine, totalLine, arrivalTime, burstTime);
 
     // Store the process in the map
     processMap[processName] = newProcess;

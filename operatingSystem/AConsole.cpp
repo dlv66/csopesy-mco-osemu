@@ -10,3 +10,7 @@ std::string AConsole::getName()
 {
 	return this->name;
 }
+
+AConsole::~AConsole() {
+	// Destructor implementation
+}

@@ -134,6 +134,7 @@
     <ClCompile Include="Core.cpp" />
     <ClCompile Include="FCFSScheduler.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="MainConsole.cpp" />
     <ClCompile Include="Process.cpp" />
     <ClCompile Include="Screen.cpp" />
     <ClCompile Include="Utils.cpp" />
@@ -146,6 +147,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
     </ClInclude>
     <ClInclude Include="FCFSScheduler.h" />
+    <ClInclude Include="MainConsole.h" />
     <ClInclude Include="Process.h" />
     <ClInclude Include="Screen.h" />
     <ClInclude Include="Utils.h" />

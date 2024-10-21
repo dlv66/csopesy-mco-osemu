@@ -2,6 +2,8 @@
 
 #include <iostream>
 
+#include "MainConsole.h"
+
 ConsoleManager* ConsoleManager::sharedInstance = nullptr;
 
 ConsoleManager::ConsoleManager()
@@ -10,10 +12,10 @@ ConsoleManager::ConsoleManager()
 	this->consoleHandle = GetStdHandle(STD_OUTPUT_HANDLE);
 
 	const std::shared_ptr<MainConsole> mainConsole = std::make_shared<MainConsole>();
-	const std::shared_ptr<SchedulingConsole> schedulingConsole = std::make_shared<SchedulingConsole>();
+	//const std::shared_ptr<SchedulingConsole> schedulingConsole = std::make_shared<SchedulingConsole>();
 
 	this->consoleTable["MainConsole"] = mainConsole;
-	this->consoleTable["SchedulingConsole"] = schedulingConsole;
+	//this->consoleTable["SchedulingConsole"] = schedulingConsole;
 
 	this->switchConsole("MainConsole");
 }
@@ -36,7 +38,8 @@ void ConsoleManager::destroy()
 // TODO: Implement this function
 void ConsoleManager::drawConsole() const
 {
-
+	this->currentConsole->display();
+	this->currentConsole->process();
 }
 
 // TODO: Implement this function

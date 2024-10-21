@@ -3,9 +3,10 @@
 
 class AConsole
 {
+public:
 	typedef std::string String;
 	AConsole(String name);
-	~AConsole();
+	virtual ~AConsole();
 
 	String getName();
 	virtual void onEnabled() = 0; // first time appearance

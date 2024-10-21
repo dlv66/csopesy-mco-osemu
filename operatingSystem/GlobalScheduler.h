@@ -21,9 +21,14 @@ public:
 	void stop();
 
 	void tick() const;
+	void addProcess(std::shared_ptr<Process> process);
 
 	bool isRunning() const;
 	std::shared_ptr<AScheduler> scheduler;
+
+	ProcessTable processTable;
+	ProcessTable activeProcessesTable;
+	ProcessTable terminatedProcessesTable;
 
 private:
 	GlobalScheduler();
@@ -31,10 +36,6 @@ private:
 	GlobalScheduler(GlobalScheduler const&) {};
 	GlobalScheduler& operator=(GlobalScheduler const&) {};
 	static GlobalScheduler* sharedInstance;
-
-	ProcessTable processTable;
-	ProcessTable activeProcessesTable;
-	ProcessTable terminatedProcessesTable;
 
 	SchedulerTable schedulerTable;
 	bool running = true;

@@ -1,17 +1,25 @@
 #pragma once
+#include <memory>
+
+#include "IThread.h"
 #include "Process.h"
 
-class Core
+class Core : public IThread
 {
-	public:
-		Process process;
-		bool isBusy = false;
-		int coreID;
-		
-		// Constructor
-		Core(int coreID);
+public:
 
-		Process setProcess(Process process);
-		void startProcess();
+	// Constructor
+	Core(int coreID);
+
+	std::shared_ptr<Process> process;
+	int coreID;
+
+	void update(bool isRunning);
+
+	void run() override;
+
+	std::shared_ptr<Process> setProcess(std::shared_ptr<Process> process);
+private:
+	bool isRunning = false;
 };
 

@@ -1,34 +1,43 @@
 #include "Core.h"
+
+#include <memory>
 #include <Windows.h>
 
 //Constructor
-Core::Core(int coreID) {
+Core::Core(int coreID): IThread(){
 	this->coreID = coreID;
 }
 
+void Core::update(bool isRunning)
+{
+	this->isRunning = isRunning;
+
+}
+
+
 // Sets the new process to the core and returns the terminated process
-Process Core::setProcess(Process process) {
-	if (!this->isBusy) {
-		Process terminatedProcess = this->process;
+std::shared_ptr<Process> Core::setProcess(std::shared_ptr<Process> process) {
+	if (!this->isRunning) {
+		std::shared_ptr<Process> terminatedProcess = this->process;
 		this->process = process;
-		this->isBusy = true;
+		this->update(true);
 		return terminatedProcess;
 	}
 }
 
-void Core::startProcess() {
+void Core::run() {
 
 	while(true)
 	{
-		if (this->process.state == Process::State::READY)
+		if (this->process->getState() == Process::State::READY)
 		{
-			this->process.executeCommands(this->coreID);
-			this->isBusy = true;
+			this->process->execute();
+			this->update(true);
 		}
 
-		if(this->process.state == Process::State::TERMINATED)
+		if(this->process-> getState() == Process::State::TERMINATED)
 		{
-			this->isBusy = false;
+			this->update(false);
 			break;
 		}
 	}

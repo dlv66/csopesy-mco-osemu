@@ -52,7 +52,7 @@ bool GlobalScheduler::isRunning() const
 
 void GlobalScheduler::tick() const
 {
-	this->scheduler->execute;
+	this->scheduler->execute();
 }
 
 void GlobalScheduler::addProcess(std::shared_ptr<Process> process)

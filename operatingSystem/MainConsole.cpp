@@ -45,7 +45,7 @@ void MainConsole::process()
             // gets the name of the screen and process
             std::string screenName = sInput.substr(9);
             // TODO: improve Process constructor
-            std::shared_ptr<Process> process = std::make_shared<Process>();
+            std::shared_ptr<Process> process = std::make_shared<Process>(1, "process");
             std::shared_ptr <BaseScreen> screen = std::make_shared <BaseScreen>(process, screenName);
 
 			ConsoleManager::getInstance()->registerScreen(screen);

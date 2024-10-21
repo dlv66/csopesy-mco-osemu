@@ -5,11 +5,8 @@
 #include <iomanip>
 #include <sstream>
 
-std::string getCurrentTimestampString() {
+std::string convertTimestampToString(time_t now_time) {
     std::ostringstream oss;
-    // Get the current time
-    auto now = std::chrono::system_clock::now();
-    std::time_t now_time = std::chrono::system_clock::to_time_t(now);
 
     std::tm local_time;
     localtime_s(&local_time, &now_time);

@@ -8,7 +8,6 @@
 #include <unordered_map>
 #include "Process.h"
 #include "FCFSScheduler.h"
-#include "Screen.h"
 #include "Core.h"
 #include <thread>
 
@@ -19,7 +18,7 @@ int main()
 {
     GlobalScheduler::initialize();
 	ConsoleManager::initialize();
-
+    //TODO: make a process initializer aaaaa
 	bool running = true;
 	while (running)
 	{

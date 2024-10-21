@@ -3,81 +3,46 @@
 #include <string>
 #include <vector>
 
+const int LINE_OF_INSTRUCTIONS = 100;
+
 class Process
 {
 	public:
-		// new, running, waiting, ready, terminated
 		enum class State {
-			NEW, // Process has been created
 			RUNNING, // Process is currently running
 			WAITING, // Process is waiting for an event to occur
 			READY, // Process is ready to be executed and is waiting to be assigned to a core
 			TERMINATED // Process is done executing
 		};
 
-		bool isFinished() const
-		int getRemainingTime() const
-		int getCommandCounter() const
-		int getLinesOfCode() const
-		int getPID() const
-		int getCPUCoreID() const
-		State getState() const
+		Process(int pid, std::string processName);
+		void execute();
 
-		// Int attributes for scheduling
-		int arrivalTime; // time when the process arrives in the queue   
-        int burstTime;	// how long the process will take to execute
-		int executeTime; // time when the process starts executing
+		std::string getName() const;
+		bool isFinished() const;
+		int getRemainingTime() const;
+		int getCommandCounter() const;
+		int getLinesOfCode() const;
+		int getPID() const;
+		int getCPUCoreID() const;
+		State getState() const;
 
-		// Time attributes for scheduling
-		std::string executeTimet; // time when the process starts executing
-		std::string finishTimet; // time when the process finishes executing
+		void setCPUCoreID(int coreID);
+		void setState(State state);
 
-		int pid;
-	    std::string processName;
-	    int currentLineOfInstruction;
-	    int totalLineOfInstruction;
-	    time_t timestampCurrent; // current system time
-		time_t timestampStart; // time when process started being executed
-		time_t timestampFinish; // time when process finished execution
-	    struct tm date;
-		State state = State::NEW;
 		
+		time_t timestampCreated = 0;
+		time_t timestampStarted = 0;
+		time_t timestampFinished = 0;
 
-	    // Default constructor
-	    Process() : pid(0), processName("Unnamed Process"), currentLineOfInstruction(0), totalLineOfInstruction(0), arrivalTime(0), burstTime(0) {
-	        time(&this->timestampCurrent); // Not sure if timestampCurrent is the correct timestamp to add, but it's a placeholder for now
-	    }
-
-	    // Custom constructor
-	    Process(int pid, std::string processName, int currentLineOfInstruction, int totalLineOfInstruction, int arrival, int burst) {
-			this->pid = pid;
-	        this->processName = processName;
-	        this->currentLineOfInstruction = currentLineOfInstruction;
-	        this->totalLineOfInstruction = totalLineOfInstruction;
-			this->arrivalTime = arrival;
-            this->burstTime = burst;
-	        time(&this->timestampCurrent);
-	    }
-
-
-		std::string	getFormattedDate();
-		std::string	getTimePeriod(int hour);
-
-		void executeCommands(int coreID);
+		int currentLineOfInstruction = 0;
+		int totalLineOfInstruction = LINE_OF_INSTRUCTIONS;
 
 	private:
-		int pid;
-		std::string processName;
-
-		int currentLineOfInstruction;
-		int totalLineOfInstruction;
-		struct tm date;
+		int pid = -1;
+		std::string processName = "";
 		int cpuCoreID = -1; // the cpu core where a process is assigned
-		State state = State::NEW;
-
-		time_t timestampCurrent; // current system time
-		time_t timestampStart; // time when process started being executed
-		time_t timestampFinish; // time when process finished execution
+		State state = State::READY;
 };
 
 

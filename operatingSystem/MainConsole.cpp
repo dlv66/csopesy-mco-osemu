@@ -48,11 +48,70 @@ void MainConsole::process()
 			ConsoleManager::getInstance()->switchConsole("samplescreen");
         }
         else if (sInput.find("screen -r") == 0) {
-            std::cout << "'" + sInput + "'" + " command recognized. Doing something.\n\n";
+            //std::cout << "'" + sInput + "'" + " command recognized. Doing something.\n\n";
+
+
+            /*
+            * FOLLOWING LINES ARE STRAIGHT FROM screen.cpp:
+            * void Screen::handleScreenR(const std::string& sInput, std::unordered_map<std::string, Process>& processMap)
+            * 
+                system("CLS");
+                std::string sCommand = "screen -r";
+                std::string processName;
+
+                // Get the process name
+                int pos = sInput.find(sCommand);
+                processName = sInput.substr(pos + 10); // Extracting process name
+
+                // Check if the process exists
+                if (processMap.find(processName) != processMap.end()) {
+                    Process existingProcess = processMap[processName];
+
+                    // Print the process details
+                    std::cout << "Reattaching to process:\n";
+                    std::cout << "Process Name: " + existingProcess.processName + "\n";
+                    std::cout << "Current instruction line: " << existingProcess.currentLineOfInstruction << " / " << existingProcess.totalLineOfInstruction << "\n";
+                    std::cout << "Timestamp: " << existingProcess.getFormattedDate() << "\n\n";
+
+                    // Command loop for the screen session
+                    std::string screenInput;
+                    while (true) {
+                        std::cout << "Enter a command ('exit' to return to the main menu): ";
+                        std::getline(std::cin, screenInput);
+                        if (screenInput == "exit") {
+                            system("CLS");
+                            // main(); // TODO: Fix (no longer in main, but needs to instantiate main)
+                            break;  // Break out of the inner loop to return to the main menu
+                        }
+                        else {
+                            std::cout << "'" << screenInput << "' command is not recognized.\n";
+                        }
+                    }
+                }
+                else {
+                    std::cout << "No detached screen process found with the name '" << processName << "'.\n\n";
+                }
+            */
         }
         else if (sInput == "screen -ls")
         {
             std::cout << "'" + sInput + "'" + " command recognized. Doing something.\n\n";
+
+            /*
+            * THE FOLLOWING LINES OF CODE ARE FROM screen.cpp:
+                system("CLS");
+                std::cout << "------------------------------------------\n";
+                std::cout << "Running processes:\n";
+                // TODO: Print all active processes
+                scheduler.printActiveProcesses();
+
+                std::cout << "\n";
+
+                std::cout << "Finished processes:\n";
+                // TODO: Print all finished processes
+                scheduler.printTerminatedProcesses();
+                std::cout << "------------------------------------------\n";
+            */
         }
         else if (sInput == "scheduler-test")
         {

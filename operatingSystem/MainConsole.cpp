@@ -31,49 +31,52 @@ void MainConsole::display()
 
 void MainConsole::process()
 {
-    // Asking for text input
-    std::string sInput;
-    std::cout << "Please type in a command: ";
-    std::getline(std::cin, sInput);
+	while (true) {
+		// Asking for text input
+		std::string sInput;
+		std::cout << "Please type in a command: ";
+		std::getline(std::cin, sInput);
 
-    // Input validation and conditions
-    if (sInput != "clear" && sInput != "exit") {
-        if (sInput == "initialize" || sInput == "scheduler-stop" || sInput == "report-util") {
-            std::cout << "'" + sInput + "'" + " command recognized. Doing something.\n\n";
-        }
-        else if (sInput.find("screen -s") == 0) {
+		// Input validation and conditions
+		if (sInput != "clear" && sInput != "exit") {
+			if (sInput == "initialize" || sInput == "scheduler-stop" || sInput == "report-util") {
+				std::cout << "'" + sInput + "'" + " command recognized. Doing something.\n\n";
+			}
+			else if (sInput.find("screen -s") == 0) {
 
-            // gets the name of the screen and process
-            std::string screenName = sInput.substr(10);
+				// gets the name of the screen and process
+				std::string screenName = sInput.substr(10);
 
-            std::shared_ptr<Process> process = std::make_shared<Process>(1, screenName);
-            std::shared_ptr <BaseScreen> screen = std::make_shared <BaseScreen>(process, screenName);
+				std::shared_ptr<Process> process = std::make_shared<Process>(1, screenName);
+				std::shared_ptr <BaseScreen> screen = std::make_shared <BaseScreen>(process, screenName);
 
-			ConsoleManager::getInstance()->registerScreen(screen);
-			ConsoleManager::getInstance()->switchToScreen(screenName);
-        }
-        else if (sInput.find("screen -r") == 0) {
-            
-            std::string screenName = sInput.substr(9);
-			ConsoleManager::getInstance()->switchToScreen(screenName);
-        }
-        else if (sInput == "screen -ls")
-        {
-            // TODO: Use GlobalScheduler singleton to get the list of active and terminated processes.
-        }
-        else if (sInput == "scheduler-test")
-        {
-			// TODO: Use GlobalScheduler and make function to generate random processes
-        }
-        else {
-            std::cout << "'" + sInput + "'" + " command not recognized.\n\n";
-        }
-    }
-    else if (sInput == "clear") {
-        system("CLS");
-        this->drawHeader();
-    }
-    else if (sInput == "exit") {
-        exit(0);
-    }
+				ConsoleManager::getInstance()->registerScreen(screen);
+				ConsoleManager::getInstance()->switchToScreen(screenName);
+			}
+			else if (sInput.find("screen -r") == 0) {
+
+				std::string screenName = sInput.substr(9);
+				ConsoleManager::getInstance()->switchToScreen(screenName);
+			}
+			else if (sInput == "screen -ls")
+			{
+				// TODO: Use GlobalScheduler singleton to get the list of active and terminated processes.
+			}
+			else if (sInput == "scheduler-test")
+			{
+				// TODO: Use GlobalScheduler and make function to generate random processes
+			}
+			else {
+				std::cout << "'" + sInput + "'" + " command not recognized.\n\n";
+			}
+			sInput = "";
+		}
+		else if (sInput == "clear") {
+			system("CLS");
+			this->drawHeader();
+		}
+		else if (sInput == "exit") {
+			exit(0);
+		}
+	}
 }

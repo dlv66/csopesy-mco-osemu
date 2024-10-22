@@ -13,6 +13,31 @@ Process::Process(int pid, std::string processName) {
 	this->timestampCreated = getCurrentTimestamp();
 }
 
+std::string Process::getName() const
+{
+	return this->processName;
+
+}
+
+void Process::update()
+{
+	if (this->isFinished())
+	{
+		this->state = Process::State::TERMINATED;
+		this->timestampFinished = getCurrentTimestamp();
+	}
+	else if (this->cpuCoreID != -1)
+	{
+		this->state = Process::State::RUNNING;
+		this->timestampStarted = getCurrentTimestamp();
+	}
+	else
+	{
+		this->state = Process::State::READY;
+	}
+}
+
+
 bool Process::isFinished() const {
 	return this->currentLineOfInstruction >= this->totalLineOfInstruction;
 }
@@ -23,6 +48,22 @@ int Process::getCommandCounter() const {
 
 int Process::getRemainingTime() const {
 	return this->totalLineOfInstruction - this->currentLineOfInstruction;
+}
+
+int Process::getLinesOfCode() const {
+	return this->totalLineOfInstruction;
+}
+
+int Process::getPID() const {
+	return this->pid;
+}
+
+int Process::getCPUCoreID() const {
+	return this->cpuCoreID;
+}
+
+Process::State Process::getState() const {
+	return this->state;
 }
 
 void Process::execute() {

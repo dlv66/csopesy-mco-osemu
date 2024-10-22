@@ -8,6 +8,7 @@ const int LINE_OF_INSTRUCTIONS = 100;
 class Process
 {
 	public:
+		Process(int pid = -1, std::string processName = "DefaultProcess");
 		enum class State {
 			RUNNING, // Process is currently running
 			WAITING, // Process is waiting for an event to occur
@@ -15,7 +16,6 @@ class Process
 			TERMINATED // Process is done executing
 		};
 
-		Process(int pid, std::string processName);
 		void execute();
 
 		std::string getName() const;
@@ -28,19 +28,17 @@ class Process
 		State getState() const;
 
 		void setCPUCoreID(int coreID);
-		void setState(State state);
-
-		
-		time_t timestampCreated = 0;
-		time_t timestampStarted = 0;
-		time_t timestampFinished = 0;
-
-		int currentLineOfInstruction = 0;
-		int totalLineOfInstruction = LINE_OF_INSTRUCTIONS;
+		//void setState(State state);
+		void update();
 
 	private:
 		int pid = -1;
+		time_t timestampCreated = 0;
+		time_t timestampStarted = 0;
+		time_t timestampFinished = 0;
 		std::string processName = "";
+		int currentLineOfInstruction = 0;
+		int totalLineOfInstruction = LINE_OF_INSTRUCTIONS;
 		int cpuCoreID = -1; // the cpu core where a process is assigned
 		State state = State::READY;
 };

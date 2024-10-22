@@ -7,7 +7,7 @@
 class BaseScreen : public AConsole
 {
 public:
-	BaseScreen(std::shared_ptr<Process> process, std::string processName);
+	BaseScreen(std::shared_ptr<Process> attachedProcess, std::string processName);
 	void onEnabled() override;
 	void process() override;
 	void display() override;

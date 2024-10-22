@@ -27,18 +27,19 @@ public:
 	std::shared_ptr<Process> findProcess(std::string processName);
 	void run() override;
 	void stop();
+	SchedulingAlgorithm schedulingAlgo;
 
 	virtual void init() = 0; // the initializations of the algorithm
 	virtual void execute() = 0; // the algorithm
 
-	struct ProcessInfo {
-		int pid;
-		std::string name;
-		int cpuID;
-		int currentLine; // originally lineCounter
-		int linesOfCode; // for total lines
-		int remainingTime; // for burst time
-	};
+	//struct ProcessInfo {
+	//	int pid;
+	//	std::string name;
+	//	int cpuID;
+	//	int currentLine; // originally lineCounter
+	//	int linesOfCode; // for total lines
+	//	int remainingTime; // for burst time
+	//};
 
 	friend class GlobalScheduler;
 

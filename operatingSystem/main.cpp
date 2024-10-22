@@ -18,7 +18,7 @@ int main()
 {
     GlobalScheduler::initialize();
 	ConsoleManager::initialize();
-    //TODO: make a process initializer aaaaa
+    //TODO: make a process initializer
 	bool running = true;
 	while (running)
 	{

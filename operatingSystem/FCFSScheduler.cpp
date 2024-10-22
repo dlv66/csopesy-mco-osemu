@@ -34,7 +34,7 @@ void FCFSScheduler::run() {
             if (coreList[i].process == nullptr) { // if the current core is empty/finished
 
                 std::shared_ptr<Process> terminatedProcess = coreList[i].process; // get the old finished process from the core
-                terminatedProcess->timestampFinished = getCurrentTimestamp();
+				terminatedProcess->update(); // update the state of the process to terminated
 
             	GlobalScheduler::getInstance()->terminatedProcessesTable[terminatedProcess->getName()] = terminatedProcess;
                 coreList[i].process = nullptr; // set the core to empty
@@ -48,7 +48,7 @@ void FCFSScheduler::run() {
                         processQueues.erase(processQueues.begin()); // remove the new process from the waiting queue
 
                         coreThreads.push_back(std::thread([this, i]() {
-                            coreList[i].process->setState(Process::State::READY);
+                            coreList[i].process->update();
                             coreList[i].run();
                         }));
                     }

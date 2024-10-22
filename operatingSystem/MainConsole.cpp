@@ -44,13 +44,13 @@ void MainConsole::process()
         else if (sInput.find("screen -s") == 0) {
 
             // gets the name of the screen and process
-            std::string screenName = sInput.substr(9);
-            // TODO: improve Process constructor
+            std::string screenName = sInput.substr(10);
+
             std::shared_ptr<Process> process = std::make_shared<Process>(1, screenName);
             std::shared_ptr <BaseScreen> screen = std::make_shared <BaseScreen>(process, screenName);
 
 			ConsoleManager::getInstance()->registerScreen(screen);
-			ConsoleManager::getInstance()->switchConsole(screenName);
+			ConsoleManager::getInstance()->switchToScreen(screenName);
         }
         else if (sInput.find("screen -r") == 0) {
             

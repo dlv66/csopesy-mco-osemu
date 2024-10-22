@@ -2,6 +2,8 @@
 
 #include <iostream>
 #include <ostream>
+
+#include "MainConsole.h"
 // TODO: Implement this function
 BaseScreen::BaseScreen(std::shared_ptr<Process> process, std::string processName) : AConsole(processName), attachedProcess(process)
 {
@@ -10,21 +12,23 @@ BaseScreen::BaseScreen(std::shared_ptr<Process> process, std::string processName
 // TODO: Implement this function
 void BaseScreen::onEnabled()
 {
+	system("CLS");
 	this->refreshed = false;
+	this->display();
 }
 // TODO: Implement this function
 void BaseScreen::process()
 {
 	if (!this->refreshed)
 	{
-		//this->printProcessInfo();
+		this->printProcessInfo();
 		this->refreshed = true;
 	}
 }
 // TODO: Implement this function
 void BaseScreen::display()
 {
-	this->process();
+		this->process();
 }
 // TODO: Implement this function
 void BaseScreen::printProcessInfo() const

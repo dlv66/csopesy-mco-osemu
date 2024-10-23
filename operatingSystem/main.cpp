@@ -25,6 +25,9 @@ int main()
         GlobalScheduler::getInstance()->start();
 		ConsoleManager::getInstance()->process();
 		ConsoleManager::getInstance()->drawConsole();
+
+        //TODO: add cpu cycles here ?
+        // i dont know if this is the right position
 	}
 
     //int nClear = 0;

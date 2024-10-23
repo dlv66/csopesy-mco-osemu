@@ -45,10 +45,12 @@ void MainConsole::process()
 				// read the config file (txt)
 				// should be the first command to be called
 				// all other commands wont work if this isnt called
+				// TODO: Implement this function
 			}
 			else if (sInput == "report-util")
 			{
-				
+				// TODO: Implement this function
+				// logs of literally everything
 			}
 			else if (sInput.find("screen -s") == 0) {
 

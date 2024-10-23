@@ -29,6 +29,7 @@ class Process
 
 		void setCPUCoreID(int coreID);
 		//void setState(State state);
+
 		void update();
 
 	private:

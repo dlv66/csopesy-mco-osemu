@@ -39,8 +39,15 @@ void MainConsole::process()
 
 		// Input validation and conditions
 		if (sInput != "clear" && sInput != "exit") {
-			if (sInput == "initialize" || sInput == "scheduler-stop" || sInput == "report-util") {
-				std::cout << "'" + sInput + "'" + " command recognized. Doing something.\n\n";
+			if (sInput == "initialize")
+			{
+				// read the config file (txt)
+				// should be the first command to be called
+				// all other commands wont work if this isnt called
+			}
+			else if (sInput == "report-util")
+			{
+				
 			}
 			else if (sInput.find("screen -s") == 0) {
 
@@ -51,16 +58,19 @@ void MainConsole::process()
 				std::shared_ptr <BaseScreen> screen = std::make_shared <BaseScreen>(process, screenName);
 
 				ConsoleManager::getInstance()->registerScreen(screen);
-				ConsoleManager::getInstance()->switchToScreen(screenName);
 			}
 			else if (sInput.find("screen -r") == 0) {
 
-				std::string screenName = sInput.substr(9);
+				std::string screenName = sInput.substr(10);
 				ConsoleManager::getInstance()->switchToScreen(screenName);
 			}
 			else if (sInput == "screen -ls")
 			{
 				// TODO: Use GlobalScheduler singleton to get the list of active and terminated processes.
+			}
+			else if (sInput == "scheduler-stop")
+			{
+				// TODO: Use GlobalScheduler and make function to generate random processes
 			}
 			else if (sInput == "scheduler-test")
 			{
@@ -76,7 +86,7 @@ void MainConsole::process()
 			this->drawHeader();
 		}
 		else if (sInput == "exit") {
-			exit(0);
+			ConsoleManager::getInstance()->exitApplication();
 		}
 	}
 }

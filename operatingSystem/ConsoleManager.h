@@ -27,6 +27,8 @@ public:
 	void exitApplication();
 	bool isRunning() const;
 
+	std::shared_ptr<AConsole> getCurrentConsole() const;
+
 	HANDLE getConsoleHandle() const;
 
 	void setCursorPosition(int posX, int posY) const;

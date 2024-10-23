@@ -66,9 +66,12 @@ void ConsoleManager::switchConsole(std::string consoleName)
 
 void ConsoleManager::registerScreen(std::shared_ptr<BaseScreen> screenRef)
 {
+
 	if (this->consoleTable.find(screenRef->name) == this->consoleTable.end())
 	{
+		std::cout << "Screen " << screenRef->name << " registered.\n";
 		this->consoleTable[screenRef->name] = screenRef;
+		this->switchToScreen(screenRef->name);
 	}
 	else
 	{
@@ -76,7 +79,7 @@ void ConsoleManager::registerScreen(std::shared_ptr<BaseScreen> screenRef)
 	}
 }
 
-// TODO: Implement this function
+
 void ConsoleManager::switchToScreen(std::string screenName)
 {
 	if (this->consoleTable.find(screenName) != this->consoleTable.end())
@@ -96,22 +99,32 @@ void ConsoleManager::switchToScreen(std::string screenName)
 // TODO: Implement this function
 void ConsoleManager::unregisterScreen(std::string screenName)
 {
-
+	this->consoleTable.erase(screenName);
 }
 
 // TODO: Implement this function
 void ConsoleManager::returnToPreviousConsole()
 {
-
+	this->currentConsole = this->previousConsole;
+	this->currentConsole->onEnabled();
 }
 
 // TODO: Implement this function
 void ConsoleManager::exitApplication()
 {
-
+	if (this->currentConsole != this->consoleTable["MainConsole"])
+	{
+		system("CLS");
+		this->returnToPreviousConsole();
+	}
+	else if (this->currentConsole)
+	{
+		exit(0);
+	}
 }
 
 bool ConsoleManager::isRunning() const
 {
 	return running;
 }
+

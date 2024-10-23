@@ -10,7 +10,6 @@
 static const std::string FCFS_SCHEDULER_NAME = "FCFSScheduler";
 static const std::string RR_SCHEDULER_NAME = "RRScheduler";
 
-// do we make a thread class?
 class AScheduler : public IThread {
 
 public:
@@ -31,6 +30,9 @@ public:
 
 	virtual void init() = 0; // the initializations of the algorithm
 	virtual void execute() = 0; // the algorithm
+
+	std::vector<std::shared_ptr<Process>> activeProcessesList;
+	std::vector<std::shared_ptr<Process>> terminatedProcessesList;
 
 	//struct ProcessInfo {
 	//	int pid;

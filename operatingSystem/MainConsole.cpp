@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include "ConsoleManager.h"
+#include "GlobalScheduler.h"
 
 MainConsole::MainConsole() : AConsole("MainConsole")
 {
@@ -56,6 +57,7 @@ void MainConsole::process()
 
 				std::shared_ptr<Process> process = std::make_shared<Process>(1, screenName);
 				std::shared_ptr <BaseScreen> screen = std::make_shared <BaseScreen>(process, screenName);
+				GlobalScheduler::getInstance()->addProcess(process);
 
 				ConsoleManager::getInstance()->registerScreen(screen);
 			}
@@ -66,7 +68,7 @@ void MainConsole::process()
 			}
 			else if (sInput == "screen -ls")
 			{
-				// TODO: Use GlobalScheduler singleton to get the list of active and terminated processes.
+				GlobalScheduler::getInstance()->handleScreenLS();
 			}
 			else if (sInput == "scheduler-stop")
 			{

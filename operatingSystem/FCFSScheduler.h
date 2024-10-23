@@ -12,7 +12,6 @@ class FCFSScheduler : public AScheduler, public IThread
 public:
     int nCores;
 	std::vector<Core> coreList; // List of cores based on nCores
-	std::vector<std::shared_ptr<Process>> processQueues;
 
     // Constructor
     FCFSScheduler(int nCores);
@@ -25,5 +24,7 @@ public:
 
 	// Runs the actual scheduler
 	void run() override;
+	void init() override;
+	void execute() override;
 };
 

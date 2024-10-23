@@ -24,6 +24,8 @@ int main()
 	{
 		ConsoleManager::getInstance()->process();
 		ConsoleManager::getInstance()->drawConsole();
+		GlobalScheduler::getInstance()->tick();
+
 	}
 
     //int nClear = 0;

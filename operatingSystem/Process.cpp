@@ -19,6 +19,16 @@ std::string Process::getName() const
 
 }
 
+std::string Process::getTimestampStarted() const
+{
+	return convertTimestampToString(this->timestampStarted);
+}
+
+std::string Process::getTimestampFinished() const
+{
+	return convertTimestampToString(this->timestampFinished);
+}
+
 void Process::update()
 {
 	if (this->isFinished())

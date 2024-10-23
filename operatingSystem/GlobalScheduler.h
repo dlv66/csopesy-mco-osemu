@@ -22,13 +22,12 @@ public:
 
 	void tick() const;
 	void addProcess(std::shared_ptr<Process> process);
+	void handleScreenLS();
 
 	bool isRunning() const;
 	std::shared_ptr<AScheduler> scheduler;
 
 	ProcessTable processTable;
-	ProcessTable activeProcessesTable;
-	ProcessTable terminatedProcessesTable;
 
 private:
 	GlobalScheduler();

@@ -27,6 +27,9 @@ class Process
 		int getCPUCoreID() const;
 		State getState() const;
 
+		std::string getTimestampStarted() const;
+		std::string getTimestampFinished() const;
+
 		void setCPUCoreID(int coreID);
 		//void setState(State state);
 

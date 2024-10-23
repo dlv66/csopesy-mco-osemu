@@ -11,16 +11,25 @@ FCFSScheduler::FCFSScheduler(int nCores) :
 	IThread()
 {
     this->nCores = nCores;
-    this->processQueues = std::vector<std::shared_ptr<Process>>(nCores);
     
     for (int i = 0; i < nCores; i++) { // for all the cores
         coreList.push_back(Core(i)); // add core to the list
     }
 }
 
+void FCFSScheduler::execute()
+{
+	
+}
+
+void FCFSScheduler::init()
+{
+
+}
+
 // Adds a process to the queue
 void FCFSScheduler::addProcess(std::shared_ptr<Process> process) {
-	processQueues.push_back(process);
+    this->activeProcessesList.push_back(process);
 }
 
 // Runs the actual scheduler
@@ -29,28 +38,31 @@ void FCFSScheduler::run() {
     int currentTime = 0;  // Simulating the current time
 
     // Iterate over the available cores and run each in a separate thread
-    while (GlobalScheduler::getInstance()->activeProcessesTable.size() != 0) {
-        for (int i = 0; i < nCores; i++) {
-            if (coreList[i].process == nullptr) { // if the current core is empty/finished
+    while (GlobalScheduler::getInstance()->isRunning()) {
+        for (int i = 0; i < nCores; i++)
+{
+            // if the current core is empty/finished
+            if (coreList[i].process == nullptr) {
 
-                std::shared_ptr<Process> terminatedProcess = coreList[i].process; // get the old finished process from the core
-				terminatedProcess->update(); // update the state of the process to terminated
+                // get the old finished process from the core
+                std::shared_ptr<Process> terminatedProcess = coreList[i].process;
+                // update the state of the process to terminated
+				terminatedProcess->update(); 
 
-            	GlobalScheduler::getInstance()->terminatedProcessesTable[terminatedProcess->getName()] = terminatedProcess;
+            	this->terminatedProcessesList.push_back(terminatedProcess);
                 coreList[i].process = nullptr; // set the core to empty
 
-                if (!processQueues.empty()) { // if there are processes in the waiting queue
-                    std::shared_ptr<Process> process = processQueues.front();  // Get the process from in front of the queue
+                // if there are processes in the waiting queue
+                if (!this->activeProcessesList.empty()) {
+                    std::shared_ptr<Process> process = this->activeProcessesList.front();  // Get the process from in front of the queue
 
                     if (coreList[i].process == nullptr) // Double-check if core is empty
                     {
                         std::shared_ptr<Process> process_2 = coreList[i].setProcess(process); // set the new process to the core
-                        processQueues.erase(processQueues.begin()); // remove the new process from the waiting queue
+                        this->activeProcessesList.erase(this->activeProcessesList.begin()); // remove the new process from the waiting queue
 
-                        coreThreads.push_back(std::thread([this, i]() {
-                            coreList[i].process->update();
-                            coreList[i].run();
-                        }));
+                        coreList[i].process->update();
+                        coreList[i].start();
                     }
                 }
             }
@@ -59,11 +71,5 @@ void FCFSScheduler::run() {
             std::this_thread::sleep_for(std::chrono::seconds(1));
         }
 
-        // Join all the threads to ensure they complete
-        for (std::thread& t : coreThreads) {
-            if (t.joinable()) {
-                t.detach();
-            }
-        }
     }
 }

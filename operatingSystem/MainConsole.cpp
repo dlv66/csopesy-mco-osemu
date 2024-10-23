@@ -65,10 +65,10 @@ void MainConsole::process()
 
 				std::string screenName = sInput.substr(10);
 				ConsoleManager::getInstance()->switchToScreen(screenName);
+				ConsoleManager::getInstance()->getScreens();
 			}
 			else if (sInput == "screen -ls")
 			{
-				std::cout << "im here?" << std::endl;
 				GlobalScheduler::getInstance()->handleScreenLS();
 			}
 			else if (sInput == "scheduler-stop")

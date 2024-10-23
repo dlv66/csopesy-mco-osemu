@@ -20,6 +20,7 @@ public:
 	void switchConsole(std::string consoleName);
 
 	void registerScreen(std::shared_ptr<BaseScreen> console);
+	void getScreens();
 	void switchToScreen(std::string screenName);
 	void unregisterScreen(std::string screenName);
 

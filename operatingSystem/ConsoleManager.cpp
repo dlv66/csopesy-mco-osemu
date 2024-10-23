@@ -79,6 +79,13 @@ void ConsoleManager::registerScreen(std::shared_ptr<BaseScreen> screenRef)
 	}
 }
 
+void ConsoleManager::getScreens()
+{
+	for (auto const& screen : this->consoleTable)
+	{
+		std::cout << screen.first << std::endl;
+	}
+}
 
 void ConsoleManager::switchToScreen(std::string screenName)
 {

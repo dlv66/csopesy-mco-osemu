@@ -43,7 +43,10 @@ void BaseScreen::process()
 			this->printProcessInfo();
 		}
 		else if (sInput == "exit") {
-			ConsoleManager::getInstance()->unregisterScreen(this->getName());
+			if (this->attachedProcess->isFinished())
+			{
+				ConsoleManager::getInstance()->unregisterScreen(this->getName());
+			}
 			ConsoleManager::getInstance()->exitApplication();
 			break;
 		}

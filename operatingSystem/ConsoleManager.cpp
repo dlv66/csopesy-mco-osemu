@@ -79,6 +79,19 @@ void ConsoleManager::registerScreen(std::shared_ptr<BaseScreen> screenRef)
 	}
 }
 
+void ConsoleManager::registerScreenNoCout(std::shared_ptr<BaseScreen> screenRef) // mostly used for scheduler-test
+{
+
+	if (this->consoleTable.find(screenRef->name) == this->consoleTable.end())
+	{
+		this->consoleTable[screenRef->name] = screenRef;
+	}
+	else
+	{
+		std::cout << "Screen " << screenRef->name << " already exists.\n";
+	}
+}
+
 void ConsoleManager::getScreens()
 {
 	for (auto const& screen : this->consoleTable)

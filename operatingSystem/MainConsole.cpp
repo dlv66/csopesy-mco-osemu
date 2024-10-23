@@ -73,11 +73,12 @@ void MainConsole::process()
 			}
 			else if (sInput == "scheduler-stop")
 			{
-				// TODO: Use GlobalScheduler and make function to generate random processes
+				GlobalScheduler::getInstance()->handleSchedulerStop();
 			}
 			else if (sInput == "scheduler-test")
 			{
-				// TODO: Use GlobalScheduler and make function to generate random processes
+				GlobalScheduler::getInstance()->startSchedulerTestInBackground();
+				std::cout << "\nDummy process creation running in the background..." << std::endl;
 			}
 			else {
 				std::cout << "'" + sInput + "'" + " command not recognized.\n\n";

@@ -67,10 +67,15 @@ void GlobalScheduler::addProcessToProcessTable(std::shared_ptr<Process> process)
 	std::cout << "Process Added: " << process->getName() << std::endl;
 }
 
+void GlobalScheduler::addProcessToProcessTableNoCout(std::shared_ptr<Process> process)
+{
+	this->processTable[process->getName()] = process;
+}
+
 void GlobalScheduler::handleScreenLS() const
 {
 	// debugging
-	std::cout << "Process Table: " << std::endl;
+	std::cout << "\nProcess Table: " << std::endl;
 	for (auto& process : this->processTable)
 	{
 		std::cout << process.first << std::endl;
@@ -108,4 +113,37 @@ void GlobalScheduler::handleScreenLS() const
 		}
 	}
 	
+}
+
+void GlobalScheduler::startSchedulerTestInBackground() {
+	std::thread schedulerTestThread(&GlobalScheduler::handleSchedulerTest, this);
+	schedulerTestThread.detach(); // Detach the thread to run independently
+}
+
+void GlobalScheduler::handleSchedulerTest()
+{
+	// “scheduler-test” behavior: Every X CPU cycles, a new process is generated and put into the ready queue for your CPU scheduler. This frequency can be set in the “config.txt.” 
+	// As long as CPU cores are available, each process can be executed and be accessible via the “screen” command.
+
+	int i = 0;
+	batchScheduler = true;
+
+	while (batchScheduler) // while batchScheduler is true
+	{
+		std::string screenName = "process" + std::to_string(i);
+		std::shared_ptr<Process> process = std::make_shared<Process>(1, screenName); // create process
+		std::shared_ptr <BaseScreen> screen = std::make_shared <BaseScreen>(process, screenName); // create screen for process
+		GlobalScheduler::getInstance()->scheduler->addProcessNoCout(process); // add process to scheduler queue
+		ConsoleManager::getInstance()->registerScreenNoCout(screen); // register screen to table of layouts/screens
+
+		tick(); // wait for 1000ms
+
+		i++; // increment i
+	}
+}
+
+void GlobalScheduler::handleSchedulerStop()
+{
+	batchScheduler = false;
+	std::cout << "Dummy processes creation HALTED.\n";
 }

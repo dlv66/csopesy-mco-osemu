@@ -30,6 +30,7 @@ void BaseScreen::process()
 	while (true) {
 		// Asking for text input
 		std::string sInput;
+		std::cout << "\n";
 		std::cout << "Please type in a command: ";
 		std::getline(std::cin, sInput);
 

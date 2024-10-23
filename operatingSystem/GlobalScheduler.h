@@ -3,6 +3,8 @@
 #include <unordered_map>
 
 #include "AScheduler.h"
+#include "BaseScreen.h"
+#include "ConsoleManager.h"
 #include "Process.h"
 #include "IThread.h"
 
@@ -22,7 +24,11 @@ public:
 
 	void tick() const;
 	void addProcessToProcessTable(std::shared_ptr<Process> process);
+	void addProcessToProcessTableNoCout(std::shared_ptr<Process> process);
 	void handleScreenLS() const;
+	void startSchedulerTestInBackground();
+	void handleSchedulerStop();
+	void handleSchedulerTest();
 
 	bool isRunning() const;
 	std::shared_ptr<AScheduler> scheduler;
@@ -38,6 +44,7 @@ private:
 
 	SchedulerTable schedulerTable;
 	bool running = true;
+	bool batchScheduler = false;
 };
 
 

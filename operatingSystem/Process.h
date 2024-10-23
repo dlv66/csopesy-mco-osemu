@@ -3,8 +3,6 @@
 #include <string>
 #include <vector>
 
-const int LINE_OF_INSTRUCTIONS = 100;
-
 class Process
 {
 	public:
@@ -42,7 +40,7 @@ class Process
 		time_t timestampFinished = 0;
 		std::string processName = "";
 		int currentLineOfInstruction = 0;
-		int totalLineOfInstruction = LINE_OF_INSTRUCTIONS;
+		int totalLineOfInstruction = 100;
 		int cpuCoreID = -1; // the cpu core where a process is assigned
 		State state = State::READY;
 };

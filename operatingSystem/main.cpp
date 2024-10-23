@@ -22,10 +22,9 @@ int main()
 	bool running = true;
 	while (running)
 	{
+        GlobalScheduler::getInstance()->start();
 		ConsoleManager::getInstance()->process();
 		ConsoleManager::getInstance()->drawConsole();
-        GlobalScheduler::getInstance()->run();
-
 	}
 
     //int nClear = 0;

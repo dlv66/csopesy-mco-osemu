@@ -43,7 +43,7 @@ void GlobalScheduler::destroy()
 // TODO: Implement this function
 void GlobalScheduler::run()
 {
-	this->scheduler->run();
+	this->scheduler->start();
 }
 
 void GlobalScheduler::stop()
@@ -64,17 +64,10 @@ void GlobalScheduler::tick() const
 void GlobalScheduler::addProcessToProcessTable(std::shared_ptr<Process> process)
 {
 	this->processTable[process->getName()] = process;
-	std::cout << "Process Added: " << process->getName() << std::endl;
 }
 
 void GlobalScheduler::handleScreenLS() const
 {
-	// debugging
-	std::cout << "Process Table: " << std::endl;
-	for (auto& process : this->processTable)
-	{
-		std::cout << process.first << std::endl;
-	}
 	std::cout << "Running Processes: " << std::endl;
 	if(this->scheduler->activeProcessesList.empty())
 	{
@@ -93,6 +86,7 @@ void GlobalScheduler::handleScreenLS() const
 	}
 	
 	std::cout << "Finished Processes: " << std::endl;
+	std::cout << "Size: " << this->scheduler->terminatedProcessesList.size() << std::endl;
 	if (this->scheduler->terminatedProcessesList.empty())
 	{
 		std::cout << "No Finished Processes" << std::endl;

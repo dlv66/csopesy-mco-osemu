@@ -77,9 +77,8 @@ Process::State Process::getState() const {
 }
 
 void Process::execute() {
-	this->state = Process::State::RUNNING;
-	this->timestampStarted = getCurrentTimestamp();
 
+	std::cout << this->processName << " starting..." << std::endl;
 	std::ofstream outFile(this->processName + ".txt");
 
 	if (!outFile) {
@@ -98,7 +97,6 @@ void Process::execute() {
 	}
 
 	outFile.close();
-	this->state = Process::State::TERMINATED;
 
 	Sleep(20);
 }

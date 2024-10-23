@@ -58,14 +58,12 @@ void MainConsole::process()
 				std::shared_ptr<Process> process = std::make_shared<Process>(1, screenName);
 				std::shared_ptr <BaseScreen> screen = std::make_shared <BaseScreen>(process, screenName);
 				GlobalScheduler::getInstance()->scheduler->addProcess(process);
-
 				ConsoleManager::getInstance()->registerScreen(screen);
 			}
 			else if (sInput.find("screen -r") == 0) {
 
 				std::string screenName = sInput.substr(10);
 				ConsoleManager::getInstance()->switchToScreen(screenName);
-				ConsoleManager::getInstance()->getScreens();
 			}
 			else if (sInput == "screen -ls")
 			{

@@ -16,12 +16,10 @@ void Core::update(bool isRunning)
 
 
 // Sets the new process to the core and returns the terminated process
-std::shared_ptr<Process> Core::setProcess(std::shared_ptr<Process> process) {
+void Core::setProcess(std::shared_ptr<Process> process) {
 	if (!this->isRunning) {
-		std::shared_ptr<Process> terminatedProcess = this->process;
 		this->process = process;
 		this->update(true);
-		return terminatedProcess;
 	}
 }
 
@@ -29,16 +27,19 @@ void Core::run() {
 
 	while(true)
 	{
-		if (this->process->getState() == Process::State::READY)
+		if(!this->process->isFinished())
 		{
 			this->process->execute();
-			this->update(true);
 		}
-
-		if(this->process-> getState() == Process::State::TERMINATED)
+		else
 		{
 			this->update(false);
+			this->terminatedProcess = this->process;
+			this->process = nullptr;
 			break;
+			
 		}
+
+		this->process->update();
 	}
 }

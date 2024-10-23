@@ -19,34 +19,20 @@ FCFSScheduler::FCFSScheduler(int nCores) :
 
 void FCFSScheduler::execute()
 {
-	this->init();
-	this->run();
-}
-
-void FCFSScheduler::init()
-{
-    this->activeProcessesList;
-}
-
-// Runs the actual scheduler
-void FCFSScheduler::run() {
-    std::vector<std::thread> coreThreads;  // Thread for each core
-    int currentTime = 0;  // Simulating the current time
+	int currentTime = 0;  // Simulating the current time
 
     // Iterate over the available cores and run each in a separate thread
-    while (GlobalScheduler::getInstance()->isRunning() && !this->activeProcessesList.empty()) {
+    while (GlobalScheduler::getInstance()->isRunning()) {
         for (int i = 0; i < nCores; i++)
-{
+        {
             // if the current core is empty/finished
             if (coreList[i].process == nullptr) {
 
-                // get the old finished process from the core
-                std::shared_ptr<Process> terminatedProcess = coreList[i].process;
-                // update the state of the process to terminated
-				terminatedProcess->update(); 
-
-            	this->terminatedProcessesList.push_back(terminatedProcess);
-                coreList[i].process = nullptr; // set the core to empty
+				if (coreList[i].terminatedProcess != nullptr)
+				{
+                    this->terminatedProcessesList.push_back(coreList[i].terminatedProcess);
+					coreList[i].terminatedProcess = nullptr;
+				}
 
                 // if there are processes in the waiting queue
                 if (!this->activeProcessesList.empty()) {
@@ -54,7 +40,7 @@ void FCFSScheduler::run() {
 
                     if (coreList[i].process == nullptr) // Double-check if core is empty
                     {
-                        std::shared_ptr<Process> process_2 = coreList[i].setProcess(process); // set the new process to the core
+                        coreList[i].setProcess(process); // set the new process to the core
                         this->activeProcessesList.erase(this->activeProcessesList.begin()); // remove the new process from the waiting queue
 
                         coreList[i].process->update();
@@ -68,4 +54,15 @@ void FCFSScheduler::run() {
         }
 
     }
+}
+
+void FCFSScheduler::init()
+{
+    
+}
+
+// Runs the actual scheduler
+void FCFSScheduler::run()
+{
+	this->execute();
 }

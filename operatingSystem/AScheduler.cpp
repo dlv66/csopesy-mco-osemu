@@ -14,8 +14,6 @@ void AScheduler::addProcess(std::shared_ptr<Process> process)
 {
 	GlobalScheduler::getInstance()->addProcessToProcessTable(process);
 	this->activeProcessesList.push_back(process);
-	std::cout << process->getName() << " added to " <<"activeProcessesList" << std::endl;
-	sleep(100);
 }
 
 void AScheduler::addProcessNoCout(std::shared_ptr<Process> process)

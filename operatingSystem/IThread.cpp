@@ -2,6 +2,7 @@
 #include <thread>
 #include <chrono>
 
+
 void IThread::start()
 {
 	std::thread thread(&IThread::run, this);

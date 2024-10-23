@@ -51,6 +51,10 @@ void BaseScreen::process()
 			ConsoleManager::getInstance()->exitApplication();
 			break;
 		}
+		else
+		{
+			std::cout << "Invalid command. Please try again.\n";
+		}
 	}
 
 }

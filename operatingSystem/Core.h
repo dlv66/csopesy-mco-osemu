@@ -12,13 +12,14 @@ public:
 	Core(int coreID);
 
 	std::shared_ptr<Process> process;
+	std::shared_ptr<Process> terminatedProcess;
 	int coreID;
 
 	void update(bool isRunning);
 
 	void run() override;
 
-	std::shared_ptr<Process> setProcess(std::shared_ptr<Process> process);
+	void setProcess(std::shared_ptr<Process> process);
 private:
 	bool isRunning = false;
 };

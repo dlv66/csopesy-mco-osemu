@@ -20,7 +20,7 @@ FCFSScheduler::FCFSScheduler(int nCores) :
 void FCFSScheduler::execute()
 {
 	int currentTime = 0;  // Simulating the current time
-    std::cout << "Starting FCFS Scheduler" << std::endl;
+
     // Iterate over the available cores and run each in a separate thread
     while (GlobalScheduler::getInstance()->isRunning()) {
         for (int i = 0; i < nCores; i++)

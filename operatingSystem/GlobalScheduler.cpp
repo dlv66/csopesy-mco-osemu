@@ -72,7 +72,6 @@ void GlobalScheduler::handleScreenLS() const
 	if(this->scheduler->activeProcessesList.empty())
 	{
 		std::cout << "No Active Processes" << std::endl;
-		std::cout << "Size: " << this->scheduler->activeProcessesList.size() << std::endl;
 	}
 	else
 	{
@@ -84,9 +83,7 @@ void GlobalScheduler::handleScreenLS() const
 				<< process->getCommandCounter() << "/" << process->getLinesOfCode() << std::endl;
 		}
 	}
-	
-	std::cout << "Finished Processes: " << std::endl;
-	std::cout << "Size: " << this->scheduler->terminatedProcessesList.size() << std::endl;
+
 	if (this->scheduler->terminatedProcessesList.empty())
 	{
 		std::cout << "No Finished Processes" << std::endl;

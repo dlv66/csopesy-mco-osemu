@@ -78,7 +78,6 @@ Process::State Process::getState() const {
 
 void Process::execute() {
 
-	std::cout << this->processName << " starting..." << std::endl;
 	std::ofstream outFile(this->processName + ".txt");
 
 	if (!outFile) {

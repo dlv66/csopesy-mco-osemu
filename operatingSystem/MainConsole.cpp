@@ -34,7 +34,7 @@ void MainConsole::process()
 {
 	while (true) {
 		// Asking for text input
-		std::string sInput;
+		std::string sInput ="";
 		std::cout << "Please type in a command: ";
 		std::getline(std::cin, sInput);
 
@@ -57,7 +57,7 @@ void MainConsole::process()
 
 				std::shared_ptr<Process> process = std::make_shared<Process>(1, screenName);
 				std::shared_ptr <BaseScreen> screen = std::make_shared <BaseScreen>(process, screenName);
-				GlobalScheduler::getInstance()->addProcess(process);
+				GlobalScheduler::getInstance()->scheduler->addProcess(process);
 
 				ConsoleManager::getInstance()->registerScreen(screen);
 			}
@@ -68,6 +68,7 @@ void MainConsole::process()
 			}
 			else if (sInput == "screen -ls")
 			{
+				std::cout << "im here?" << std::endl;
 				GlobalScheduler::getInstance()->handleScreenLS();
 			}
 			else if (sInput == "scheduler-stop")
@@ -81,7 +82,6 @@ void MainConsole::process()
 			else {
 				std::cout << "'" + sInput + "'" + " command not recognized.\n\n";
 			}
-			sInput = "";
 		}
 		else if (sInput == "clear") {
 			system("CLS");

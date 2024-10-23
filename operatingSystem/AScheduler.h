@@ -20,14 +20,14 @@ public:
 	};
 
 	// a scheduler is instantiated with an initial process
-	AScheduler(SchedulingAlgorithm schedulingAlgo, int pid, std::string processName);
+	AScheduler(SchedulingAlgorithm schedulingAlgo);
 
-	void addProcess(std::shared_ptr<Process> process);
 	std::shared_ptr<Process> findProcess(std::string processName);
 	void run() override;
 	void stop();
 	SchedulingAlgorithm schedulingAlgo;
 
+	void addProcess(std::shared_ptr<Process> process);
 	virtual void init() = 0; // the initializations of the algorithm
 	virtual void execute() = 0; // the algorithm
 

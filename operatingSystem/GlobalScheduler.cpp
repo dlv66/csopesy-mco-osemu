@@ -21,7 +21,8 @@ GlobalScheduler::GlobalScheduler()
 
 	// check what scheduler is set in the config file
 	std::string schedulerName = "FCFSScheduler";
-	this->schedulerTable[schedulerName];
+	
+	this->scheduler = this->schedulerTable[schedulerName];
 }
 
 GlobalScheduler* GlobalScheduler::getInstance()
@@ -57,35 +58,54 @@ bool GlobalScheduler::isRunning() const
 
 void GlobalScheduler::tick() const
 {
-	this->scheduler->run();
+	std::this_thread::sleep_for(std::chrono::milliseconds(1000));
 }
 
-void GlobalScheduler::addProcess(std::shared_ptr<Process> process) {
-	if (!process) {
-		throw std::invalid_argument("process is null");
-	}
-	if (!this->processTable) {
-		throw std::runtime_error("processTable is not initialized");
-	}
-	this->processTable[process->getName()] = process;
-}
-
-void GlobalScheduler::handleScreenLS()
+void GlobalScheduler::addProcessToProcessTable(std::shared_ptr<Process> process)
 {
+	this->processTable[process->getName()] = process;
+	std::cout << "Process Added: " << process->getName() << std::endl;
+}
+
+void GlobalScheduler::handleScreenLS() const
+{
+	// debugging
+	std::cout << "Process Table: " << std::endl;
+	for (auto& process : this->processTable)
+	{
+		std::cout << process.first << std::endl;
+	}
 	std::cout << "Running Processes: " << std::endl;
-	for (auto& process : this->scheduler->activeProcessesList)
+	if(this->scheduler->activeProcessesList.empty())
 	{
-		std::cout	<< std::setw(20) << process->getName()
-					<< std::setw(40) << process->getTimestampStarted()
-					<< "Core: " << std::setw(5) << process->getCPUCoreID()
-					<< process->getCommandCounter() << "/" << process->getLinesOfCode() << std::endl;
+		std::cout << "No Active Processes" << std::endl;
+		std::cout << "Size: " << this->scheduler->activeProcessesList.size() << std::endl;
 	}
+	else
+	{
+		for (auto& process : this->scheduler->activeProcessesList)
+		{
+			std::cout << std::setw(20) << process->getName()
+				<< std::setw(40) << process->getTimestampStarted()
+				<< "Core: " << std::setw(5) << process->getCPUCoreID() << std::setw(10)
+				<< process->getCommandCounter() << "/" << process->getLinesOfCode() << std::endl;
+		}
+	}
+	
 	std::cout << "Finished Processes: " << std::endl;
-	for (auto& process : this->scheduler->terminatedProcessesList)
+	if (this->scheduler->terminatedProcessesList.empty())
 	{
-		std::cout << std::setw(20) << process->getName()
-			<< std::setw(40) << process->getTimestampFinished()
-			<< "Core: " << std::setw(10) << "Finished"
-			<< process->getCommandCounter() << "/" << process->getLinesOfCode() << std::endl;
+		std::cout << "No Finished Processes" << std::endl;
 	}
+	else
+	{
+		for (auto& process : this->scheduler->terminatedProcessesList)
+		{
+			std::cout << std::setw(20) << process->getName()
+				<< std::setw(40) << process->getTimestampFinished()
+				<< "Core: " << std::setw(10) << "Finished"
+				<< process->getCommandCounter() << "/" << process->getLinesOfCode() << std::endl;
+		}
+	}
+	
 }

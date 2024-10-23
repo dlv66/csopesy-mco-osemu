@@ -45,6 +45,7 @@ void BaseScreen::process()
 		else if (sInput == "exit") {
 			ConsoleManager::getInstance()->unregisterScreen(this->getName());
 			ConsoleManager::getInstance()->exitApplication();
+			break;
 		}
 	}
 

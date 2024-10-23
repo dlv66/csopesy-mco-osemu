@@ -1,14 +1,21 @@
 #include "AScheduler.h"
+
+#include <iostream>
+
 #include "GlobalScheduler.h"
 
-AScheduler::AScheduler(SchedulingAlgorithm schedulingAlgo, int pid, std::string processName) : IThread() {
+AScheduler::AScheduler(SchedulingAlgorithm schedulingAlgo) : IThread() {
 	this->schedulingAlgo = schedulingAlgo;
-	std::shared_ptr<Process> process = std::make_shared<Process>(pid, processName);
-	this->addProcess(std::shared_ptr<Process>(process));
+	//std::shared_ptr<Process> process = std::make_shared<Process>(pid, processName);
+	//this->addProcess(std::shared_ptr<Process>(process));
 }
 
-void AScheduler::addProcess(std::shared_ptr<Process> process) {
-	GlobalScheduler::getInstance()->addProcess(process);
+void AScheduler::addProcess(std::shared_ptr<Process> process)
+{
+	GlobalScheduler::getInstance()->addProcessToProcessTable(process);
+	this->activeProcessesList.push_back(process);
+	std::cout << process->getName() << " added to " <<"activeProcessesList" << std::endl;
+	sleep(100);
 }
 
 std::shared_ptr<Process> AScheduler::findProcess(std::string processName) {

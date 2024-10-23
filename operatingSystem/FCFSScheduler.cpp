@@ -7,7 +7,7 @@
 #include "GlobalScheduler.h"
 
 FCFSScheduler::FCFSScheduler(int nCores) :
-	AScheduler(SchedulingAlgorithm::FCFS, -1, FCFS_SCHEDULER_NAME),
+	AScheduler(SchedulingAlgorithm::FCFS),
 	IThread()
 {
     this->nCores = nCores;
@@ -19,17 +19,13 @@ FCFSScheduler::FCFSScheduler(int nCores) :
 
 void FCFSScheduler::execute()
 {
-	
+	this->init();
+	this->run();
 }
 
 void FCFSScheduler::init()
 {
-
-}
-
-// Adds a process to the queue
-void FCFSScheduler::addProcess(std::shared_ptr<Process> process) {
-    this->activeProcessesList.push_back(process);
+    this->activeProcessesList;
 }
 
 // Runs the actual scheduler
@@ -38,7 +34,7 @@ void FCFSScheduler::run() {
     int currentTime = 0;  // Simulating the current time
 
     // Iterate over the available cores and run each in a separate thread
-    while (GlobalScheduler::getInstance()->isRunning()) {
+    while (GlobalScheduler::getInstance()->isRunning() && !this->activeProcessesList.empty()) {
         for (int i = 0; i < nCores; i++)
 {
             // if the current core is empty/finished

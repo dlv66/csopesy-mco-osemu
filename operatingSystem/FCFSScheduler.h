@@ -19,9 +19,6 @@ public:
 	// Instantiates core list based on given number of cores
 	void instantiateCoreList();
 
-    // Adds a process to the queue
-	void addProcess(std::shared_ptr<Process> process);
-
 	// Runs the actual scheduler
 	void run() override;
 	void init() override;

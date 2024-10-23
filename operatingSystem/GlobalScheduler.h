@@ -21,8 +21,8 @@ public:
 	void stop();
 
 	void tick() const;
-	void addProcess(std::shared_ptr<Process> process);
-	void handleScreenLS();
+	void addProcessToProcessTable(std::shared_ptr<Process> process);
+	void handleScreenLS() const;
 
 	bool isRunning() const;
 	std::shared_ptr<AScheduler> scheduler;

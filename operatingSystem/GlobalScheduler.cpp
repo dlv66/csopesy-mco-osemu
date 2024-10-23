@@ -93,11 +93,14 @@ void GlobalScheduler::handleScreenLS() const
 		}
 		for (auto& process : this->scheduler->activeProcessesList)
 		{
-			if (process->getCPUCoreID() == -1)
-				std::cout << std::setw(20) << std::left << process->getName()
-				<< std::setw(40) << std::left << process->getTimestampStarted()
-				<< "Core: " << std::setw(10) << std::left << "N/A"
-				<< process->getCommandCounter() << "/" << process->getLinesOfCode() << std::endl;
+			if (process != nullptr)
+			{
+				if (process->getCPUCoreID() == -1)
+					std::cout << std::setw(20) << std::left << process->getName()
+					<< std::setw(40) << std::left << process->getTimestampStarted()
+					<< "Core: " << std::setw(10) << std::left << "N/A"
+					<< process->getCommandCounter() << "/" << process->getLinesOfCode() << std::endl;
+			}
 		}
 	}
 

@@ -72,6 +72,10 @@ int Process::getCPUCoreID() const {
 	return this->cpuCoreID;
 }
 
+void Process::setCPUCoreID(int coreID) {
+	this->cpuCoreID = coreID;
+}
+
 Process::State Process::getState() const {
 	return this->state;
 }
@@ -92,10 +96,10 @@ void Process::execute() {
 	{
 		this->currentLineOfInstruction++;
 		outFile << "(" << convertTimestampToString(getCurrentTimestamp()) << ")" << " Core:" << this->getCPUCoreID() << " 'Hello world from " << this->processName << "!'" << std::endl;
-		Sleep(20);
+		Sleep(200);
 	}
 
 	outFile.close();
 
-	Sleep(20);
+	Sleep(200);
 }

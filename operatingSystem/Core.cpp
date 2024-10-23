@@ -1,6 +1,8 @@
 #include "Core.h"
 
+#include <iostream>
 #include <memory>
+#include <ostream>
 #include <Windows.h>
 
 //Constructor
@@ -11,7 +13,6 @@ Core::Core(int coreID): IThread(){
 void Core::update(bool isRunning)
 {
 	this->isRunning = isRunning;
-
 }
 
 
@@ -19,6 +20,7 @@ void Core::update(bool isRunning)
 void Core::setProcess(std::shared_ptr<Process> process) {
 	if (!this->isRunning) {
 		this->process = process;
+		this->process->setCPUCoreID(this->coreID);
 		this->update(true);
 	}
 }

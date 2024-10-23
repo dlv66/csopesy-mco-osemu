@@ -10,9 +10,6 @@
 class FCFSScheduler : public AScheduler, public IThread
 {
 public:
-    int nCores;
-	std::vector<Core> coreList; // List of cores based on nCores
-
     // Constructor
     FCFSScheduler(int nCores);
 

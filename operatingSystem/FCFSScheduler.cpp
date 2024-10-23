@@ -42,7 +42,6 @@ void FCFSScheduler::execute()
                     {
                         coreList[i].setProcess(process); // set the new process to the core
                         this->activeProcessesList.erase(this->activeProcessesList.begin()); // remove the new process from the waiting queue
-
                         coreList[i].process->update();
                         coreList[i].start();
                     }

@@ -4,6 +4,7 @@
 #include <unordered_map>
 #include <sstream>
 
+#include "Core.h"
 #include "IThread.h"
 #include "Process.h"
 
@@ -13,6 +14,9 @@ static const std::string RR_SCHEDULER_NAME = "RRScheduler";
 class AScheduler : public IThread {
 
 public:
+
+	int nCores;
+	std::vector<Core> coreList;
 
 	enum SchedulingAlgorithm {
 		FCFS,

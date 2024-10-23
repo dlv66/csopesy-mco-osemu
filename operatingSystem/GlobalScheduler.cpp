@@ -80,15 +80,29 @@ void GlobalScheduler::handleScreenLS() const
 	}
 	else
 	{
+		for (int i = 0; i < this->scheduler->nCores; i++)
+		{
+			if (this->scheduler->coreList[i].process != nullptr)
+			{
+				std::shared_ptr<Process> runningProcess = this->scheduler->coreList[i].process;
+				std::cout << std::setw(20) << std::left << runningProcess->getName()
+					<< std::setw(40) << std::left << runningProcess->getTimestampStarted()
+					<< "Core: " << std::setw(10) << std::left << runningProcess->getCPUCoreID()
+					<< runningProcess->getCommandCounter() << "/" << runningProcess->getLinesOfCode() << std::endl;
+			}
+		}
 		for (auto& process : this->scheduler->activeProcessesList)
 		{
-			std::cout << std::setw(20) << process->getName()
-				<< std::setw(40) << process->getTimestampStarted()
-				<< "Core: " << std::setw(5) << process->getCPUCoreID() << std::setw(10)
+			if (process->getCPUCoreID() == -1)
+				std::cout << std::setw(20) << std::left << process->getName()
+				<< std::setw(40) << std::left << process->getTimestampStarted()
+				<< "Core: " << std::setw(10) << std::left << "N/A"
 				<< process->getCommandCounter() << "/" << process->getLinesOfCode() << std::endl;
 		}
 	}
 
+
+	std::cout << "Terminated Processes: " << std::endl;
 	if (this->scheduler->terminatedProcessesList.empty())
 	{
 		std::cout << "No Finished Processes" << std::endl;

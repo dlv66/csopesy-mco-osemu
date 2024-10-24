@@ -5,19 +5,12 @@
 #include <chrono>
 
 RRScheduler::RRScheduler(int quantum, int delayExec, int nCores)
-    : timeQuantum(quantum), delayPerExec(delayExec) {
+    : AScheduler(SchedulingAlgorithm::ROUND_ROBIN), timeQuantum(quantum), delayPerExec(delayExec) {
     this->nCores = nCores;
-    // Initialize cores based on the number of cores
     for (int i = 0; i < nCores; ++i) {
         this->coreList.push_back(Core(i));
     }
 }
-
-void RRScheduler::addProcess(std::shared_ptr<Process> process) {
-    processQueue.push(process);  // add process to the ready queue
-    activeProcessesList.push_back(process);  // keep track of active processes
-}
-
 
 /*
 RRScheduler::RRScheduler() : AScheduler(SchedulingAlgorithm::ROUND_ROBIN)

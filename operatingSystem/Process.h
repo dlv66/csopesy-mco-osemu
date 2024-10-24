@@ -33,6 +33,8 @@ class Process
 
 		void update();
 
+		void incrementCpuCycles();
+
 	private:
 		int pid = -1;
 		time_t timestampCreated = 0;

@@ -46,6 +46,8 @@ void MainConsole::process()
 				// should be the first command to be called
 				// all other commands wont work if this isnt called
 				// TODO: Implement this function
+				// TODO: Add if statement to all other inputs to check if "initialize" has been called first
+				
 			}
 			else if (sInput == "report-util")
 			{

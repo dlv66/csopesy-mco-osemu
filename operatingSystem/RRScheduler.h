@@ -1,19 +1,29 @@
 #pragma once
 #include "AScheduler.h"
+#include "Process.h"
+#include "Core.h"
+#include <queue>
+#include <memory>
 
 // TODO: Implement the round robin scheduler
-class RRScheduler : AScheduler
+class RRScheduler : public AScheduler, public IThread
 {
-public:
-	// Constructor
-	RRScheduler();
+	private:
+		std::queue<std::shared_ptr<Process>> processQueue;  // Q of processes
+		int timeQuantum;  // quantum in CPU cycles
+		int delayPerExec; // delay between instruction executions
 
-	// Instantiates core list based on given number of cores
-	void instantiateCoreList();
+	public:
+		// Constructor
+		RRScheduler(int quantum, int delayExec, int nCores);
 
-	// Runs the actual scheduler
-	void run() override;
-	void init() override;
-	void execute() override;
+		// Instantiates core list based on given number of cores
+		void instantiateCoreList();
+
+		// Runs the actual scheduler
+		void addProcess(std::shared_ptr<Process> process) override;  // add process to RR queue
+		void run() override;
+		void init() override;
+		void execute() override;
 };
 

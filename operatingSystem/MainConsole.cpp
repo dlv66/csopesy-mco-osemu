@@ -3,6 +3,7 @@
 #include <iostream>
 #include "ConsoleManager.h"
 #include "GlobalScheduler.h"
+#include "Initialize.h"
 
 MainConsole::MainConsole() : AConsole("MainConsole")
 {
@@ -47,7 +48,8 @@ void MainConsole::process()
 				// all other commands wont work if this isnt called
 				// TODO: Implement this function
 				// TODO: Add if statement to all other inputs to check if "initialize" has been called first
-				
+				Initialize init;
+				init.start();
 			}
 			else if (sInput == "report-util")
 			{

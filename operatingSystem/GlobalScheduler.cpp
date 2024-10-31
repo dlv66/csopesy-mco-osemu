@@ -6,23 +6,40 @@
 #include <chrono>
 #include <iomanip>
 #include "RRScheduler.h"
+#include "FCFSScheduler.h"
 
 GlobalScheduler* GlobalScheduler::sharedInstance = nullptr;
 
-GlobalScheduler::GlobalScheduler() {
-    this->running = true;
-    const std::shared_ptr<RRScheduler> rrScheduler = std::make_shared<RRScheduler>(5, 0, 4);
-    this->schedulerTable[RR_SCHEDULER_NAME] = rrScheduler;
-    this->scheduler = rrScheduler;
-    std::cout << "GlobalScheduler initialized with Round-Robin Scheduler.\n";
+GlobalScheduler::GlobalScheduler(const Initialize& initConfig) : running(true) {
+    // Choose the scheduler based on the config file's scheduler value
+    if (initConfig.scheduler == "rr") {
+        // Instantiate Round-Robin Scheduler with quantum, delayExec, and numCPU from Initialize
+        auto rrScheduler = std::make_shared<RRScheduler>(initConfig.quantumCycles, initConfig.delayPerExec, initConfig.numCPU);
+        this->schedulerTable[RR_SCHEDULER_NAME] = rrScheduler;
+        this->scheduler = rrScheduler;
+        std::cout << "GlobalScheduler initialized with Round-Robin Scheduler.\n";
+    }
+    else if (initConfig.scheduler == "fcfs") {
+        // Instantiate First-Come, First-Served Scheduler
+        //auto fcfsScheduler = std::make_shared<FCFSScheduler>(initConfig.numCPU);
+        //this->schedulerTable[FCFS_SCHEDULER_NAME] = fcfsScheduler;
+        //this->scheduler = fcfsScheduler;
+        std::cout << "GlobalScheduler initialized with FCFS Scheduler.\n";
+    }
+    else {
+        std::cerr << "Unknown scheduler type in config: " << initConfig.scheduler << std::endl;
+    }
+}
+
+
+void GlobalScheduler::initialize(const Initialize& initConfig) {
+    if (!sharedInstance) {
+        sharedInstance = new GlobalScheduler(initConfig);
+    }
 }
 
 GlobalScheduler* GlobalScheduler::getInstance() {
     return sharedInstance;
-}
-
-void GlobalScheduler::initialize() {
-    sharedInstance = new GlobalScheduler();
 }
 
 void GlobalScheduler::destroy() {

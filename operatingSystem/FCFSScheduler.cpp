@@ -57,7 +57,7 @@ void FCFSScheduler::execute()
 
 void FCFSScheduler::init()
 {
-    
+    std::cout << "FCFSScheduler initialized." << std::endl;
 }
 
 // Runs the actual scheduler

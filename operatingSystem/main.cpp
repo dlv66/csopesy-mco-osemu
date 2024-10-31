@@ -16,13 +16,14 @@
 
 int main()
 {
-    GlobalScheduler::initialize();
+    Initialize init;
+    //GlobalScheduler::initialize();
 	ConsoleManager::initialize();
     //TODO: make a process initializer
 	bool running = true;
 	while (running)
 	{
-        GlobalScheduler::getInstance()->start();
+        //GlobalScheduler::getInstance()->start();
 		ConsoleManager::getInstance()->process();
 		ConsoleManager::getInstance()->drawConsole();
 

@@ -26,6 +26,7 @@ public:
 	void addProcessToProcessTable(std::shared_ptr<Process> process);
 	void addProcessToProcessTableNoCout(std::shared_ptr<Process> process);
 	void handleScreenLS() const;
+	void handleReportUtil() const;
 	void startSchedulerTestInBackground();
 	void handleSchedulerStop();
 	void handleSchedulerTest();

@@ -1,6 +1,7 @@
 #include "GlobalScheduler.h"
 #include "Process.h"
 #include <iostream>
+#include <fstream>
 #include <thread>
 #include <chrono>
 #include <iomanip>
@@ -57,6 +58,53 @@ void GlobalScheduler::addProcessToProcessTable(std::shared_ptr<Process> process)
 
 void GlobalScheduler::addProcessToProcessTableNoCout(std::shared_ptr<Process> process) {
     this->processTable[process->getName()] = process;
+}
+
+void GlobalScheduler::handleReportUtil() const {
+
+    std::ofstream reportUtilFile("csopesy-log.txt");
+
+    reportUtilFile << "Running Processes: " << std::endl;
+    if (this->scheduler->activeProcessesList.empty()) {
+        reportUtilFile << "No Active Processes" << std::endl;
+    }
+    else {
+        for (int i = 0; i < this->scheduler->nCores; i++) {
+            if (this->scheduler->coreList[i].process != nullptr) {
+                std::shared_ptr<Process> runningProcess = this->scheduler->coreList[i].process;
+                reportUtilFile << std::setw(20) << std::left << runningProcess->getName()
+                    << std::setw(40) << std::left << runningProcess->getTimestampStarted()
+                    << "Core: " << std::setw(10) << std::left << runningProcess->getCPUCoreID()
+                    << runningProcess->getCommandCounter() << "/" << runningProcess->getLinesOfCode() << std::endl;
+            }
+        }
+        for (auto& process : this->scheduler->activeProcessesList) {
+            if (process != nullptr) {
+                if (process->getCPUCoreID() == -1)
+                    reportUtilFile << std::setw(20) << std::left << process->getName()
+                    << std::setw(40) << std::left << process->getTimestampStarted()
+                    << "Core: " << std::setw(10) << std::left << "N/A"
+                    << process->getCommandCounter() << "/" << process->getLinesOfCode() << std::endl;
+            }
+        }
+    }
+
+    reportUtilFile << "Terminated Processes: " << std::endl;
+    if (this->scheduler->terminatedProcessesList.empty()) {
+        reportUtilFile << "No Finished Processes" << std::endl;
+    }
+    else {
+        for (auto& process : this->scheduler->terminatedProcessesList) {
+            reportUtilFile << std::setw(20) << process->getName()
+                << std::setw(40) << process->getTimestampFinished()
+                << "Core: " << std::setw(10) << "Finished"
+                << process->getCommandCounter() << "/" << process->getLinesOfCode() << std::endl;
+        }
+    }
+
+    reportUtilFile.close();
+
+    std::cout << "Report Util file created through file 'csopesy-log.txt'.\n";
 }
 
 void GlobalScheduler::handleScreenLS() const {

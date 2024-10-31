@@ -6,7 +6,7 @@
 #include <mutex>
 
 RRScheduler::RRScheduler(int quantum, int delayExec, int nCores)
-    : AScheduler(SchedulingAlgorithm::ROUND_ROBIN), timeQuantum(quantum), delayPerExec(delayExec) {
+    : AScheduler(SchedulingAlgorithm::RR), timeQuantum(quantum), delayPerExec(delayExec) {
     std::cout << "RRScheduler created with quantum: " << quantum
         << ", delayExec: " << delayExec << ", nCores: " << nCores << std::endl;
     this->nCores = nCores;

@@ -4,6 +4,19 @@
 #include <iostream>
 #include <fstream>
 
+Initialize::Initialize()
+{
+	myText = "";
+	numCPU = 0;
+	scheduler = "";
+	quantumCycles = 0;
+	batchProcessFreq = 0;
+	minIns = 0;
+	maxIns = 0;
+	delayPerExec = 0;
+
+}
+
 void Initialize::start()
 {
 	std::ifstream configFile("config.txt");

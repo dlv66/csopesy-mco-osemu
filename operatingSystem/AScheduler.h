@@ -20,7 +20,7 @@ public:
 
     enum SchedulingAlgorithm {
         FCFS,
-        ROUND_ROBIN
+        RR
     };
 
     // a scheduler is instantiated with an initial process

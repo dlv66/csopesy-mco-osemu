@@ -55,6 +55,7 @@ void MainConsole::process()
 			{
 				// TODO: Implement this function
 				// logs of literally everything
+				GlobalScheduler::getInstance()->handleReportUtil();
 			}
 			else if (sInput.find("screen -s") == 0) {
 

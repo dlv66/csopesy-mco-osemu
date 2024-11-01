@@ -3,6 +3,7 @@
 #include <iostream>
 #include "ConsoleManager.h"
 #include "GlobalScheduler.h"
+#include "Initialize.h"
 
 MainConsole::MainConsole() : AConsole("MainConsole")
 {
@@ -42,17 +43,16 @@ void MainConsole::process()
 		if (sInput != "clear" && sInput != "exit") {
 			if (sInput == "initialize")
 			{
-				// read the config file (txt)
-				// should be the first command to be called
-				// all other commands wont work if this isnt called
-				// TODO: Implement this function
+				Initialize init;
+
+				init.start();
 				// TODO: Add if statement to all other inputs to check if "initialize" has been called first
 				
 			}
 			else if (sInput == "report-util")
 			{
-				// TODO: Implement this function
-				// logs of literally everything
+				GlobalScheduler::getInstance()->handleReportUtil();
+				// logs of literally everything, but printed into a .txt file
 			}
 			else if (sInput.find("screen -s") == 0) {
 

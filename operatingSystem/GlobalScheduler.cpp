@@ -1,6 +1,7 @@
 #include "GlobalScheduler.h"
 #include "Process.h"
 #include <iostream>
+#include <fstream>
 #include <thread>
 #include <chrono>
 #include <iomanip>
@@ -66,9 +67,51 @@ void GlobalScheduler::addProcessToProcessTable(std::shared_ptr<Process> process)
 	this->processTable[process->getName()] = process;
 }
 
-void GlobalScheduler::addProcessToProcessTableNoCout(std::shared_ptr<Process> process)
+void GlobalScheduler::handleReportUtil() const 
 {
-	this->processTable[process->getName()] = process;
+	std::ofstream reportUtilFile("csopesy-log.txt");
+
+	reportUtilFile << "Running Processes: " << std::endl;
+	if (this->scheduler->activeProcessesList.empty()) {
+		reportUtilFile << "No Active Processes" << std::endl;
+	}
+	else {
+		for (int i = 0; i < this->scheduler->nCores; i++) {
+			if (this->scheduler->coreList[i].process != nullptr) {
+				std::shared_ptr<Process> runningProcess = this->scheduler->coreList[i].process;
+				reportUtilFile << std::setw(20) << std::left << runningProcess->getName()
+					<< std::setw(40) << std::left << runningProcess->getTimestampStarted()
+					<< "Core: " << std::setw(10) << std::left << runningProcess->getCPUCoreID()
+					<< runningProcess->getCommandCounter() << "/" << runningProcess->getLinesOfCode() << std::endl;
+			}
+		}
+		for (auto& process : this->scheduler->activeProcessesList) {
+			if (process != nullptr) {
+				if (process->getCPUCoreID() == -1)
+					reportUtilFile << std::setw(20) << std::left << process->getName()
+					<< std::setw(40) << std::left << process->getTimestampStarted()
+					<< "Core: " << std::setw(10) << std::left << "N/A"
+					<< process->getCommandCounter() << "/" << process->getLinesOfCode() << std::endl;
+			}
+		}
+	}
+
+	reportUtilFile << "Terminated Processes: " << std::endl;
+	if (this->scheduler->terminatedProcessesList.empty()) {
+		reportUtilFile << "No Finished Processes" << std::endl;
+	}
+	else {
+		for (auto& process : this->scheduler->terminatedProcessesList) {
+			reportUtilFile << std::setw(20) << process->getName()
+				<< std::setw(40) << process->getTimestampFinished()
+				<< "Core: " << std::setw(10) << "Finished"
+				<< process->getCommandCounter() << "/" << process->getLinesOfCode() << std::endl;
+		}
+	}
+
+	reportUtilFile.close();
+
+	std::cout << "Report Util file created through file 'csopesy-log.txt'.\n";
 }
 
 void GlobalScheduler::handleScreenLS() const
@@ -130,8 +173,6 @@ void GlobalScheduler::startSchedulerTestInBackground() {
 
 void GlobalScheduler::handleSchedulerTest()
 {
-	// “scheduler-test” behavior: Every X CPU cycles, a new process is generated and put into the ready queue for your CPU scheduler. This frequency can be set in the “config.txt.” 
-	// As long as CPU cores are available, each process can be executed and be accessible via the “screen” command.
 
 	int i = 0;
 	batchScheduler = true;
@@ -141,8 +182,8 @@ void GlobalScheduler::handleSchedulerTest()
 		std::string screenName = "process" + std::to_string(i);
 		std::shared_ptr<Process> process = std::make_shared<Process>(1, screenName); // create process
 		std::shared_ptr <BaseScreen> screen = std::make_shared <BaseScreen>(process, screenName); // create screen for process
-		GlobalScheduler::getInstance()->scheduler->addProcessNoCout(process); // add process to scheduler queue
-		ConsoleManager::getInstance()->registerScreenNoCout(screen); // register screen to table of layouts/screens
+		GlobalScheduler::getInstance()->scheduler->addProcess(process); // add process to scheduler queue
+		ConsoleManager::getInstance()->registerScreenNoCout(screen); // register screen to table of layouts/screens, NO COUT IMPORTANT.
 
 		tick(); // wait for 1000ms
 

@@ -20,7 +20,7 @@ public:
 
 	enum SchedulingAlgorithm {
 		FCFS,
-		ROUND_ROBIN
+		RR
 	};
 
 	// a scheduler is instantiated with an initial process
@@ -32,7 +32,6 @@ public:
 	SchedulingAlgorithm schedulingAlgo;
 
 	void addProcess(std::shared_ptr<Process> process);
-	void addProcessNoCout(std::shared_ptr<Process> process);
 	virtual void init() = 0; // the initializations of the algorithm
 	virtual void execute() = 0; // the algorithm
 

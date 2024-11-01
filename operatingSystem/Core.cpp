@@ -31,7 +31,7 @@ void Core::run() {
 	{
 		if(!this->process->isFinished())
 		{
-			this->process->execute();
+			this->process->executeOneStep();
 		}
 		else
 		{

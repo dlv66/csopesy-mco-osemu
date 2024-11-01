@@ -1,31 +1,35 @@
 #pragma once
+
 #include "AScheduler.h"
-#include "Process.h"
 #include "Core.h"
 #include <queue>
 #include <memory>
-#include <thread>  
+#include <vector>
+#include <mutex>
 
-// TODO: Implement the round robin scheduler
-class RRScheduler : public AScheduler
-{
-	private:
-		std::queue<std::shared_ptr<Process>> processQueue;  // Q of processes
-		int timeQuantum;  // quantum in CPU cycles
-		int delayPerExec; // delay between instruction executions
+// Round Robin Scheduler class for managing process scheduling
+class RRScheduler : public AScheduler {
+public:
+    RRScheduler(int quantum, int delayExec, int nCores); // Constructor to initialize scheduler
+    void addProcess(std::shared_ptr<Process> process) override; // Add a new process to the queue
+    void run() override; // Start running the scheduler
+    void init() override; // Initialize if needed
 
-	public:
-		// Constructor
-		RRScheduler(int quantum, int delayExec, int nCores);
+private:
+    void execute(); // Execute all cores in separate threads
+    void runCore(int coreID); // Main function for each core thread
+    void printQueue() const;  // For debugging the queue state
+    int findLowestIdleCore(); // Find the lowest idle core
+    int findNextAvailableCore(); // Find the next available core using round-robin
 
-		void addProcess(std::shared_ptr<Process> process) override;
+    int timeQuantum; // Time quantum for each process
+    int delayPerExec; // Delay per execution step
+    int lastAssignedCore = -1; // Tracks last core assigned in round-robin
+    int nCores; // Number of cores
 
-		// Instantiates core list based on given number of cores
-		void instantiateCoreList();
-
-		// Runs the actual scheduler
-		void run() override;
-		void init() override;
-		void execute() override;
+    std::vector<Core> coreList; // List of core objects
+    std::queue<std::shared_ptr<Process>> processQueue; // Queue of pending processes
+    std::vector<std::shared_ptr<Process>> activeProcessesList; // List of active processes
+    std::vector<std::shared_ptr<Process>> terminatedProcessesList; // List of terminated processes
+    std::mutex queueMutex; // Mutex for managing access to process queue
 };
-

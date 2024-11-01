@@ -1,110 +1,100 @@
 #include "Process.h"
-
-#include <chrono>
 #include <iostream>
-#include <thread>
-#include <fstream>
+#include <chrono>
 #include <Windows.h>
 #include "Utils.h"
 
 Process::Process(int pid, std::string processName) {
-	this->pid = pid;
-	this->processName = processName;
-	this->timestampCreated = getCurrentTimestamp();
+    this->pid = pid;
+    this->processName = processName;
+    this->timestampCreated = getCurrentTimestamp();
+    this->state = State::READY; 
 }
 
-std::string Process::getName() const
-{
-	return this->processName;
-
+// Executes a single step of the process
+void Process::executeOneStep() {
+    if (!isFinished()) {
+        this->currentLineOfInstruction++;
+        update(); // Updates state based on progress
+    }
 }
 
-std::string Process::getTimestampStarted() const
-{
-	return convertTimestampToString(this->timestampStarted);
-}
-
-std::string Process::getTimestampFinished() const
-{
-	return convertTimestampToString(this->timestampFinished);
-}
-
-void Process::update()
-{
-	if (this->isFinished())
-	{
-		this->state = Process::State::TERMINATED;
-		this->timestampFinished = getCurrentTimestamp();
-		std::cout << "Process " << this->processName << " has finished executing.\n";
-	}
-	else if (this->cpuCoreID != -1)
-	{
-		this->state = Process::State::RUNNING;
-		this->timestampStarted = getCurrentTimestamp();
-	}
-	else
-	{
-		this->state = Process::State::READY;
-	}
-}
-
-
+// Checks if the process has finished executing
 bool Process::isFinished() const {
-	return this->currentLineOfInstruction >= this->totalLineOfInstruction;
+    return this->currentLineOfInstruction >= this->totalLineOfInstruction;
+}
+
+// Gets remaining steps for completion
+int Process::getRemainingSteps() const {
+    return this->totalLineOfInstruction - this->currentLineOfInstruction;
+}
+
+// Sets the quantum counter to manage time slice
+void Process::setQuantumCounter(int quantum) {
+    this->quantumCounter = quantum;
+}
+
+// Gets the current quantum counter value
+int Process::getQuantumCounter() const {
+    return this->quantumCounter;
+}
+
+// Decreases the quantum counter after a step
+void Process::decrementQuantumCounter() {
+    if (this->quantumCounter > 0) {
+        --this->quantumCounter;
+    }
+}
+
+std::string Process::getName() const {
+    return this->processName;
 }
 
 int Process::getCommandCounter() const {
-	return this->currentLineOfInstruction;
-}
-
-int Process::getRemainingTime() const {
-	return this->totalLineOfInstruction - this->currentLineOfInstruction;
+    return this->currentLineOfInstruction;
 }
 
 int Process::getLinesOfCode() const {
-	return this->totalLineOfInstruction;
+    return this->totalLineOfInstruction;
 }
 
 int Process::getPID() const {
-	return this->pid;
+    return this->pid;
 }
 
 int Process::getCPUCoreID() const {
-	return this->cpuCoreID;
+    return this->cpuCoreID;
+}
+
+std::string Process::getTimestampStarted() const {
+    return convertTimestampToString(this->timestampStarted);
+}
+
+std::string Process::getTimestampFinished() const {
+    return convertTimestampToString(this->timestampFinished);
 }
 
 void Process::setCPUCoreID(int coreID) {
-	this->cpuCoreID = coreID;
+    this->cpuCoreID = coreID;
 }
 
-void Process::incrementCpuCycles() {
-	this->currentLineOfInstruction++;  // track CPU cycles through instruction count
+// Updates the process state based on its execution progress
+void Process::update() {
+    if (this->isFinished()) {
+        this->state = Process::State::TERMINATED;
+        this->timestampFinished = getCurrentTimestamp();
+    }
+    else if (this->cpuCoreID != -1 && this->quantumCounter > 0) {
+        this->state = Process::State::RUNNING;
+        if (this->timestampStarted == 0) {
+            this->timestampStarted = getCurrentTimestamp();
+        }
+    }
+    else {
+        this->state = Process::State::READY;
+    }
 }
 
 Process::State Process::getState() const {
-	return this->state;
+    return this->state;
 }
-
-void Process::execute() {
-	std::ofstream outFile(this->processName + ".txt");
-
-	if (!outFile) {
-		std::cerr << "Error: Could not open the file for writing." << std::endl;
-		return;
-	}
-
-	outFile << "Process name: " << this->processName << std::endl;
-	outFile << "Logs: \n" << std::endl;
-
-	for (int i = 0; i < this->totalLineOfInstruction; i++)
-	{
-		this->currentLineOfInstruction++;
-		outFile << "(" << convertTimestampToString(getCurrentTimestamp()) << ")" << " Core:" << this->getCPUCoreID() << " 'Hello world from " << this->processName << "!'" << std::endl;
-		Sleep(200);
-	}
-
-	outFile.close();
-
-	Sleep(200);
-}
-

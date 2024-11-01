@@ -19,6 +19,7 @@ GlobalScheduler::GlobalScheduler(const Initialize& initConfig) : running(true) {
 		this->schedulerTable[RR_SCHEDULER_NAME] = rrScheduler;
 		this->scheduler = rrScheduler;
 		std::cout << "GlobalScheduler initialized with Round-Robin Scheduler.\n";
+		this->scheduler->start();
 	}
 	else if (initConfig.scheduler == "fcfs") {
 		// Instantiate First-Come, First-Served Scheduler
@@ -26,6 +27,7 @@ GlobalScheduler::GlobalScheduler(const Initialize& initConfig) : running(true) {
 		this->schedulerTable[FCFS_SCHEDULER_NAME] = fcfsScheduler;
 		this->scheduler = fcfsScheduler;
 		std::cout << "GlobalScheduler initialized with FCFS Scheduler.\n";
+		this->scheduler->start();
 	}
 	else {
 		std::cerr << "Unknown scheduler type in config: " << initConfig.scheduler << std::endl;

@@ -21,7 +21,7 @@ class RRScheduler : public AScheduler, public IThread
 		void instantiateCoreList();
 
 		// Runs the actual scheduler
-		void addProcessRR(std::shared_ptr<Process> process);  // add process to RR queue
+		//void addProcessRR(std::shared_ptr<Process> process);  // add process to RR queue
 		void run() override;
 		void init() override;
 		void execute() override;

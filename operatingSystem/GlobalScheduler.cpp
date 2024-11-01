@@ -7,33 +7,39 @@
 #include <iomanip>
 
 #include "FCFSScheduler.h"
+#include "RRScheduler.h"
 
 GlobalScheduler* GlobalScheduler::sharedInstance = nullptr;
 
-GlobalScheduler::GlobalScheduler()
-{
-	this->running = true;
-
-	const std::shared_ptr<FCFSScheduler> scheduler = std::make_shared<FCFSScheduler>(4);
-	//const std::shared_ptr<RRScheduler> RRScheduler = std::make_shared<RRScheduler>();
-
-	this->schedulerTable[FCFS_SCHEDULER_NAME] = scheduler;
-	//this->schedulerTable[RR_SCHEDULER_NAME] = RRScheduler;
-
-	// check what scheduler is set in the config file
-	std::string schedulerName = "FCFSScheduler";
-	
-	this->scheduler = this->schedulerTable[schedulerName];
+GlobalScheduler::GlobalScheduler(const Initialize& initConfig) : running(true) {
+	// Choose the scheduler based on the config file's scheduler value
+	if (initConfig.scheduler == "rr") {
+		// Instantiate Round-Robin Scheduler with quantum, delayExec, and numCPU from Initialize
+		auto rrScheduler = std::make_shared<RRScheduler>(initConfig.quantumCycles, initConfig.delayPerExec, initConfig.numCPU);
+		this->schedulerTable[RR_SCHEDULER_NAME] = rrScheduler;
+		this->scheduler = rrScheduler;
+		std::cout << "GlobalScheduler initialized with Round-Robin Scheduler.\n";
+	}
+	else if (initConfig.scheduler == "fcfs") {
+		// Instantiate First-Come, First-Served Scheduler
+		auto fcfsScheduler = std::make_shared<FCFSScheduler>(initConfig.numCPU);
+		this->schedulerTable[FCFS_SCHEDULER_NAME] = fcfsScheduler;
+		this->scheduler = fcfsScheduler;
+		std::cout << "GlobalScheduler initialized with FCFS Scheduler.\n";
+	}
+	else {
+		std::cerr << "Unknown scheduler type in config: " << initConfig.scheduler << std::endl;
+	}
 }
 
-GlobalScheduler* GlobalScheduler::getInstance()
-{
+void GlobalScheduler::initialize(const Initialize& initConfig) {
+	if (!sharedInstance) {
+		sharedInstance = new GlobalScheduler(initConfig);
+	}
+}
+
+GlobalScheduler* GlobalScheduler::getInstance() {
 	return sharedInstance;
-}
-
-void GlobalScheduler::initialize()
-{
-	sharedInstance = new GlobalScheduler();
 }
 
 void GlobalScheduler::destroy()

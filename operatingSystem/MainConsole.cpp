@@ -33,6 +33,9 @@ void MainConsole::display()
 
 void MainConsole::process()
 {
+	Initialize init;
+	bool isInitialized = false;
+
 	while (true) {
 		// Asking for text input
 		std::string sInput ="";
@@ -43,9 +46,11 @@ void MainConsole::process()
 		if (sInput != "clear" && sInput != "exit") {
 			if (sInput == "initialize")
 			{
-				Initialize init;
-
 				init.start();
+
+				GlobalScheduler::initialize(init);  // Pass init to initialize GlobalScheduler
+				isInitialized = true;
+				std::cout << "System initialized with config file.\n";
 				// TODO: Add if statement to all other inputs to check if "initialize" has been called first
 				
 			}

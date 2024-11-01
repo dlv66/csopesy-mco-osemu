@@ -15,7 +15,7 @@ RRScheduler::RRScheduler(int quantum, int delayExec, int nCores)
     }
 }
 
-void RRScheduler::addProcess(std::shared_ptr<Process> process) {
+void RRScheduler::addProcessRR(std::shared_ptr<Process> process) {
     //std::cout << "Adding process " << process->getName() << " to the Round-Robin queue.\n";
     processQueue.push(process);
     this->activeProcessesList.push_back(process);

@@ -29,24 +29,16 @@ std::string Process::getTimestampFinished() const
 	return convertTimestampToString(this->timestampFinished);
 }
 
-void Process::update()
-{
-	if (this->isFinished())
-	{
+void Process::update() {
+	if (this->isFinished()) {
 		this->state = Process::State::TERMINATED;
 		this->timestampFinished = getCurrentTimestamp();
 	}
-	else if (this->cpuCoreID != -1)
-	{
+	else if (this->cpuCoreID != -1) {
 		this->state = Process::State::RUNNING;
 		this->timestampStarted = getCurrentTimestamp();
 	}
-	else if (!this->isFinished() || this->cpuCoreID != -1) // LOGIC FOR PREEMPTION
-	{
-		this->state = Process::State::PREEMPTED;
-	}
-	else
-	{
+	else {
 		this->state = Process::State::READY;
 	}
 }
@@ -54,10 +46,6 @@ void Process::update()
 
 bool Process::isFinished() const {
 	return this->currentLineOfInstruction >= this->totalLineOfInstruction;
-}
-
-bool Process::forPreemption(int timeQuantum) const {
-	return this->ticksLineOfInstruction == timeQuantum;
 }
 
 void Process::resetTicksLineOfInstruction() {
@@ -131,8 +119,6 @@ void Process::executeQuantum(int timeQuantum) { // FOR RRScheduler
 	int instructionsToRun;
 	int remainingInstructions = this->totalLineOfInstruction - this->currentLineOfInstruction;
 
-
-
 	// RRScheduler-specific lines of code:
 	if (timeQuantum > remainingInstructions) {
 		// If time quantum is larger than the remaining instructions, just use the remaining instructions.
@@ -156,7 +142,7 @@ void Process::executeQuantum(int timeQuantum) { // FOR RRScheduler
 			<< this->processName << "!'" << std::endl;
 		std::this_thread::sleep_for(std::chrono::milliseconds(200));
 	}
-
+	
 	if (this->isFinished()) {
 		this->state = Process::State::TERMINATED;
 		this->timestampFinished = getCurrentTimestamp();

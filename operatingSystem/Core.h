@@ -21,6 +21,7 @@ public:
 	void runQuantum(int timeQuantum) override;
 
 	void setProcess(std::shared_ptr<Process> process);
+	bool isRunningBool() const;
 
 private:
 	bool isRunning = false;

@@ -93,14 +93,18 @@ void RRScheduler::executeQuantum(int timeQuantum) {
             }
 
             // Check for preemption: process has exceeded its quantum
-            if (core.process != nullptr && core.process->forPreemption(timeQuantum)) {
-                if (!core.process->isFinished()) {
-                    // Move preempted process back to the queue
-                    activeProcessesList.push_back(core.process);
+            if (core.process != nullptr) {
+                core.runQuantum(timeQuantum); // Let the core handle the quantum execution and preemption
+
+                // If the core is now free, it means the process was preempted or finished
+                if (!core.isRunningBool()) {
+                    if (core.process != nullptr && !core.process->isFinished()) {
+                        // Move preempted process back to the queue
+                        activeProcessesList.push_back(core.process);
+                        core.process->setCPUCoreID(-1);
+                        core.process = nullptr;
+                    }
                 }
-                // Clear the current process and reset execution time
-                core.setProcess(nullptr);
-                core.process->resetTicksLineOfInstruction();
             }
 
             // Assign a new process to the core if it's empty and the queue is not empty

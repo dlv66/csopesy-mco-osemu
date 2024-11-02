@@ -27,6 +27,10 @@ void Core::setProcess(std::shared_ptr<Process> process) {
 	}
 }
 
+bool Core::isRunningBool() const {
+	return this->isRunning;
+}
+
 // FOR FCFSScheduler
 void Core::run() {
 
@@ -50,6 +54,66 @@ void Core::run() {
 }
 
 
+
+// FOR RRScheduler
+void Core::runQuantum(int timeQuantum) {
+	int executedTime = 0; // overall time executed
+
+	while (this->process != nullptr) {
+
+		// if the process is NOT FINISHED
+		if (!this->process->isFinished()) {
+
+			// Execute the process for the time quantum or until it finishes
+			int remainingTime = this->process->getRemainingTime();
+			int timeToExecute = timeQuantum;
+
+			// Adjust timeToExecute if remaining time is less than time quantum
+			if (remainingTime < timeQuantum) {
+				timeToExecute = remainingTime;
+			}
+
+			// Execute the process for the time quantum or until it finishes
+			this->process->executeQuantum(timeToExecute);
+			executedTime += timeToExecute;
+
+			if (this->process->isFinished()) {
+				this->terminatedProcess = this->process;
+				this->update(false);
+				this->process = nullptr;
+				break;
+			}
+
+			// Check if the process needs preemption
+			if (executedTime >= timeQuantum) {
+				// std::cout << "Preempting process: " << this->process->getName() << std::endl;
+
+				
+				// NOTE: THE 6 LINES OF CODE BELOW THIS COMMENT ARE BREAKING THE ENTIRE PROGRAM
+				this->process->update(); // To note preemption
+				this->update(false); // Core is now available
+
+				executedTime = 0;
+				std::this_thread::sleep_for(std::chrono::milliseconds(10));
+				break;
+			
+			}
+		}
+
+		// if the process IS ALREADY FINISHED
+		else {
+			this->terminatedProcess = this->process;
+			this->update(false);
+			this->process = nullptr;
+			break; // Exit if process finished
+		}
+		this->process->update();
+	}
+}
+
+
+
+/*
 // FOR RRScheduler
 void Core::runQuantum(int timeQuantum) {
 
@@ -61,7 +125,7 @@ void Core::runQuantum(int timeQuantum) {
 
 			// plainly execute the process instructions; assume it will execute until the number set for timeQuantum
 			this->process->executeQuantum(timeQuantum);
-			
+
 			// if the current process in the core is FOR PREEMPTION
 			if (this->process->forPreemption(timeQuantum)) {
 				std::cout << "umaabot dito"; // THIS IS ACTUALLY WORKING
@@ -85,3 +149,4 @@ void Core::runQuantum(int timeQuantum) {
 		this->process->update();
 	}
 }
+*/

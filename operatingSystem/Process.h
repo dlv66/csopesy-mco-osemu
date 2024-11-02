@@ -20,7 +20,6 @@ class Process
 
 		std::string getName() const;
 		bool isFinished() const;
-		bool forPreemption(int timeQuantum) const;
 		void resetTicksLineOfInstruction();
 		int getRemainingTime() const;
 		int getCommandCounter() const;

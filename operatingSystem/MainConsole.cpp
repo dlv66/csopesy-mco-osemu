@@ -63,8 +63,9 @@ void MainConsole::process()
 
 				// gets the name of the screen and process
 				std::string screenName = sInput.substr(10);
-
-				std::shared_ptr<Process> process = std::make_shared<Process>(1, screenName, init.minIns, init.maxIns);
+				int processID = GlobalScheduler::getInstance()->processID;
+				GlobalScheduler::getInstance()->incrementProcessID();
+				std::shared_ptr<Process> process = std::make_shared<Process>(processID, screenName, init.minIns, init.maxIns);
 				std::shared_ptr <BaseScreen> screen = std::make_shared <BaseScreen>(process, screenName);
 				GlobalScheduler::getInstance()->scheduler->addProcess(process);
 				ConsoleManager::getInstance()->registerScreen(screen);

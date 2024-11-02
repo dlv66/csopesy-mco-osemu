@@ -33,12 +33,14 @@ public:
 	void handleSchedulerStop();
 	void handleSchedulerTest(int minIns, int maxIns, int batchProcessFreq);
 	void getCPUUtilization() const;
+	void incrementProcessID();
 
 	bool isRunning() const;
 	std::shared_ptr<AScheduler> scheduler;
 
 	ProcessTable processTable;
 
+	int processID = 0;
 	int globalCPUCycles = 0;
 
 private:

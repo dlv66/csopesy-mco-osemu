@@ -6,6 +6,10 @@
 #include <sstream>
 
 std::string convertTimestampToString(time_t now_time) {
+    if (now_time == 0) { // time_t 0 corresponds to "1970-01-01 00:00:00" in UTC
+        return "N/A";
+    }
+
     std::ostringstream oss;
 
     std::tm local_time;

@@ -168,6 +168,11 @@ void GlobalScheduler::getCPUUtilization() const
 	std::cout << "Cores Available: " << coresAvailble << "\n";
 }
 
+void GlobalScheduler::incrementProcessID()
+{
+	this->processID++;
+}
+
 void GlobalScheduler::handleScreenLS() const
 {
 
@@ -191,7 +196,7 @@ void GlobalScheduler::handleScreenLS() const
 				std::cout << std::setw(20) << std::left << runningProcess->getName()
 					<< std::setw(40) << std::left << runningProcess->getTimestampStarted()
 					<< "Core: " << std::setw(10) << std::left << runningProcess->getCPUCoreID()
-					<< runningProcess->getCommandCounter() << "/" << runningProcess->getLinesOfCode();
+					<< runningProcess->getCommandCounter() << "/" << runningProcess->getLinesOfCode() << std::endl;
 			}
 		}
 	}
@@ -247,12 +252,13 @@ void GlobalScheduler::handleSchedulerTest(int minIns, int maxIns, int batchProce
 		for (i = 0; i < batchProcessFreq; i++) {
 
 			// LOGIC ERROR: Every new enter of for loop creates "process0"
-			std::string screenName = "process" + std::to_string(i);
-			std::shared_ptr<Process> process = std::make_shared<Process>(1, screenName, minIns, maxIns); // create process
+			std::string screenName = "process" + std::to_string(this->processID);
+			std::shared_ptr<Process> process = std::make_shared<Process>(this->processID, screenName, minIns, maxIns); // create process
 			std::shared_ptr <BaseScreen> screen = std::make_shared <BaseScreen>(process, screenName); // create screen for process
 			GlobalScheduler::getInstance()->scheduler->addProcess(process); // add process to scheduler queue
 			ConsoleManager::getInstance()->registerScreenNoCout(screen); // register screen to table of layouts/screens, NO COUT IMPORTANT.
-
+			this->incrementProcessID(); // increment process ID
+			Sleep(100);
 		}
 
 	}

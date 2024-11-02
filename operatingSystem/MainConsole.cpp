@@ -84,7 +84,7 @@ void MainConsole::process()
 			}
 			else if (sInput == "scheduler-test")
 			{
-				GlobalScheduler::getInstance()->startSchedulerTestInBackground(init.minIns, init.maxIns);
+				GlobalScheduler::getInstance()->startSchedulerTestInBackground(init.minIns, init.maxIns, init.batchProcessFreq);
 				std::cout << "\nDummy process creation running in the background..." << std::endl;
 			}
 			else {

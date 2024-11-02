@@ -25,18 +25,21 @@ public:
 	void stop();
 
 	void tick() const;
+	void tickGlobal();
 	void addProcessToProcessTable(std::shared_ptr<Process> process);
 	void handleScreenLS() const;
 	void handleReportUtil() const;
-	void startSchedulerTestInBackground(int minIns, int maxIns);
+	void startSchedulerTestInBackground(int minIns, int maxIns, int batchProcessFreq);
 	void handleSchedulerStop();
-	void handleSchedulerTest(int minIns, int maxIns);
+	void handleSchedulerTest(int minIns, int maxIns, int batchProcessFreq);
 	void getCPUUtilization() const;
 
 	bool isRunning() const;
 	std::shared_ptr<AScheduler> scheduler;
 
 	ProcessTable processTable;
+
+	int globalCPUCycles = 0;
 
 private:
 	GlobalScheduler(const Initialize& initConfig);

@@ -37,7 +37,7 @@ void Initialize::start()
 		else if (myText.find("quantum-cycles") != std::string::npos) {
 			quantumCycles = std::stoi(myText.substr(myText.find("quantum-cycles") + 15));
 		}
-		else if (myText.find("batch-orocess-freq") != std::string::npos) {
+		else if (myText.find("batch-process-freq") != std::string::npos) {
 			batchProcessFreq = std::stoi(myText.substr(myText.find("batch-process-freq") + 19));
 		}
 		else if (myText.find("min-ins") != std::string::npos) {

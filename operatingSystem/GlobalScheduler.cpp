@@ -76,6 +76,11 @@ void GlobalScheduler::tick() const
 	std::this_thread::sleep_for(std::chrono::milliseconds(1000));
 }
 
+void GlobalScheduler::tickGlobal()
+{
+	this->globalCPUCycles++;
+}
+
 void GlobalScheduler::addProcessToProcessTable(std::shared_ptr<Process> process)
 {
 	this->processTable[process->getName()] = process;
@@ -219,33 +224,37 @@ void GlobalScheduler::handleScreenLS() const
 		}
 	}
 
-		
-
 	std::cout << "\n";
 }
 
-void GlobalScheduler::startSchedulerTestInBackground(int minIns, int maxIns) {
-	std::thread schedulerTestThread([this, minIns, maxIns]() { handleSchedulerTest(minIns, maxIns); });
+void GlobalScheduler::startSchedulerTestInBackground(int minIns, int maxIns, int batchProcessFreq) {
+	std::thread schedulerTestThread([this, minIns, maxIns, batchProcessFreq]() { handleSchedulerTest(minIns, maxIns, batchProcessFreq); });
 
 	schedulerTestThread.detach(); // Detach the thread to run independently
 }
 
-void GlobalScheduler::handleSchedulerTest(int minIns, int maxIns)
+void GlobalScheduler::handleSchedulerTest(int minIns, int maxIns, int batchProcessFreq)
 {
 	int i = 0;
 	batchScheduler = true;
 
 	while (batchScheduler) // while batchScheduler is true
 	{
-		std::string screenName = "process" + std::to_string(i);
-		std::shared_ptr<Process> process = std::make_shared<Process>(1, screenName, minIns, maxIns); // create process
-		std::shared_ptr <BaseScreen> screen = std::make_shared <BaseScreen>(process, screenName); // create screen for process
-		GlobalScheduler::getInstance()->scheduler->addProcess(process); // add process to scheduler queue
-		ConsoleManager::getInstance()->registerScreenNoCout(screen); // register screen to table of layouts/screens, NO COUT IMPORTANT.
 
-		tick(); // wait for 1000ms
+		// code for batch process freq
+		tickGlobal(); // tick one cpu cycle
 
-		i++; // increment i
+		for (i = 0; i < batchProcessFreq; i++) {
+
+			// LOGIC ERROR: Every new enter of for loop creates "process0"
+			std::string screenName = "process" + std::to_string(i);
+			std::shared_ptr<Process> process = std::make_shared<Process>(1, screenName, minIns, maxIns); // create process
+			std::shared_ptr <BaseScreen> screen = std::make_shared <BaseScreen>(process, screenName); // create screen for process
+			GlobalScheduler::getInstance()->scheduler->addProcess(process); // add process to scheduler queue
+			ConsoleManager::getInstance()->registerScreenNoCout(screen); // register screen to table of layouts/screens, NO COUT IMPORTANT.
+
+		}
+
 	}
 }
 

@@ -7,6 +7,8 @@
 #include <thread>
 #include <Windows.h>
 
+#include "GlobalScheduler.h"
+
 //Constructor
 Core::Core(int coreID): IThread(){
 	this->coreID = coreID;
@@ -15,6 +17,16 @@ Core::Core(int coreID): IThread(){
 void Core::update(bool isRunning)
 {
 	this->isRunning = isRunning;
+}
+
+void Core::tick()
+{
+	this->cpuCycles++;
+}
+
+int Core::getCpuCycles() const
+{
+	return this->cpuCycles;
 }
 
 

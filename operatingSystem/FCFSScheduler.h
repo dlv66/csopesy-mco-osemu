@@ -11,7 +11,7 @@ class FCFSScheduler : public AScheduler, public IThread
 {
 public:
     // Constructor
-    FCFSScheduler(int nCores);
+    FCFSScheduler(int nCores, int delayPerExec);
 
 	// Instantiates core list based on given number of cores
 	void instantiateCoreList();
@@ -22,5 +22,7 @@ public:
 	void init() override;
 	void execute() override;
 	void executeQuantum(int timeQuantum) override;
+
+	void delay(int coreID);
 };
 

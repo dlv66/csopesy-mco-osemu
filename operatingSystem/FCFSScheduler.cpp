@@ -6,11 +6,12 @@
 
 #include "GlobalScheduler.h"
 
-FCFSScheduler::FCFSScheduler(int nCores) :
+FCFSScheduler::FCFSScheduler(int nCores, int delayPerExec) :
 	AScheduler(SchedulingAlgorithm::FCFS),
 	IThread()
 {
     this->nCores = nCores;
+	this->delayPerExec = delayPerExec;
     
     for (int i = 0; i < nCores; i++) { // for all the cores
         coreList.push_back(Core(i)); // add core to the list
@@ -69,7 +70,7 @@ void FCFSScheduler::run()
 }
 
 void FCFSScheduler::runQuantum(int timeQuantum) {
-    
+	// Not used in FCFS
 }
 
 void FCFSScheduler::executeQuantum(int timeQuantum) {

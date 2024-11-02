@@ -16,6 +16,7 @@ class AScheduler : public IThread {
 public:
 
 	int nCores;
+	int delayPerExec;
 	std::vector<Core> coreList;
 
 	enum SchedulingAlgorithm {
@@ -36,6 +37,7 @@ public:
 	virtual void init() = 0; // the initializations of the algorithm
 	virtual void execute() = 0; // the algorithm
 	virtual void executeQuantum(int timeQuantum) = 0; // the algorithm
+	void delay(int coreID);
 
 	std::vector<std::shared_ptr<Process>> activeProcessesList;
 	std::vector<std::shared_ptr<Process>> terminatedProcessesList;

@@ -30,6 +30,15 @@ void AScheduler::runQuantum(int timeQuantum) {
 	this->executeQuantum(timeQuantum);
 }
 
+void AScheduler::delay(int coreID) {
+	for (int i = 0; i < this->delayPerExec; i++) {
+		this->coreList[coreID].tick();
+		//std::cout << "Delaying " << i << std::endl;
+		Sleep(100);
+	}
+
+}
+
 void AScheduler::stop() {
 	
 }

@@ -6,6 +6,8 @@
 #include <fstream>
 #include <random>
 #include <Windows.h>
+
+#include "GlobalScheduler.h"
 #include "Utils.h"
 
 Process::Process(int pid, std::string processName, int minIns, int maxIns) {
@@ -105,6 +107,8 @@ void Process::execute() { // FOR FCFS
 		this->currentLineOfInstruction++;
 		outFile << "(" << convertTimestampToString(getCurrentTimestamp()) << ")" << " Core:" << this->getCPUCoreID() << " 'Hello world from " << this->processName << "!'" << std::endl;
 		Sleep(200);
+
+		GlobalScheduler::getInstance()->scheduler->delay(this->getCPUCoreID());
 	}
 
 	outFile.close();

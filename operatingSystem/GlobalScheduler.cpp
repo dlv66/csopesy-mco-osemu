@@ -24,7 +24,7 @@ GlobalScheduler::GlobalScheduler(const Initialize& initConfig) : running(true) {
 	else if (initConfig.scheduler == "fcfs" || initConfig.scheduler == "FCFS") {
 		// Instantiate First-Come, First-Served Scheduler
 		// Instantiate First-Come, First-Served Scheduler
-		auto fcfsScheduler = std::make_shared<FCFSScheduler>(initConfig.numCPU);
+		auto fcfsScheduler = std::make_shared<FCFSScheduler>(initConfig.numCPU, initConfig.delayPerExec);
 		this->schedulerTable[FCFS_SCHEDULER_NAME] = fcfsScheduler;
 		this->scheduler = fcfsScheduler;
 		std::cout << "GlobalScheduler initialized with FCFS Scheduler.\n";
@@ -186,7 +186,7 @@ void GlobalScheduler::handleScreenLS() const
 				std::cout << std::setw(20) << std::left << runningProcess->getName()
 					<< std::setw(40) << std::left << runningProcess->getTimestampStarted()
 					<< "Core: " << std::setw(10) << std::left << runningProcess->getCPUCoreID()
-					<< runningProcess->getCommandCounter() << "/" << runningProcess->getLinesOfCode() << std::endl;
+					<< runningProcess->getCommandCounter() << "/" << runningProcess->getLinesOfCode() << this->scheduler->coreList[i].getCpuCycles() << std::endl;
 			}
 		}
 	}

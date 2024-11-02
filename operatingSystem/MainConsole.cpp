@@ -50,7 +50,7 @@ void MainConsole::process()
 
 				GlobalScheduler::initialize(init);  // Pass init to initialize GlobalScheduler
 				isInitialized = true;
-				std::cout << "System initialized with config file.\n";
+				std::cout << "System initialized with config file.\n\n";
 				// TODO: Add if statement to all other inputs to check if "initialize" has been called first
 				
 			}

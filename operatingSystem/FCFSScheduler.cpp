@@ -25,6 +25,7 @@ void FCFSScheduler::execute()
     while (GlobalScheduler::getInstance()->isRunning()) {
         for (int i = 0; i < nCores; i++)
         {
+
             // if the current core is empty/finished
             if (coreList[i].process == nullptr) {
 

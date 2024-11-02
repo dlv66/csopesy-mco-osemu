@@ -138,8 +138,36 @@ void GlobalScheduler::handleReportUtil() const
 	std::cout << "Report Util file created through file 'csopesy-log.txt'.\n";
 }
 
+void GlobalScheduler::getCPUUtilization() const
+{
+	// check cores being used
+	int coresUsed = 0;
+	for (int i = 0; i < this->scheduler->nCores; i++)
+	{
+		if (this->scheduler->coreList[i].process != nullptr && 
+			this->scheduler->coreList[i].process->getState() == Process::State::RUNNING)
+		{
+			coresUsed++;
+		}
+	}
+	double cpuUtilPercentage = 0.0;
+
+	if (this->scheduler->nCores != 0) {
+		cpuUtilPercentage = (static_cast<double>(coresUsed) / this->scheduler->nCores) * 100.0;
+	}
+
+	int coresAvailble = this->scheduler->nCores - coresUsed;
+
+	std::cout << "CPU Utilization: " << cpuUtilPercentage << "%\n";
+	std::cout << "Cores Used: " << coresUsed << "\n";
+	std::cout << "Cores Available: " << coresAvailble << "\n";
+}
+
 void GlobalScheduler::handleScreenLS() const
 {
+
+	this->getCPUUtilization();
+
 	std::cout << "\n\n\n";
 	std::cout << "---------------------------------------------------------";
 	std::cout << "\n";
@@ -162,7 +190,18 @@ void GlobalScheduler::handleScreenLS() const
 			}
 		}
 	}
-
+	//std::cout << "\nWaiting Processes: " << std::endl;
+	for (auto& process : this->scheduler->activeProcessesList)
+	{
+		if (process != nullptr)
+		{
+			if (process->getCPUCoreID() == -1)
+				std::cout << std::setw(20) << std::left << process->getName()
+				<< std::setw(40) << std::left << process->getTimestampStarted()
+				<< "Core: " << std::setw(10) << std::left << "N/A"
+				<< process->getCommandCounter() << "/" << process->getLinesOfCode() << std::endl;
+		}
+	}
 
 	std::cout << "\nTerminated Processes: " << std::endl;
 	if (this->scheduler->terminatedProcessesList.empty())
@@ -180,18 +219,7 @@ void GlobalScheduler::handleScreenLS() const
 		}
 	}
 
-	std::cout << "\nWaiting Processes: " << std::endl;
-	for (auto& process : this->scheduler->activeProcessesList)
-	{
-		if (process != nullptr)
-		{
-			if (process->getCPUCoreID() == -1)
-				std::cout << std::setw(20) << std::left << process->getName()
-				<< std::setw(40) << std::left << process->getTimestampStarted()
-				<< "Core: " << std::setw(10) << std::left << "N/A"
-				<< process->getCommandCounter() << "/" << process->getLinesOfCode() << std::endl;
-		}
-	}
+		
 
 	std::cout << "\n";
 }

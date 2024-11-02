@@ -31,6 +31,7 @@ public:
 	void startSchedulerTestInBackground();
 	void handleSchedulerStop();
 	void handleSchedulerTest();
+	void getCPUUtilization() const;
 
 	bool isRunning() const;
 	std::shared_ptr<AScheduler> scheduler;

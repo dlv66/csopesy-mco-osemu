@@ -30,7 +30,7 @@ public:
 	void handleReportUtil() const;
 	void startSchedulerTestInBackground(int minIns, int maxIns);
 	void handleSchedulerStop();
-	void handleSchedulerTest();
+	void handleSchedulerTest(int minIns, int maxIns);
 	void getCPUUtilization() const;
 
 	bool isRunning() const;

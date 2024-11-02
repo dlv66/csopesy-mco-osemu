@@ -30,7 +30,8 @@ public:
 	void handleReportUtil() const;
 	void startSchedulerTestInBackground(int minIns, int maxIns);
 	void handleSchedulerStop();
-	void handleSchedulerTest(int minIns, int maxIns);
+	void handleSchedulerTest();
+	void getCPUUtilization() const;
 
 	bool isRunning() const;
 	std::shared_ptr<AScheduler> scheduler;

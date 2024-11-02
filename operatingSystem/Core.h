@@ -18,9 +18,12 @@ public:
 	void update(bool isRunning);
 
 	void run() override;
+	void runQuantum(int timeQuantum) override;
 
 	void setProcess(std::shared_ptr<Process> process);
+
 private:
 	bool isRunning = false;
+	bool requiresQuantum = false; // assumes FCFS default scheduler
 };
 

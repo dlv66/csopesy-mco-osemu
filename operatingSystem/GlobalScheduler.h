@@ -21,6 +21,7 @@ public:
 	static void destroy();
 
 	void run() override;
+	void runQuantum(int timeQuantum) override;
 	void stop();
 
 	void tick() const;

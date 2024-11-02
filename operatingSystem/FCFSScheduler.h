@@ -18,7 +18,9 @@ public:
 
 	// Runs the actual scheduler
 	void run() override;
+	void runQuantum(int timeQuantum) override;
 	void init() override;
 	void execute() override;
+	void executeQuantum(int timeQuantum) override;
 };
 

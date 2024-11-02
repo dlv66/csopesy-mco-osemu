@@ -28,12 +28,14 @@ public:
 
 	std::shared_ptr<Process> findProcess(std::string processName);
 	void run() override;
+	void runQuantum(int timeQuantum) override;
 	void stop();
 	SchedulingAlgorithm schedulingAlgo;
 
 	void addProcess(std::shared_ptr<Process> process);
 	virtual void init() = 0; // the initializations of the algorithm
 	virtual void execute() = 0; // the algorithm
+	virtual void executeQuantum(int timeQuantum) = 0; // the algorithm
 
 	std::vector<std::shared_ptr<Process>> activeProcessesList;
 	std::vector<std::shared_ptr<Process>> terminatedProcessesList;

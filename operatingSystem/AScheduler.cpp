@@ -25,6 +25,11 @@ void AScheduler::run() {
 	this->execute();
 }
 
+void AScheduler::runQuantum(int timeQuantum) {
+	this->init();
+	this->executeQuantum(timeQuantum);
+}
+
 void AScheduler::stop() {
 	
 }

@@ -11,13 +11,17 @@ class Process
 			RUNNING, // Process is currently running
 			WAITING, // Process is waiting for an event to occur
 			READY, // Process is ready to be executed and is waiting to be assigned to a core
-			TERMINATED // Process is done executing
+			TERMINATED, // Process is done executing
+			PREEMPTED // Process has been preempted
 		};
 
 		void execute();
+		void executeQuantum(int timeQuantum);
 
 		std::string getName() const;
 		bool isFinished() const;
+		bool forPreemption(int timeQuantum) const;
+		void resetTicksLineOfInstruction();
 		int getRemainingTime() const;
 		int getCommandCounter() const;
 		int getLinesOfCode() const;
@@ -39,6 +43,7 @@ class Process
 		time_t timestampStarted = 0;
 		time_t timestampFinished = 0;
 		std::string processName = "";
+		int ticksLineOfInstruction = 0;
 		int currentLineOfInstruction = 0;
 		int totalLineOfInstruction = 100;
 		int cpuCoreID = -1; // the cpu core where a process is assigned

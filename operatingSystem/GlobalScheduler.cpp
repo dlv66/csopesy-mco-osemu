@@ -13,15 +13,16 @@ GlobalScheduler* GlobalScheduler::sharedInstance = nullptr;
 
 GlobalScheduler::GlobalScheduler(const Initialize& initConfig) : running(true) {
 	// Choose the scheduler based on the config file's scheduler value
-	if (initConfig.scheduler == "rr") {
+	if (initConfig.scheduler == "rr" || initConfig.scheduler == "RR") {
 		// Instantiate Round-Robin Scheduler with quantum, delayExec, and numCPU from Initialize
 		auto rrScheduler = std::make_shared<RRScheduler>(initConfig.quantumCycles, initConfig.delayPerExec, initConfig.numCPU);
 		this->schedulerTable[RR_SCHEDULER_NAME] = rrScheduler;
 		this->scheduler = rrScheduler;
 		std::cout << "GlobalScheduler initialized with Round-Robin Scheduler.\n";
-		this->scheduler->start();
+		this->scheduler->startQuantum(initConfig.quantumCycles);
 	}
-	else if (initConfig.scheduler == "fcfs") {
+	else if (initConfig.scheduler == "fcfs" || initConfig.scheduler == "FCFS") {
+		// Instantiate First-Come, First-Served Scheduler
 		// Instantiate First-Come, First-Served Scheduler
 		auto fcfsScheduler = std::make_shared<FCFSScheduler>(initConfig.numCPU);
 		this->schedulerTable[FCFS_SCHEDULER_NAME] = fcfsScheduler;
@@ -53,6 +54,11 @@ void GlobalScheduler::destroy()
 void GlobalScheduler::run()
 {
 	this->scheduler->start();
+}
+
+void GlobalScheduler::runQuantum(int timeQuantum)
+{
+	this->scheduler->startQuantum(timeQuantum);
 }
 
 void GlobalScheduler::stop()

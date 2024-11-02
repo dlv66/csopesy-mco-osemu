@@ -65,3 +65,11 @@ void FCFSScheduler::run()
 {
 	this->execute();
 }
+
+void FCFSScheduler::runQuantum(int timeQuantum) {
+    
+}
+
+void FCFSScheduler::executeQuantum(int timeQuantum) {
+
+}

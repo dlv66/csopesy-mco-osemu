@@ -8,6 +8,7 @@
 #include <unordered_map>
 #include "Process.h"
 #include "FCFSScheduler.h"
+#include "RRScheduler.h"
 #include "Core.h"
 #include <thread>
 

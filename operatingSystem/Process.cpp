@@ -41,6 +41,10 @@ void Process::update()
 		this->state = Process::State::RUNNING;
 		this->timestampStarted = getCurrentTimestamp();
 	}
+	else if (!this->isFinished() || this->cpuCoreID != -1) // LOGIC FOR PREEMPTION
+	{
+		this->state = Process::State::PREEMPTED;
+	}
 	else
 	{
 		this->state = Process::State::READY;
@@ -50,6 +54,14 @@ void Process::update()
 
 bool Process::isFinished() const {
 	return this->currentLineOfInstruction >= this->totalLineOfInstruction;
+}
+
+bool Process::forPreemption(int timeQuantum) const {
+	return this->ticksLineOfInstruction == timeQuantum;
+}
+
+void Process::resetTicksLineOfInstruction() {
+	this->ticksLineOfInstruction = 0;
 }
 
 int Process::getCommandCounter() const {
@@ -80,7 +92,7 @@ Process::State Process::getState() const {
 	return this->state;
 }
 
-void Process::execute() {
+void Process::execute() { // FOR FCFS
 
 	std::ofstream outFile(this->processName + ".txt");
 
@@ -102,4 +114,52 @@ void Process::execute() {
 	outFile.close();
 
 	Sleep(200);
+}
+
+void Process::executeQuantum(int timeQuantum) { // FOR RRScheduler
+	std::ofstream outFile(this->processName + ".txt");
+
+	if (!outFile) {
+		std::cerr << "Error: Could not open the file for writing." << std::endl;
+		return;
+	}
+
+	outFile << "Process name: " << this->processName << std::endl;
+	outFile << "Logs: \n" << std::endl;
+
+
+	int instructionsToRun;
+	int remainingInstructions = this->totalLineOfInstruction - this->currentLineOfInstruction;
+
+
+
+	// RRScheduler-specific lines of code:
+	if (timeQuantum > remainingInstructions) {
+		// If time quantum is larger than the remaining instructions, just use the remaining instructions.
+		instructionsToRun = remainingInstructions;
+	}
+	else {
+		// Otherwise, use the maxInstructions value.
+		instructionsToRun = timeQuantum;
+	}
+
+
+	for (int i = 0; i < instructionsToRun; i++) {
+		if (this->currentLineOfInstruction >= this->totalLineOfInstruction) {
+			break;
+		}
+
+		this->currentLineOfInstruction++;
+		this->ticksLineOfInstruction++;
+		outFile << "(" << convertTimestampToString(getCurrentTimestamp()) << ") Core:"
+			<< this->getCPUCoreID() << " 'Hello world from "
+			<< this->processName << "!'" << std::endl;
+		std::this_thread::sleep_for(std::chrono::milliseconds(200));
+	}
+
+	if (this->isFinished()) {
+		this->state = Process::State::TERMINATED;
+		this->timestampFinished = getCurrentTimestamp();
+		outFile.close();
+	}
 }

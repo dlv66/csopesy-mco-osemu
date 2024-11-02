@@ -186,11 +186,11 @@ void GlobalScheduler::handleScreenLS() const
 				std::cout << std::setw(20) << std::left << runningProcess->getName()
 					<< std::setw(40) << std::left << runningProcess->getTimestampStarted()
 					<< "Core: " << std::setw(10) << std::left << runningProcess->getCPUCoreID()
-					<< runningProcess->getCommandCounter() << "/" << runningProcess->getLinesOfCode() << this->scheduler->coreList[i].getCpuCycles() << std::endl;
+					<< runningProcess->getCommandCounter() << "/" << runningProcess->getLinesOfCode();
 			}
 		}
 	}
-	//std::cout << "\nWaiting Processes: " << std::endl;
+	std::cout << "\nWaiting Processes: " << std::endl;
 	for (auto& process : this->scheduler->activeProcessesList)
 	{
 		if (process != nullptr)

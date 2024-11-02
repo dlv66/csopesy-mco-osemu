@@ -4,12 +4,20 @@
 #include <iostream>
 #include <thread>
 #include <fstream>
+#include <random>
 #include <Windows.h>
 #include "Utils.h"
 
-Process::Process(int pid, std::string processName) {
+Process::Process(int pid, std::string processName, int minIns, int maxIns) {
 	this->pid = pid;
 	this->processName = processName;
+
+	// Random number generator helper lines of code
+	unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
+	std::mt19937_64 rng(seed);
+
+	this->totalLineOfInstruction = rng() % (maxIns - minIns + 1) + minIns;
+
 	this->timestampCreated = getCurrentTimestamp();
 }
 

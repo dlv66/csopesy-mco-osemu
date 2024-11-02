@@ -64,7 +64,7 @@ void MainConsole::process()
 				// gets the name of the screen and process
 				std::string screenName = sInput.substr(10);
 
-				std::shared_ptr<Process> process = std::make_shared<Process>(1, screenName);
+				std::shared_ptr<Process> process = std::make_shared<Process>(1, screenName, init.minIns, init.maxIns);
 				std::shared_ptr <BaseScreen> screen = std::make_shared <BaseScreen>(process, screenName);
 				GlobalScheduler::getInstance()->scheduler->addProcess(process);
 				ConsoleManager::getInstance()->registerScreen(screen);
@@ -84,7 +84,7 @@ void MainConsole::process()
 			}
 			else if (sInput == "scheduler-test")
 			{
-				GlobalScheduler::getInstance()->startSchedulerTestInBackground();
+				GlobalScheduler::getInstance()->startSchedulerTestInBackground(init.minIns, init.maxIns);
 				std::cout << "\nDummy process creation running in the background..." << std::endl;
 			}
 			else {

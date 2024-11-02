@@ -28,9 +28,9 @@ public:
 	void addProcessToProcessTable(std::shared_ptr<Process> process);
 	void handleScreenLS() const;
 	void handleReportUtil() const;
-	void startSchedulerTestInBackground();
+	void startSchedulerTestInBackground(int minIns, int maxIns);
 	void handleSchedulerStop();
-	void handleSchedulerTest();
+	void handleSchedulerTest(int minIns, int maxIns);
 
 	bool isRunning() const;
 	std::shared_ptr<AScheduler> scheduler;

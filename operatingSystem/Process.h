@@ -6,7 +6,7 @@
 class Process
 {
 	public:
-		Process(int pid = -1, std::string processName = "DefaultProcess");
+		Process(int pid = -1, std::string processName = "DefaultProcess", int minIns = 1, int maxIns = 1);
 		enum class State {
 			RUNNING, // Process is currently running
 			WAITING, // Process is waiting for an event to occur

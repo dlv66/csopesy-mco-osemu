@@ -196,21 +196,21 @@ void GlobalScheduler::handleScreenLS() const
 	std::cout << "\n";
 }
 
-void GlobalScheduler::startSchedulerTestInBackground() {
-	std::thread schedulerTestThread(&GlobalScheduler::handleSchedulerTest, this);
+void GlobalScheduler::startSchedulerTestInBackground(int minIns, int maxIns) {
+	std::thread schedulerTestThread([this, minIns, maxIns]() { handleSchedulerTest(minIns, maxIns); });
+
 	schedulerTestThread.detach(); // Detach the thread to run independently
 }
 
-void GlobalScheduler::handleSchedulerTest()
+void GlobalScheduler::handleSchedulerTest(int minIns, int maxIns)
 {
-
 	int i = 0;
 	batchScheduler = true;
 
 	while (batchScheduler) // while batchScheduler is true
 	{
 		std::string screenName = "process" + std::to_string(i);
-		std::shared_ptr<Process> process = std::make_shared<Process>(1, screenName); // create process
+		std::shared_ptr<Process> process = std::make_shared<Process>(1, screenName, minIns, maxIns); // create process
 		std::shared_ptr <BaseScreen> screen = std::make_shared <BaseScreen>(process, screenName); // create screen for process
 		GlobalScheduler::getInstance()->scheduler->addProcess(process); // add process to scheduler queue
 		ConsoleManager::getInstance()->registerScreenNoCout(screen); // register screen to table of layouts/screens, NO COUT IMPORTANT.

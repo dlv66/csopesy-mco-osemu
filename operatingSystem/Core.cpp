@@ -91,7 +91,6 @@ void Core::runQuantum(long long timeQuantum) {
 
 			if (this->process && this->process->isFinished()) {
 				this->terminatedProcess = this->process;
-				std::cout << "[DEBUG] 1:" << this->terminatedProcess->getName() << std::endl;
 				this->update(false);
 				this->process = nullptr;
 				break;
@@ -119,7 +118,6 @@ void Core::runQuantum(long long timeQuantum) {
 		// if the process IS ALREADY FINISHED
 		else {
 			this->terminatedProcess = this->process;
-			std::cout << "[DEBUG] 2:" << this->terminatedProcess->getName() << std::endl;
 			this->update(false);
 			this->process = nullptr;
 			break; // Exit if process finished

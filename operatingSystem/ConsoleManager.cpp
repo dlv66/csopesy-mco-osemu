@@ -2,6 +2,7 @@
 
 #include <iostream>
 
+#include "GlobalScheduler.h"
 #include "MainConsole.h"
 
 ConsoleManager* ConsoleManager::sharedInstance = nullptr;

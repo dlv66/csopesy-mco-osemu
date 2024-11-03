@@ -168,13 +168,6 @@ void GlobalScheduler::handleScreenLS() const
 					<< "Core: " << std::setw(10) << std::left << runningProcess->getCPUCoreID()
 					<< runningProcess->getCommandCounter() << "/" << runningProcess->getLinesOfCode() << std::endl;
 			}
-			else
-			{
-				std::cout << std::setw(20) << std::left << "N/A"
-					<< std::setw(40) << std::left << "N/A"
-					<< "Core: " << std::setw(10) << std::left << i
-					<< "N/A" << "/" << "N/A" << std::endl;
-			}
 		}
 	}
 	std::cout << "\nWaiting Processes: " << std::endl;
@@ -373,6 +366,11 @@ void GlobalScheduler::handleSchedulerTest(long long minIns, long long maxIns, lo
 
 void GlobalScheduler::handleSchedulerStop()
 {
-	batchScheduler = false;
-	std::cout << "Dummy processes creation HALTED.\n";
+	if (batchScheduler) {
+		batchScheduler = false;
+		std::cout << "Dummy processes creation HALTED.\n";
+	}
+	else {
+		std::cout << "No such process creation currently running.\n";
+	}
 }

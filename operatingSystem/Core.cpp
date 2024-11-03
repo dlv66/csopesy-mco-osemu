@@ -68,8 +68,8 @@ void Core::run() {
 
 
 // FOR RRScheduler
-void Core::runQuantum(int timeQuantum) {
-	int executedTime = 0; // overall time executed
+void Core::runQuantum(long long timeQuantum) {
+	long long executedTime = 0; // overall time executed
 
 	while (this->process != nullptr) {
 
@@ -77,8 +77,8 @@ void Core::runQuantum(int timeQuantum) {
 		if (!this->process->isFinished()) {
 
 			// Execute the process for the time quantum or until it finishes
-			int remainingTime = this->process->getRemainingTime();
-			int timeToExecute = timeQuantum;
+			long long remainingTime = this->process->getRemainingTime();
+			long long timeToExecute = timeQuantum;
 
 			// Adjust timeToExecute if remaining time is less than time quantum
 			if (remainingTime < timeQuantum) {

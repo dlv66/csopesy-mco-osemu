@@ -16,7 +16,7 @@ class AScheduler : public IThread {
 public:
 
 	int nCores;
-	int delayPerExec;
+	long long delayPerExec;
 	std::vector<Core> coreList;
 
 	enum SchedulingAlgorithm {
@@ -29,14 +29,14 @@ public:
 
 	std::shared_ptr<Process> findProcess(std::string processName);
 	void run() override;
-	void runQuantum(int timeQuantum) override;
+	void runQuantum(long long timeQuantum) override;
 	void stop();
 	SchedulingAlgorithm schedulingAlgo;
 
 	void addProcess(std::shared_ptr<Process> process);
 	virtual void init() = 0; // the initializations of the algorithm
 	virtual void execute() = 0; // the algorithm
-	virtual void executeQuantum(int timeQuantum) = 0; // the algorithm
+	virtual void executeQuantum(long long timeQuantum) = 0; // the algorithm
 	void delay(int coreID);
 
 	std::vector<std::shared_ptr<Process>> activeProcessesList;

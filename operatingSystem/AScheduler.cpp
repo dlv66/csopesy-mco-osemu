@@ -25,13 +25,13 @@ void AScheduler::run() {
 	this->execute();
 }
 
-void AScheduler::runQuantum(int timeQuantum) {
+void AScheduler::runQuantum(long long timeQuantum) {
 	this->init();
 	this->executeQuantum(timeQuantum);
 }
 
 void AScheduler::delay(int coreID) {
-	for (int i = 0; i < this->delayPerExec; i++) {
+	for (long long i = 0; i < this->delayPerExec; i++) {
 		this->coreList[coreID].tick();
 		//std::cout << "Delaying " << i << std::endl;
 		Sleep(100);

@@ -6,7 +6,7 @@
 
 #include "GlobalScheduler.h"
 
-FCFSScheduler::FCFSScheduler(int nCores, int delayPerExec) :
+FCFSScheduler::FCFSScheduler(int nCores, long long delayPerExec) :
 	AScheduler(SchedulingAlgorithm::FCFS),
 	IThread()
 {
@@ -69,10 +69,10 @@ void FCFSScheduler::run()
 	this->execute();
 }
 
-void FCFSScheduler::runQuantum(int timeQuantum) {
+void FCFSScheduler::runQuantum(long long timeQuantum) {
 	// Not used in FCFS
 }
 
-void FCFSScheduler::executeQuantum(int timeQuantum) {
+void FCFSScheduler::executeQuantum(long long timeQuantum) {
 
 }

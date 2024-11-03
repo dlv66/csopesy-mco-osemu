@@ -16,11 +16,11 @@ public:
 	std::string myText;
 	int numCPU;
 	std::string scheduler;
-	int quantumCycles;
-	int batchProcessFreq;
-	int minIns;
-	int maxIns;
-	int delayPerExec;
+	long long quantumCycles;
+	long long batchProcessFreq;
+	long long minIns;
+	long long maxIns;
+	long long delayPerExec;
 
 	// Functions
 	void start();

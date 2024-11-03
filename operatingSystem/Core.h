@@ -18,7 +18,7 @@ public:
 	void update(bool isRunning);
 
 	void run() override;
-	void runQuantum(int timeQuantum) override;
+	void runQuantum(long long timeQuantum) override;
 
 	void tick();
 	int getCpuCycles() const;

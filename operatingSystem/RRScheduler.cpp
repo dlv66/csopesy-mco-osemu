@@ -7,7 +7,7 @@
 
 #include "GlobalScheduler.h"
 
-RRScheduler::RRScheduler(int quantum, int delayExec, int nCores) : 
+RRScheduler::RRScheduler(long long quantum, long long delayExec, int nCores) :
     AScheduler(SchedulingAlgorithm::RR), timeQuantum(quantum), delayPerExec(delayExec), IThread()
 {
     std::cout << "RRScheduler created with quantum: " << quantum << ", delayExec: " << delayExec << ", nCores: " << nCores << std::endl;
@@ -21,7 +21,7 @@ RRScheduler::RRScheduler(int quantum, int delayExec, int nCores) :
     }
 }
 
-void RRScheduler::executeQuantum(int timeQuantum) {
+void RRScheduler::executeQuantum(long long timeQuantum) {
     while (GlobalScheduler::getInstance()->isRunning()) {
         for (int i = 0; i < nCores; i++) {
             Core& core = coreList[i];
@@ -74,7 +74,7 @@ void RRScheduler::run()
 }
 
 // Runs the actual scheduler, but with Quantum
-void RRScheduler::runQuantum(int timeQuantum)
+void RRScheduler::runQuantum(long long timeQuantum)
 {
     this->executeQuantum(timeQuantum);
 }

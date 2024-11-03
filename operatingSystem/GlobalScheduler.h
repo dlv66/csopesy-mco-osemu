@@ -21,7 +21,7 @@ public:
 	static void destroy();
 
 	void run() override;
-	void runQuantum(int timeQuantum) override;
+	void runQuantum(long long timeQuantum) override;
 	void stop();
 
 	void tick() const;
@@ -29,9 +29,9 @@ public:
 	void addProcessToProcessTable(std::shared_ptr<Process> process);
 	void handleScreenLS() const;
 	void handleReportUtil() const;
-	void startSchedulerTestInBackground(int minIns, int maxIns, int batchProcessFreq);
+	void startSchedulerTestInBackground(long long minIns, long long maxIns, long long batchProcessFreq);
 	void handleSchedulerStop();
-	void handleSchedulerTest(int minIns, int maxIns, int batchProcessFreq);
+	void handleSchedulerTest(long long minIns, long long maxIns, long long batchProcessFreq);
 	void getCPUUtilization() const;
 	void incrementProcessID();
 

@@ -10,7 +10,7 @@
 #include "GlobalScheduler.h"
 #include "Utils.h"
 
-Process::Process(int pid, std::string processName, int minIns, int maxIns) {
+Process::Process(int pid, std::string processName, long long minIns, long long maxIns) {
 	this->pid = pid;
 	this->processName = processName;
 
@@ -62,15 +62,15 @@ void Process::resetTicksLineOfInstruction() {
 	this->ticksLineOfInstruction = 0;
 }
 
-int Process::getCommandCounter() const {
+long long Process::getCommandCounter() const {
 	return this->currentLineOfInstruction;
 }
 
-int Process::getRemainingTime() const {
+long long Process::getRemainingTime() const {
 	return this->totalLineOfInstruction - this->currentLineOfInstruction;
 }
 
-int Process::getLinesOfCode() const {
+long long Process::getLinesOfCode() const {
 	return this->totalLineOfInstruction;
 }
 
@@ -92,20 +92,20 @@ Process::State Process::getState() const {
 
 void Process::execute() { // FOR FCFS
 
-	std::ofstream outFile(this->processName + ".txt");
+	//std::ofstream outFile(this->processName + ".txt");
 
-	if (!outFile) {
-		std::cerr << "Error: Could not open the file for writing." << std::endl;
-		return;
-	}
+	//if (!outFile) {
+	//	std::cerr << "Error: Could not open the file for writing." << std::endl;
+	//	return;
+	//}
 
-	outFile << "Process name: " << this->processName << std::endl;
-	outFile << "Logs: \n" << std::endl;
+	//outFile << "Process name: " << this->processName << std::endl;
+	//outFile << "Logs: \n" << std::endl;
 
-	for (int i = 0; i < this->totalLineOfInstruction; i++)
+	for (long long i = 0; i < this->totalLineOfInstruction; i++)
 	{
 		this->currentLineOfInstruction++;
-		outFile << "(" << convertTimestampToString(getCurrentTimestamp()) << ")" << " Core:" << this->getCPUCoreID() << " 'Hello world from " << this->processName << "!'" << std::endl;
+		//outFile << "(" << convertTimestampToString(getCurrentTimestamp()) << ")" << " Core:" << this->getCPUCoreID() << " 'Hello world from " << this->processName << "!'" << std::endl;
 		Sleep(200);
 
 		// CPU Ticks
@@ -113,25 +113,25 @@ void Process::execute() { // FOR FCFS
 		GlobalScheduler::getInstance()->scheduler->delay(this->getCPUCoreID());
 	}
 
-	outFile.close();
+	//outFile.close();
 
 	Sleep(200);
 }
 
 void Process::executeQuantum(int timeQuantum) { // FOR RRScheduler
-	std::ofstream outFile(this->processName + ".txt");
+	//std::ofstream outFile(this->processName + ".txt");
 
-	if (!outFile) {
-		std::cerr << "Error: Could not open the file for writing." << std::endl;
-		return;
-	}
+	//if (!outFile) {
+	//	std::cerr << "Error: Could not open the file for writing." << std::endl;
+	//	return;
+	//}
 
-	outFile << "Process name: " << this->processName << std::endl;
-	outFile << "Logs: \n" << std::endl;
+	//outFile << "Process name: " << this->processName << std::endl;
+	//outFile << "Logs: \n" << std::endl;
 
 
-	int instructionsToRun;
-	int remainingInstructions = this->totalLineOfInstruction - this->currentLineOfInstruction;
+	long long instructionsToRun;
+	long long remainingInstructions = this->totalLineOfInstruction - this->currentLineOfInstruction;
 
 	// RRScheduler-specific lines of code:
 	if (timeQuantum > remainingInstructions) {
@@ -144,16 +144,16 @@ void Process::executeQuantum(int timeQuantum) { // FOR RRScheduler
 	}
 
 
-	for (int i = 0; i < instructionsToRun; i++) {
+	for (long long i = 0; i < instructionsToRun; i++) {
 		if (this->currentLineOfInstruction >= this->totalLineOfInstruction) {
 			break;
 		}
 
 		this->currentLineOfInstruction++;
 		this->ticksLineOfInstruction++;
-		outFile << "(" << convertTimestampToString(getCurrentTimestamp()) << ") Core:"
-			<< this->getCPUCoreID() << " 'Hello world from "
-			<< this->processName << "!'" << std::endl;
+		//outFile << "(" << convertTimestampToString(getCurrentTimestamp()) << ") Core:"
+		//	<< this->getCPUCoreID() << " 'Hello world from "
+		//	<< this->processName << "!'" << std::endl;
 
 		// CPU Ticks
 		GlobalScheduler::getInstance()->scheduler->coreList[this->getCPUCoreID()].tick();
@@ -165,6 +165,6 @@ void Process::executeQuantum(int timeQuantum) { // FOR RRScheduler
 	if (this->isFinished()) {
 		this->state = Process::State::TERMINATED;
 		this->timestampFinished = getCurrentTimestamp();
-		outFile.close();
+		//outFile.close();
 	}
 }

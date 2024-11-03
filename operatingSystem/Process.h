@@ -6,7 +6,7 @@
 class Process
 {
 	public:
-		Process(int pid = -1, std::string processName = "DefaultProcess", int minIns = 1, int maxIns = 1);
+		Process(int pid = -1, std::string processName = "DefaultProcess", long long minIns = 1, long long maxIns = 1);
 		enum class State {
 			RUNNING, // Process is currently running
 			WAITING, // Process is waiting for an event to occur
@@ -21,9 +21,9 @@ class Process
 		std::string getName() const;
 		bool isFinished() const;
 		void resetTicksLineOfInstruction();
-		int getRemainingTime() const;
-		int getCommandCounter() const;
-		int getLinesOfCode() const;
+		long long getRemainingTime() const;
+		long long getCommandCounter() const;
+		long long getLinesOfCode() const;
 		int getPID() const;
 		int getCPUCoreID() const;
 		State getState() const;
@@ -42,9 +42,9 @@ class Process
 		time_t timestampStarted = 0;
 		time_t timestampFinished = 0;
 		std::string processName = "";
-		int ticksLineOfInstruction = 0;
-		int currentLineOfInstruction = 0;
-		int totalLineOfInstruction = 100;
+		long long ticksLineOfInstruction = 0;
+		long long currentLineOfInstruction = 0;
+		long long totalLineOfInstruction = 0;
 		int cpuCoreID = -1; // the cpu core where a process is assigned
 		State state = State::READY;
 };

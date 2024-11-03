@@ -9,7 +9,7 @@ void IThread::start()
 	thread.detach();
 }
 
-void IThread::startQuantum(int timeQuantum)
+void IThread::startQuantum(long long timeQuantum)
 {
 	std::thread thread([this, timeQuantum]() { runQuantum(timeQuantum); });
 	thread.detach();

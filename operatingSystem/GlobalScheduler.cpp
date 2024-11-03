@@ -28,6 +28,7 @@ GlobalScheduler::GlobalScheduler(const Initialize& initConfig) : running(true) {
 		this->schedulerTable[FCFS_SCHEDULER_NAME] = fcfsScheduler;
 		this->scheduler = fcfsScheduler;
 		std::cout << "GlobalScheduler initialized with FCFS Scheduler.\n";
+		std::cout << "[DEBUG]" << "Batch Freq: " << initConfig.batchProcessFreq << std::endl;
 		this->scheduler->start();
 	}
 	else {
@@ -56,7 +57,7 @@ void GlobalScheduler::run()
 	this->scheduler->start();
 }
 
-void GlobalScheduler::runQuantum(int timeQuantum)
+void GlobalScheduler::runQuantum(long long timeQuantum)
 {
 	this->scheduler->startQuantum(timeQuantum);
 }
@@ -198,6 +199,13 @@ void GlobalScheduler::handleScreenLS() const
 					<< "Core: " << std::setw(10) << std::left << runningProcess->getCPUCoreID()
 					<< runningProcess->getCommandCounter() << "/" << runningProcess->getLinesOfCode() << std::endl;
 			}
+			else
+			{
+				std::cout << std::setw(20) << std::left << "N/A"
+					<< std::setw(40) << std::left << "N/A"
+					<< "Core: " << std::setw(10) << std::left << i
+					<< "N/A" << "/" << "N/A" << std::endl;
+			}
 		}
 	}
 	std::cout << "\nWaiting Processes: " << std::endl;
@@ -230,17 +238,18 @@ void GlobalScheduler::handleScreenLS() const
 	}
 
 	std::cout << "\n";
+	Sleep(100);
 }
 
-void GlobalScheduler::startSchedulerTestInBackground(int minIns, int maxIns, int batchProcessFreq) {
+void GlobalScheduler::startSchedulerTestInBackground(long long minIns, long long maxIns, long long batchProcessFreq) {
 	std::thread schedulerTestThread([this, minIns, maxIns, batchProcessFreq]() { handleSchedulerTest(minIns, maxIns, batchProcessFreq); });
 
 	schedulerTestThread.detach(); // Detach the thread to run independently
 }
 
-void GlobalScheduler::handleSchedulerTest(int minIns, int maxIns, int batchProcessFreq)
+void GlobalScheduler::handleSchedulerTest(long long minIns, long long maxIns, long long batchProcessFreq)
 {
-	int i = 0;
+	long long i = 0;
 	batchScheduler = true;
 
 	while (batchScheduler) // while batchScheduler is true

@@ -36,21 +36,42 @@ void MainConsole::process()
 	Initialize init;
 	bool isInitialized = false;
 
-	while (true) {
+	while (!isInitialized) {
+		std::string sInput = "";
+		std::cout << "[NEW SYSTEM BOOTUP] Please type in a command: ";
+		std::getline(std::cin, sInput);
+
+		if (sInput == "initialize")
+		{
+			init.start();
+
+			GlobalScheduler::initialize(init);  // Pass init to initialize GlobalScheduler
+			isInitialized = true;
+			std::cout << "System initialized with config file.\n\n";
+
+		}
+		else {
+			std::cout << "System NOT yet initialized. Please initialize system by entering 'initialize'.\n\n";
+		}
+	}
+
+	while (true && isInitialized) {
 		// Asking for text input
 		std::string sInput ="";
-		std::cout << "Please type in a command: ";
+		std::cout << "[SYSTEM INITIALIZED] Please type in a command: ";
 		std::getline(std::cin, sInput);
 
 		// Input validation and conditions
 		if (sInput != "clear" && sInput != "exit") {
 			if (sInput == "initialize")
 			{
+				/*
 				init.start();
 
 				GlobalScheduler::initialize(init);  // Pass init to initialize GlobalScheduler
 				isInitialized = true;
-				std::cout << "System initialized with config file.\n\n";
+				*/
+				std::cout << "ERROR: System has already been initialized. Please try again.\n\n";
 				// TODO: Add if statement to all other inputs to check if "initialize" has been called first
 				
 			}

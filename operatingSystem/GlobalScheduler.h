@@ -33,6 +33,7 @@ public:
 	void handleSchedulerStop();
 	void handleSchedulerTest(long long minIns, long long maxIns, long long batchProcessFreq);
 	void getCPUUtilization() const;
+	void getCPUUtilizationReport(std::ofstream& reportUtilFile) const;
 	void incrementProcessID();
 
 	bool isRunning() const;

@@ -6,19 +6,14 @@
 #include <chrono>
 #include <iomanip>
 <<<<<<< HEAD
-<<<<<<< HEAD
 #include "RRScheduler.h"
 =======
 
 >>>>>>> parent of 9b0d641 (rr pt2)
-=======
-
->>>>>>> parent of f7daf88 (Merge remote-tracking branch 'origin/RR_Testing')
 #include "FCFSScheduler.h"
 
 GlobalScheduler* GlobalScheduler::sharedInstance = nullptr;
 
-<<<<<<< HEAD
 <<<<<<< HEAD
 GlobalScheduler::GlobalScheduler(const Initialize& initConfig) : running(true) {
     // Choose the scheduler based on the config file's scheduler value
@@ -189,70 +184,6 @@ void GlobalScheduler::handleScreenLS() const {
         }
     }
 =======
-=======
-GlobalScheduler::GlobalScheduler()
-{
-	this->running = true;
-
-	const std::shared_ptr<FCFSScheduler> scheduler = std::make_shared<FCFSScheduler>(4);
-	//const std::shared_ptr<RRScheduler> RRScheduler = std::make_shared<RRScheduler>();
-
-	this->schedulerTable[FCFS_SCHEDULER_NAME] = scheduler;
-	//this->schedulerTable[RR_SCHEDULER_NAME] = RRScheduler;
-
-	// check what scheduler is set in the config file
-	std::string schedulerName = "FCFSScheduler";
-	
-	this->scheduler = this->schedulerTable[schedulerName];
-}
-
-GlobalScheduler* GlobalScheduler::getInstance()
-{
-	return sharedInstance;
-}
-
-void GlobalScheduler::initialize()
-{
-	sharedInstance = new GlobalScheduler();
-}
-
-void GlobalScheduler::destroy()
-{
-	delete sharedInstance;
-}
-
-// TODO: Implement this function
-void GlobalScheduler::run()
-{
-	this->scheduler->start();
-}
-
-void GlobalScheduler::stop()
-{
-	this->running = false;
-}
-
-bool GlobalScheduler::isRunning() const
-{
-	return this->running;
-}
-
-void GlobalScheduler::tick() const
-{
-	std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-}
-
-void GlobalScheduler::addProcessToProcessTable(std::shared_ptr<Process> process)
-{
-	this->processTable[process->getName()] = process;
-}
-
-void GlobalScheduler::addProcessToProcessTableNoCout(std::shared_ptr<Process> process)
-{
-	this->processTable[process->getName()] = process;
-}
-
->>>>>>> parent of f7daf88 (Merge remote-tracking branch 'origin/RR_Testing')
 void GlobalScheduler::handleScreenLS() const
 {
 	std::cout << "Running Processes: " << std::endl;
@@ -285,10 +216,7 @@ void GlobalScheduler::handleScreenLS() const
 			}
 		}
 	}
-<<<<<<< HEAD
 >>>>>>> parent of 9b0d641 (rr pt2)
-=======
->>>>>>> parent of f7daf88 (Merge remote-tracking branch 'origin/RR_Testing')
 
 
 	std::cout << "Terminated Processes: " << std::endl;

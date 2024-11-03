@@ -1,9 +1,0 @@
-Process name: process5
-Logs: 
-
-(2024-10-30 23:36:19) Core:1 'Hello world from process5!'
-(2024-10-30 23:36:19) Core:1 'Hello world from process5!'
-(2024-10-30 23:36:19) Core:1 'Hello world from process5!'
-(2024-10-30 23:36:20) Core:1 'Hello world from process5!'
-(2024-10-30 23:36:20) Core:1 'Hello world from process5!'
-(2024-10-30 23:36:20) Core:1 'Hello world from process5!'

@@ -18,9 +18,17 @@ public:
 	void update(bool isRunning);
 
 	void run() override;
+	void runQuantum(long long timeQuantum) override;
+
+	void tick();
+	int getCpuCycles() const;
 
 	void setProcess(std::shared_ptr<Process> process);
+	bool isRunningBool() const;
+
 private:
 	bool isRunning = false;
+	bool requiresQuantum = false; // assumes FCFS default scheduler
+	int cpuCycles = 0;
 };
 

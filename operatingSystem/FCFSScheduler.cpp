@@ -6,11 +6,12 @@
 
 #include "GlobalScheduler.h"
 
-FCFSScheduler::FCFSScheduler(int nCores) :
+FCFSScheduler::FCFSScheduler(int nCores, long long delayPerExec) :
 	AScheduler(SchedulingAlgorithm::FCFS),
 	IThread()
 {
     this->nCores = nCores;
+	this->delayPerExec = delayPerExec;
     
     for (int i = 0; i < nCores; i++) { // for all the cores
         coreList.push_back(Core(i)); // add core to the list
@@ -23,35 +24,37 @@ void FCFSScheduler::execute()
 
     // Iterate over the available cores and run each in a separate thread
     while (GlobalScheduler::getInstance()->isRunning()) {
-        for (int i = 0; i < nCores; i++)
-        {
-            // if the current core is empty/finished
-            if (coreList[i].process == nullptr) {
 
-				if (coreList[i].terminatedProcess != nullptr)
-				{
-                    this->terminatedProcessesList.push_back(coreList[i].terminatedProcess);
-					coreList[i].terminatedProcess = nullptr;
-				}
-
-                // if there are processes in the waiting queue
-                if (!this->activeProcessesList.empty()) {
-                    std::shared_ptr<Process> process = this->activeProcessesList.front();  // Get the process from in front of the queue
-
-                    if (coreList[i].process == nullptr) // Double-check if core is empty
-                    {
-                        coreList[i].setProcess(process); // set the new process to the core
-                        this->activeProcessesList.erase(this->activeProcessesList.begin()); // remove the new process from the waiting queue
-                        coreList[i].process->update();
-                        coreList[i].start();
-                    }
-                }
+        // check for terminated processes
+        for (int i = 0; i < nCores; i++) {
+            if (this->coreList[i].terminatedProcess != nullptr) {
+                this->terminatedProcessesList.push_back(this->coreList[i].terminatedProcess);
+                this->coreList[i].terminatedProcess = nullptr;
             }
-
-            // Simulate time passing (e.g., 1-second steps)
-            std::this_thread::sleep_for(std::chrono::seconds(1));
         }
 
+		// If there are processes in the waiting queue
+		if (!this->activeProcessesList.empty()) {
+            std::shared_ptr<Process> process = this->activeProcessesList.front();
+            for (int i = 0; i < nCores; i++)
+            {
+                // if the current core is empty/finished
+                if (this->coreList[i].process == nullptr) {
+
+                    this->coreList[i].setProcess(process); // set the new process to the core
+                    this->activeProcessesList.erase(this->activeProcessesList.begin()); // remove the new process from the waiting queue
+                    this->coreList[i].process->update();
+                    this->coreList[i].start();
+
+                    break;
+                }
+
+                // Simulate time passing (e.g., 1-second steps)
+                Sleep(50);
+            }
+		}
+
+        
     }
 }
 
@@ -64,4 +67,12 @@ void FCFSScheduler::init()
 void FCFSScheduler::run()
 {
 	this->execute();
+}
+
+void FCFSScheduler::runQuantum(long long timeQuantum) {
+	// Not used in FCFS
+}
+
+void FCFSScheduler::executeQuantum(long long timeQuantum) {
+
 }

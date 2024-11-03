@@ -36,20 +36,42 @@ void MainConsole::process()
 	Initialize init;
 	bool isInitialized = false;
 
-	while (true) {
+	while (!isInitialized) {
+		std::string sInput = "";
+		std::cout << "[NEW SYSTEM BOOTUP] Please type in a command: ";
+		std::getline(std::cin, sInput);
+
+		if (sInput == "initialize")
+		{
+			init.start();
+
+			GlobalScheduler::initialize(init);  // Pass init to initialize GlobalScheduler
+			isInitialized = true;
+			std::cout << "System initialized with config file.\n\n";
+
+		}
+		else {
+			std::cout << "System NOT yet initialized. Please initialize system by entering 'initialize'.\n\n";
+		}
+	}
+
+	while (true && isInitialized) {
 		// Asking for text input
 		std::string sInput ="";
-		std::cout << "Please type in a command: ";
+		std::cout << "[SYSTEM INITIALIZED] Please type in a command: ";
 		std::getline(std::cin, sInput);
 
 		// Input validation and conditions
 		if (sInput != "clear" && sInput != "exit") {
 			if (sInput == "initialize")
 			{
-				// read the config file (txt)
-				// should be the first command to be called
-				// all other commands wont work if this isnt called
-				// TODO: Implement this function
+				/*
+				init.start();
+
+				GlobalScheduler::initialize(init);  // Pass init to initialize GlobalScheduler
+				isInitialized = true;
+				*/
+				std::cout << "ERROR: System has already been initialized. Please try again.\n\n";
 				// TODO: Add if statement to all other inputs to check if "initialize" has been called first
 				init.start();
 				GlobalScheduler::initialize(init);  // Pass init to initialize GlobalScheduler
@@ -58,16 +80,16 @@ void MainConsole::process()
 			}
 			else if (sInput == "report-util")
 			{
-				// TODO: Implement this function
-				// logs of literally everything
 				GlobalScheduler::getInstance()->handleReportUtil();
+				// logs of literally everything, but printed into a .txt file
 			}
 			else if (sInput.find("screen -s") == 0) {
 
 				// gets the name of the screen and process
 				std::string screenName = sInput.substr(10);
-
-				std::shared_ptr<Process> process = std::make_shared<Process>(1, screenName);
+				int processID = GlobalScheduler::getInstance()->processID;
+				GlobalScheduler::getInstance()->incrementProcessID();
+				std::shared_ptr<Process> process = std::make_shared<Process>(processID, screenName, init.minIns, init.maxIns);
 				std::shared_ptr <BaseScreen> screen = std::make_shared <BaseScreen>(process, screenName);
 				GlobalScheduler::getInstance()->scheduler->addProcess(process);
 				ConsoleManager::getInstance()->registerScreen(screen);
@@ -87,7 +109,7 @@ void MainConsole::process()
 			}
 			else if (sInput == "scheduler-test")
 			{
-				GlobalScheduler::getInstance()->startSchedulerTestInBackground();
+				GlobalScheduler::getInstance()->startSchedulerTestInBackground(init.minIns, init.maxIns, init.batchProcessFreq);
 				std::cout << "\nDummy process creation running in the background..." << std::endl;
 			}
 			else {

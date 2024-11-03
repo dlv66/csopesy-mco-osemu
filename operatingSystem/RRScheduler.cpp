@@ -1,94 +1,91 @@
 #include "RRScheduler.h"
-#include "GlobalScheduler.h"
+#include "Utils.h"
 #include <iostream>
 #include <thread>
 #include <chrono>
+#include <mutex>
 
-RRScheduler::RRScheduler(int quantum, int delayExec, int nCores)
-    : timeQuantum(quantum), delayPerExec(delayExec) {
+#include "GlobalScheduler.h"
+
+RRScheduler::RRScheduler(long long quantum, long long delayExec, int nCores) :
+    AScheduler(SchedulingAlgorithm::RR), timeQuantum(quantum), delayPerExec(delayExec), IThread()
+{
+    std::cout << "RRScheduler created with quantum: " << quantum << ", delayExec: " << delayExec << ", nCores: " << nCores << std::endl;
+
     this->nCores = nCores;
-    // Initialize cores based on the number of cores
-    for (int i = 0; i < nCores; ++i) {
-        this->coreList.push_back(Core(i));
+    this->timeQuantum = quantum;
+    this->delayPerExec = delayExec;
+
+    for (int i = 0; i < nCores; i++) { // for all the cores
+        coreList.push_back(Core(i)); // add core to the list
     }
 }
 
-void RRScheduler::addProcess(std::shared_ptr<Process> process) {
-    processQueue.push(process);  // add process to the ready queue
-    activeProcessesList.push_back(process);  // keep track of active processes
-}
-
-
-/*
-RRScheduler::RRScheduler() : AScheduler(SchedulingAlgorithm::ROUND_ROBIN)
-{
-	
-}
-*/
-
-void RRScheduler::execute() {
+void RRScheduler::executeQuantum(long long timeQuantum) {
     while (GlobalScheduler::getInstance()->isRunning()) {
         for (int i = 0; i < nCores; i++) {
-            // if the core is idle, assign a new process
-            if (coreList[i].process == nullptr) {
-                if (coreList[i].terminatedProcess != nullptr) {
-                    this->terminatedProcessesList.push_back(coreList[i].terminatedProcess);
-                    coreList[i].terminatedProcess = nullptr;
-                }
+            Core& core = coreList[i];
 
-                if (!processQueue.empty()) {
-                    std::shared_ptr<Process> process = processQueue.front();
-                    processQueue.pop();
-                    coreList[i].setProcess(process);
-                    coreList[i].process->update();
-                    coreList[i].start();
+            // Handle terminated processes
+            if (core.terminatedProcess != nullptr) {
+                terminatedProcessesList.push_back(core.terminatedProcess);
+                core.terminatedProcess = nullptr;
+            }
+
+            // Check for preemption: process has exceeded its quantum
+            if (core.process != nullptr) {
+                //core.startQuantum(timeQuantum); // Let the core handle the quantum execution and preemption
+
+                // If the core is now free, it means the process was preempted or finished
+                if (!core.isRunningBool()) {
+                    if (core.process != nullptr && !core.process->isFinished()) {
+                        // Move preempted process back to the queue
+                        activeProcessesList.push_back(core.process);
+                        core.process->setCPUCoreID(-1);
+                        core.process = nullptr;
+                    }
                 }
             }
 
-            // simulate round-robin execution
-            if (coreList[i].process != nullptr) {
-                int executedInstructions = 0;
-                while (executedInstructions < timeQuantum) {
-                    coreList[i].process->execute();  // execute one instruction
-                    executedInstructions++;
-
-                    // simulate delay between instructions
-                    // delays-per-exec are not part of the quantum
-                    for (int j = 0; j < delayPerExec; ++j) {
-                        // 1 CPU cycle is one run through the main loop
-                        coreList[i].process->incrementCpuCycles();
-                    }
-
-                    if (coreList[i].process->isFinished()) {
-                        terminatedProcessesList.push_back(coreList[i].process);
-                        coreList[i].update(false);  // mark core as idle
-                        break;
-                    }
-
-                    coreList[i].process->incrementCpuCycles();  // increment CPU cycle
+            // Assign a new process to the core if it's empty and the queue is not empty
+            if (core.process == nullptr && !activeProcessesList.empty()) {
+                std::shared_ptr<Process> newProcess = this->activeProcessesList.front();
+                this->activeProcessesList.erase(this->activeProcessesList.begin());
+                core.setProcess(newProcess);
+                if(core.process)
+                {
+                    core.startQuantum(timeQuantum);
+                }else
+                {
+                    std::cout << "Process not set to Core " << core.coreID << " successfully" << std::endl;
                 }
-
-                // preempt process if not finished and requeue
-                if (!coreList[i].process->isFinished()) {
-                    processQueue.push(coreList[i].process);
-                }
-
-                // mark core as idle after quantum or process completion
-                coreList[i].update(false);
-                coreList[i].process = nullptr;
             }
 
-            std::this_thread::sleep_for(std::chrono::seconds(1));  // simulate time passage
         }
+
+        // Wait a short time to simulate time passing (adjust if needed)
+        std::this_thread::sleep_for(std::chrono::milliseconds(200));
     }
 }
 
-void RRScheduler::run() 
+void RRScheduler::init()
 {
-    this->execute();
+    std::cout << "RRScheduler initialized." << std::endl;
 }
 
-void RRScheduler::init() 
+// Runs the actual scheduler
+void RRScheduler::run()
 {
-    
+    this->executeQuantum(timeQuantum);
+}
+
+// Runs the actual scheduler, but with Quantum
+void RRScheduler::runQuantum(long long timeQuantum)
+{
+    this->executeQuantum(timeQuantum);
+}
+
+void RRScheduler::execute()
+{
+
 }

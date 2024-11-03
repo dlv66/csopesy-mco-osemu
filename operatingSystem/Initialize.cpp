@@ -35,24 +35,22 @@ void Initialize::start()
 			scheduler = schedulerValue.substr(1, schedulerValue.length() - 2);
 		}
 		else if (myText.find("quantum-cycles") != std::string::npos) {
-			quantumCycles = std::stoi(myText.substr(myText.find("quantum-cycles") + 15));
+			quantumCycles = std::stoll(myText.substr(myText.find("quantum-cycles") + 15));
 		}
-		else if (myText.find("batch-orocess-freq") != std::string::npos) {
-			batchProcessFreq = std::stoi(myText.substr(myText.find("batch-process-freq") + 19));
+		else if (myText.find("batch-process-freq") != std::string::npos) {
+			batchProcessFreq = std::stoll(myText.substr(myText.find("batch-process-freq") + 19));
 		}
 		else if (myText.find("min-ins") != std::string::npos) {
-			minIns = std::stoi(myText.substr(myText.find("min-ins") + 8));
+			minIns = std::stoll(myText.substr(myText.find("min-ins") + 8));
 		}
 		else if (myText.find("max-ins") != std::string::npos) {
-			maxIns = std::stoi(myText.substr(myText.find("max-ins") + 8));
+			maxIns = std::stoll(myText.substr(myText.find("max-ins") + 8));
 		}
 		else if (myText.find("delay-per-exec") != std::string::npos) {
-			delayPerExec = std::stoi(myText.substr(myText.find("delay-per-exec") + 15));
+			delayPerExec = std::stoll(myText.substr(myText.find("delay-per-exec") + 15));
 		}
 	}
 	configFile.close();
-
-	std::cout << "Initialization complete." << std::endl;
 
 	// TODO: Find way to use the variables for the other parts of the operating system
 	// GlobalScheduler::getInstance()->initialize(numCPU, scheduler, quantumCycles, batchProcessFreq, minIns, maxIns, delayPerExec);

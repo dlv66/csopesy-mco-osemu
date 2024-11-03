@@ -21,21 +21,28 @@ public:
 	static void destroy();
 
 	void run() override;
+	void runQuantum(long long timeQuantum) override;
 	void stop();
 
 	void tick() const;
+	void tickGlobal();
 	void addProcessToProcessTable(std::shared_ptr<Process> process);
-	void addProcessToProcessTableNoCout(std::shared_ptr<Process> process);
 	void handleScreenLS() const;
 	void handleReportUtil() const;
-	void startSchedulerTestInBackground();
+	void startSchedulerTestInBackground(long long minIns, long long maxIns, long long batchProcessFreq);
 	void handleSchedulerStop();
-	void handleSchedulerTest();
+	void handleSchedulerTest(long long minIns, long long maxIns, long long batchProcessFreq);
+	void getCPUUtilization() const;
+	void getCPUUtilizationReport(std::ofstream& reportUtilFile) const;
+	void incrementProcessID();
 
 	bool isRunning() const;
 	std::shared_ptr<AScheduler> scheduler;
 
 	ProcessTable processTable;
+
+	int processID = 0;
+	int globalCPUCycles = 0;
 
 private:
 	GlobalScheduler(const Initialize& initConfig);

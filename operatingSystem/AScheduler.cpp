@@ -16,12 +16,6 @@ void AScheduler::addProcess(std::shared_ptr<Process> process)
 	this->activeProcessesList.push_back(process);
 }
 
-void AScheduler::addProcessNoCout(std::shared_ptr<Process> process)
-{
-	GlobalScheduler::getInstance()->addProcessToProcessTableNoCout(process);
-	this->activeProcessesList.push_back(process);
-}
-
 std::shared_ptr<Process> AScheduler::findProcess(std::string processName) {
 	return GlobalScheduler::getInstance()->processTable[processName];
 }
@@ -29,6 +23,20 @@ std::shared_ptr<Process> AScheduler::findProcess(std::string processName) {
 void AScheduler::run() {
 	this->init();
 	this->execute();
+}
+
+void AScheduler::runQuantum(long long timeQuantum) {
+	this->init();
+	this->executeQuantum(timeQuantum);
+}
+
+void AScheduler::delay(int coreID) {
+	for (long long i = 0; i < this->delayPerExec; i++) {
+		this->coreList[coreID].tick();
+		//std::cout << "Delaying " << i << std::endl;
+		Sleep(100);
+	}
+
 }
 
 void AScheduler::stop() {

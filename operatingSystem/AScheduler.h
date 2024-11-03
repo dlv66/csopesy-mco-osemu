@@ -16,11 +16,12 @@ class AScheduler : public IThread {
 public:
 
 	int nCores;
+	long long delayPerExec;
 	std::vector<Core> coreList;
 
 	enum SchedulingAlgorithm {
 		FCFS,
-		ROUND_ROBIN
+		RR
 	};
 
 	// a scheduler is instantiated with an initial process
@@ -28,13 +29,15 @@ public:
 
 	std::shared_ptr<Process> findProcess(std::string processName);
 	void run() override;
+	void runQuantum(long long timeQuantum) override;
 	void stop();
 	SchedulingAlgorithm schedulingAlgo;
 
 	void addProcess(std::shared_ptr<Process> process);
-	void addProcessNoCout(std::shared_ptr<Process> process);
 	virtual void init() = 0; // the initializations of the algorithm
 	virtual void execute() = 0; // the algorithm
+	virtual void executeQuantum(long long timeQuantum) = 0; // the algorithm
+	void delay(int coreID);
 
 	std::vector<std::shared_ptr<Process>> activeProcessesList;
 	std::vector<std::shared_ptr<Process>> terminatedProcessesList;

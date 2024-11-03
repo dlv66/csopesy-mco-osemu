@@ -51,7 +51,7 @@ void RRScheduler::executeQuantum(long long timeQuantum) {
             if (core.process == nullptr && !activeProcessesList.empty()) {
                 std::shared_ptr<Process> newProcess = this->activeProcessesList.front();
                 this->activeProcessesList.erase(this->activeProcessesList.begin());
-                core.setProcess(newProcess);
+                core.setProcess(newProcess); // Set the new process to the core
                 if(core.process)
                 {
                     core.startQuantum(timeQuantum);

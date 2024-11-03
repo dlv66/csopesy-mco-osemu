@@ -73,6 +73,8 @@ void Core::runQuantum(long long timeQuantum) {
 
 	while (this->process != nullptr) {
 
+		this->process->update();
+
 		// if the process is NOT FINISHED
 		if (!this->process->isFinished()) {
 
@@ -87,6 +89,7 @@ void Core::runQuantum(long long timeQuantum) {
 
 			// Execute the process for the time quantum or until it finishes
 			this->process->executeQuantum(timeToExecute);
+			this->process->update(); // To note running
 			executedTime += timeToExecute;
 
 			if (this->process && this->process->isFinished()) {
@@ -103,8 +106,6 @@ void Core::runQuantum(long long timeQuantum) {
 			if (executedTime >= timeQuantum) {
 				// std::cout << "Preempting process: " << this->process->getName() << std::endl;
 
-				
-				// NOTE: THE 6 LINES OF CODE BELOW THIS COMMENT ARE BREAKING THE ENTIRE PROGRAM
 				this->process->update(); // To note preemption
 				this->update(false); // Core is now available
 
@@ -122,6 +123,5 @@ void Core::runQuantum(long long timeQuantum) {
 			this->process = nullptr;
 			break; // Exit if process finished
 		}
-		this->process->update();
 	}
 }

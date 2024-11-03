@@ -113,8 +113,7 @@ void GlobalScheduler::getCPUUtilizationReport(std::ofstream& reportUtilFile) con
     int coresUsed = 0;
     for (int i = 0; i < this->scheduler->nCores; i++)
     {
-        if (this->scheduler->coreList[i].process != nullptr &&
-            this->scheduler->coreList[i].process->getState() == Process::State::RUNNING)
+        if (this->scheduler->coreList[i].process != nullptr)
         {
             coresUsed++;
         }

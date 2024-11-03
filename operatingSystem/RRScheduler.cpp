@@ -3,23 +3,21 @@
 #include <iostream>
 #include <thread>
 #include <chrono>
-#include <mutex>
 
 RRScheduler::RRScheduler(int quantum, int delayExec, int nCores)
-    : AScheduler(SchedulingAlgorithm::RR), timeQuantum(quantum), delayPerExec(delayExec) {
-    std::cout << "RRScheduler created with quantum: " << quantum
-        << ", delayExec: " << delayExec << ", nCores: " << nCores << std::endl;
+    : timeQuantum(quantum), delayPerExec(delayExec) {
     this->nCores = nCores;
+    // Initialize cores based on the number of cores
     for (int i = 0; i < nCores; ++i) {
-        this->coreList.push_back(Core(i)); 
+        this->coreList.push_back(Core(i));
     }
 }
 
 void RRScheduler::addProcess(std::shared_ptr<Process> process) {
-    //std::cout << "Adding process " << process->getName() << " to the Round-Robin queue.\n";
-    processQueue.push(process);
-    this->activeProcessesList.push_back(process);  
+    processQueue.push(process);  // add process to the ready queue
+    activeProcessesList.push_back(process);  // keep track of active processes
 }
+
 
 /*
 RRScheduler::RRScheduler() : AScheduler(SchedulingAlgorithm::ROUND_ROBIN)
@@ -28,41 +26,62 @@ RRScheduler::RRScheduler() : AScheduler(SchedulingAlgorithm::ROUND_ROBIN)
 }
 */
 
-std::mutex queueMutex;  // Mutex for synchronizing access to the queue
-
 void RRScheduler::execute() {
     while (GlobalScheduler::getInstance()->isRunning()) {
         for (int i = 0; i < nCores; i++) {
-            if (coreList[i].process == nullptr && !processQueue.empty()) {
-                std::lock_guard<std::mutex> lock(queueMutex); 
-                if (!processQueue.empty()) {  
+            // if the core is idle, assign a new process
+            if (coreList[i].process == nullptr) {
+                if (coreList[i].terminatedProcess != nullptr) {
+                    this->terminatedProcessesList.push_back(coreList[i].terminatedProcess);
+                    coreList[i].terminatedProcess = nullptr;
+                }
+
+                if (!processQueue.empty()) {
                     std::shared_ptr<Process> process = processQueue.front();
                     processQueue.pop();
                     coreList[i].setProcess(process);
-                    coreList[i].process->setCPUCoreID(i); // assign coreID to the process
-                    std::cout << "Process " << process->getName() << " assigned to Core " << i << "\n";
-
-                    // thread to run the process
-                    std::thread([this, i, process]() {
-                        process->execute(); 
-                        std::lock_guard<std::mutex> lock(queueMutex); // lock when accessing shared resources
-                        if (process->isFinished()) {
-                            terminatedProcessesList.push_back(process);
-                            std::cout << "Terminating Process: " << process->getName() << "\n";
-                        }
-                        coreList[i].process = nullptr; // clear process from core
-                        }).detach(); // detach thread for independent execution
+                    coreList[i].process->update();
+                    coreList[i].start();
                 }
             }
-        }
 
-        // sleep
-        std::this_thread::sleep_for(std::chrono::milliseconds(10));
+            // simulate round-robin execution
+            if (coreList[i].process != nullptr) {
+                int executedInstructions = 0;
+                while (executedInstructions < timeQuantum) {
+                    coreList[i].process->execute();  // execute one instruction
+                    executedInstructions++;
+
+                    // simulate delay between instructions
+                    // delays-per-exec are not part of the quantum
+                    for (int j = 0; j < delayPerExec; ++j) {
+                        // 1 CPU cycle is one run through the main loop
+                        coreList[i].process->incrementCpuCycles();
+                    }
+
+                    if (coreList[i].process->isFinished()) {
+                        terminatedProcessesList.push_back(coreList[i].process);
+                        coreList[i].update(false);  // mark core as idle
+                        break;
+                    }
+
+                    coreList[i].process->incrementCpuCycles();  // increment CPU cycle
+                }
+
+                // preempt process if not finished and requeue
+                if (!coreList[i].process->isFinished()) {
+                    processQueue.push(coreList[i].process);
+                }
+
+                // mark core as idle after quantum or process completion
+                coreList[i].update(false);
+                coreList[i].process = nullptr;
+            }
+
+            std::this_thread::sleep_for(std::chrono::seconds(1));  // simulate time passage
+        }
     }
 }
-
-
-
 
 void RRScheduler::run() 
 {

@@ -35,7 +35,6 @@ void Process::update()
 	{
 		this->state = Process::State::TERMINATED;
 		this->timestampFinished = getCurrentTimestamp();
-		std::cout << "Process " << this->processName << " has finished executing.\n";
 	}
 	else if (this->cpuCoreID != -1)
 	{
@@ -77,15 +76,12 @@ void Process::setCPUCoreID(int coreID) {
 	this->cpuCoreID = coreID;
 }
 
-void Process::incrementCpuCycles() {
-	this->currentLineOfInstruction++;  // track CPU cycles through instruction count
-}
-
 Process::State Process::getState() const {
 	return this->state;
 }
 
 void Process::execute() {
+
 	std::ofstream outFile(this->processName + ".txt");
 
 	if (!outFile) {
@@ -107,4 +103,3 @@ void Process::execute() {
 
 	Sleep(200);
 }
-

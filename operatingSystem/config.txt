@@ -3,5 +3,5 @@ scheduler "rr"
 quantum-cycles 20
 batch-process-freq 4294967296
 min-ins 100
-max-ins 100
+max-ins 150
 delay-per-exec 10

@@ -106,7 +106,7 @@ void Process::execute() { // FOR FCFS
 	{
 		this->currentLineOfInstruction++;
 		//outFile << "(" << convertTimestampToString(getCurrentTimestamp()) << ")" << " Core:" << this->getCPUCoreID() << " 'Hello world from " << this->processName << "!'" << std::endl;
-		Sleep(100);
+		Sleep(200);
 
 		// CPU Ticks
 		GlobalScheduler::getInstance()->scheduler->coreList[this->getCPUCoreID()].tick(); 
@@ -115,7 +115,7 @@ void Process::execute() { // FOR FCFS
 
 	//outFile.close();
 
-	Sleep(100);
+	Sleep(200);
 }
 
 void Process::executeQuantum(int timeQuantum) { // FOR RRScheduler
@@ -158,7 +158,7 @@ void Process::executeQuantum(int timeQuantum) { // FOR RRScheduler
 		// CPU Ticks
 		GlobalScheduler::getInstance()->scheduler->coreList[this->getCPUCoreID()].tick();
 		GlobalScheduler::getInstance()->scheduler->delay(this->getCPUCoreID());
-		std::this_thread::sleep_for(std::chrono::milliseconds(100));
+		Sleep(200);
 		
 	}
 	

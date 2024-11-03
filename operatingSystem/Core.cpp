@@ -89,11 +89,15 @@ void Core::runQuantum(long long timeQuantum) {
 			this->process->executeQuantum(timeToExecute);
 			executedTime += timeToExecute;
 
-			if (this->process->isFinished()) {
+			if (this->process && this->process->isFinished()) {
 				this->terminatedProcess = this->process;
+				std::cout << "[DEBUG] 1:" << this->terminatedProcess->getName() << std::endl;
 				this->update(false);
 				this->process = nullptr;
 				break;
+			} else if (!this->process)
+			{
+				std::cout << "Process is null" << std::endl;
 			}
 
 			// Check if the process needs preemption
@@ -106,7 +110,7 @@ void Core::runQuantum(long long timeQuantum) {
 				this->update(false); // Core is now available
 
 				executedTime = 0;
-				std::this_thread::sleep_for(std::chrono::milliseconds(10));
+				Sleep(50);
 				break;
 			
 			}
@@ -115,6 +119,7 @@ void Core::runQuantum(long long timeQuantum) {
 		// if the process IS ALREADY FINISHED
 		else {
 			this->terminatedProcess = this->process;
+			std::cout << "[DEBUG] 2:" << this->terminatedProcess->getName() << std::endl;
 			this->update(false);
 			this->process = nullptr;
 			break; // Exit if process finished

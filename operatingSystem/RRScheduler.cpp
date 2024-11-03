@@ -34,7 +34,7 @@ void RRScheduler::executeQuantum(long long timeQuantum) {
 
             // Check for preemption: process has exceeded its quantum
             if (core.process != nullptr) {
-                core.runQuantum(timeQuantum); // Let the core handle the quantum execution and preemption
+                //core.startQuantum(timeQuantum); // Let the core handle the quantum execution and preemption
 
                 // If the core is now free, it means the process was preempted or finished
                 if (!core.isRunningBool()) {
@@ -52,13 +52,19 @@ void RRScheduler::executeQuantum(long long timeQuantum) {
                 std::shared_ptr<Process> newProcess = this->activeProcessesList.front();
                 this->activeProcessesList.erase(this->activeProcessesList.begin());
                 core.setProcess(newProcess);
-                core.startQuantum(timeQuantum);
+                if(core.process)
+                {
+                    core.startQuantum(timeQuantum);
+                }else
+                {
+                    std::cout << "Process not set to Core " << core.coreID << " successfully" << std::endl;
+                }
             }
 
         }
 
         // Wait a short time to simulate time passing (adjust if needed)
-        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+        std::this_thread::sleep_for(std::chrono::milliseconds(200));
     }
 }
 

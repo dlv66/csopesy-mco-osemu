@@ -6,7 +6,7 @@
 #include <memory>
 
 // TODO: Implement the round robin scheduler
-class RRScheduler : public AScheduler
+class RRScheduler : public AScheduler, public IThread
 {
 	private:
 		std::queue<std::shared_ptr<Process>> processQueue;  // Q of processes
@@ -21,6 +21,7 @@ class RRScheduler : public AScheduler
 		void instantiateCoreList();
 
 		// Runs the actual scheduler
+		void addProcess(std::shared_ptr<Process> process) override;  // add process to RR queue
 		void run() override;
 		void init() override;
 		void execute() override;

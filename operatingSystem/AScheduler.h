@@ -12,6 +12,7 @@ static const std::string FCFS_SCHEDULER_NAME = "FCFSScheduler";
 static const std::string RR_SCHEDULER_NAME = "RRScheduler";
 
 class AScheduler : public IThread {
+<<<<<<< HEAD
 
 public:
 
@@ -24,6 +25,13 @@ public:
 	int nCores;
 	std::vector<Core> coreList;
 >>>>>>> parent of 9b0d641 (rr pt2)
+=======
+
+public:
+
+	int nCores;
+	std::vector<Core> coreList;
+>>>>>>> parent of f7daf88 (Merge remote-tracking branch 'origin/RR_Testing')
 
 	enum SchedulingAlgorithm {
 		FCFS,

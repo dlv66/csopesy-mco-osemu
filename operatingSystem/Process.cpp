@@ -76,10 +76,6 @@ void Process::setCPUCoreID(int coreID) {
 	this->cpuCoreID = coreID;
 }
 
-void Process::incrementCpuCycles() {
-	this->currentLineOfInstruction++;  // track CPU cycles through instruction count
-}
-
 Process::State Process::getState() const {
 	return this->state;
 }

@@ -22,7 +22,6 @@ GlobalScheduler::GlobalScheduler(const Initialize& initConfig) : running(true) {
 	}
 	else if (initConfig.scheduler == "fcfs" || initConfig.scheduler == "FCFS") {
 		// Instantiate First-Come, First-Served Scheduler
-		// Instantiate First-Come, First-Served Scheduler
 		auto fcfsScheduler = std::make_shared<FCFSScheduler>(initConfig.numCPU, initConfig.delayPerExec);
 		this->schedulerTable[FCFS_SCHEDULER_NAME] = fcfsScheduler;
 		this->scheduler = fcfsScheduler;
@@ -267,60 +266,6 @@ void GlobalScheduler::handleReportUtil() const
 	}
 
 	reportUtilFile << "\n";
-
-	/*
-	* ORIGINAL reportUtilFile code BELOW:
-	*
-	std::ofstream reportUtilFile("csopesy-log.txt");
-
-	reportUtilFile << "\n\n\n";
-	reportUtilFile << "---------------------------------------------------------";
-	reportUtilFile << "\n";
-
-	reportUtilFile << "Running Processes: " << std::endl;
-	if (this->scheduler->activeProcessesList.empty()) {
-		reportUtilFile << "No Active Processes" << std::endl;
-	}
-	else {
-		for (int i = 0; i < this->scheduler->nCores; i++) {
-			if (this->scheduler->coreList[i].process != nullptr) {
-				std::shared_ptr<Process> runningProcess = this->scheduler->coreList[i].process;
-				reportUtilFile << std::setw(20) << std::left << runningProcess->getName()
-					<< std::setw(40) << std::left << runningProcess->getTimestampStarted()
-					<< "Core: " << std::setw(10) << std::left << runningProcess->getCPUCoreID()
-					<< runningProcess->getCommandCounter() << "/" << runningProcess->getLinesOfCode() << std::endl;
-			}
-		}
-	}
-
-	reportUtilFile << "\nTerminated Processes: " << std::endl;
-	if (this->scheduler->terminatedProcessesList.empty()) {
-		reportUtilFile << "No Finished Processes" << std::endl;
-	}
-	else {
-		for (auto& process : this->scheduler->terminatedProcessesList) {
-			reportUtilFile << std::setw(20) << process->getName()
-				<< std::setw(40) << process->getTimestampFinished()
-				<< "Core: " << std::setw(10) << "Finished"
-				<< process->getCommandCounter() << "/" << process->getLinesOfCode() << std::endl;
-		}
-	}
-
-	reportUtilFile << "\nWaiting Processes: " << std::endl;
-	for (auto& process : this->scheduler->activeProcessesList)
-	{
-		if (process != nullptr)
-		{
-			if (process->getCPUCoreID() == -1)
-				reportUtilFile << std::setw(20) << std::left << process->getName()
-				<< std::setw(40) << std::left << process->getTimestampStarted()
-				<< "Core: " << std::setw(10) << std::left << "N/A"
-				<< process->getCommandCounter() << "/" << process->getLinesOfCode() << std::endl;
-		}
-	}
-
-	reportUtilFile << "\n";
-	*/
 
 	reportUtilFile.close();
 

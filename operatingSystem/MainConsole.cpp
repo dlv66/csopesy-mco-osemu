@@ -65,23 +65,11 @@ void MainConsole::process()
 		if (sInput != "clear" && sInput != "exit") {
 			if (sInput == "initialize")
 			{
-				/*
-				init.start();
-
-				GlobalScheduler::initialize(init);  // Pass init to initialize GlobalScheduler
-				isInitialized = true;
-				*/
 				std::cout << "ERROR: System has already been initialized. Please try again.\n\n";
-				// TODO: Add if statement to all other inputs to check if "initialize" has been called first
-				init.start();
-				GlobalScheduler::initialize(init);  // Pass init to initialize GlobalScheduler
-            isInitialized = true;
-            std::cout << "System initialized with config file.\n";
 			}
 			else if (sInput == "report-util")
 			{
 				GlobalScheduler::getInstance()->handleReportUtil();
-				// logs of literally everything, but printed into a .txt file
 			}
 			else if (sInput.find("screen -s") == 0) {
 

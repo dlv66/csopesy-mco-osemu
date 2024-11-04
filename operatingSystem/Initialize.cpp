@@ -52,6 +52,4 @@ void Initialize::start()
 	}
 	configFile.close();
 
-	// TODO: Find way to use the variables for the other parts of the operating system
-	// GlobalScheduler::getInstance()->initialize(numCPU, scheduler, quantumCycles, batchProcessFreq, minIns, maxIns, delayPerExec);
 }

@@ -19,16 +19,12 @@ int main()
 {
 	Initialize init;
 	ConsoleManager::initialize();
-    //TODO: make a process initializer
 	bool running = true;
 	while (running)
 	{
-        //GlobalScheduler::getInstance()->start();
 		ConsoleManager::getInstance()->process();
 		ConsoleManager::getInstance()->drawConsole();
 
-        //TODO: add cpu cycles here ?
-        // i dont know if this is the right position
 	}
 
 }

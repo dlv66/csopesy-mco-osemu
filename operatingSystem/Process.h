@@ -6,7 +6,7 @@
 class Process
 {
 	public:
-		Process(int pid = -1, std::string processName = "DefaultProcess", long long minIns = 1, long long maxIns = 1);
+		Process(int pid = -1, std::string processName = "DefaultProcess", long long minIns = 1, long long maxIns = 1, int memorySize = 4096);
 		enum class State {
 			RUNNING, // Process is currently running
 			WAITING, // Process is waiting for an event to occur
@@ -32,6 +32,10 @@ class Process
 		std::string getTimestampFinished() const;
 
 		void setCPUCoreID(int coreID);
+
+		void setMemoryBlockIndex(int index); // NEW: Set the memory block index for this process
+		int getMemoryBlockIndex() const; // NEW: Get the memory block index
+		int getMemorySize() const;           // NEW: Get the memory size of the process
 		//void setState(State state);
 
 		void update();
@@ -47,6 +51,9 @@ class Process
 		long long totalLineOfInstruction = 0;
 		int cpuCoreID = -1; // the cpu core where a process is assigned
 		State state = State::READY;
+
+		int memorySize = 4096; // NEW: Memory size in KB, using MEM_PER_PROC as default
+		int memoryBlockIndex = -1; // NEW: Tracks the index of the allocated memory block, -1 if not allocated
 };
 
 

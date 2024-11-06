@@ -139,6 +139,7 @@
     <ClCompile Include="IThread.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MainConsole.cpp" />
+    <ClCompile Include="MemoryManager.cpp" />
     <ClCompile Include="Process.cpp" />
     <ClCompile Include="RRScheduler.cpp" />
     <ClCompile Include="Utils.cpp" />
@@ -156,6 +157,7 @@
     <ClInclude Include="Initialize.h" />
     <ClInclude Include="IThread.h" />
     <ClInclude Include="MainConsole.h" />
+    <ClInclude Include="MemoryManager.h" />
     <ClInclude Include="Process.h" />
     <ClInclude Include="RRScheduler.h" />
     <ClInclude Include="Utils.h" />

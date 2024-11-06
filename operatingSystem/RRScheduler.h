@@ -1,31 +1,35 @@
 #pragma once
+
 #include "AScheduler.h"
-#include "Process.h"
 #include "Core.h"
 #include <queue>
 #include <memory>
-#include <thread>  
+#include <thread>
 
-// TODO: Implement the round robin scheduler
+// Forward declarations
+class Process;
+class MemoryManager;
+
 class RRScheduler : public AScheduler, public IThread
 {
-	private:
-		std::queue<std::shared_ptr<Process>> processQueue;  // Queue of processes
-		long long timeQuantum;  // quantum in CPU cycles
-		long long delayPerExec; // delay between instruction executions
+private:
+    std::queue<std::shared_ptr<Process>> processQueue;  // Queue of processes
+    long long timeQuantum;  // quantum in CPU cycles
+    long long delayPerExec; // delay between instruction executions
+    int nCores;
+    std::vector<Core> coreList;
+    std::vector<std::shared_ptr<Process>> activeProcessesList;
+    std::vector<std::shared_ptr<Process>> terminatedProcessesList;
 
-	public:
-		// Constructor
-		RRScheduler(long long quantum, long long delayExec, int nCores);
+    std::shared_ptr<MemoryManager> memoryManager; // Persistent MemoryManager instance
 
-		// Instantiates core list based on given number of cores
-		void instantiateCoreList();
+public:
+    // Constructor
+    RRScheduler(long long quantum, long long delayExec, int nCores);
 
-		// Runs the actual scheduler
-		//void addProcessRR(std::shared_ptr<Process> process);  // add process to RR queue
-		void run() override;
-		void runQuantum(long long timeQuantum) override;
-		void init() override;
-		void execute() override;
-		void executeQuantum(long long timeQuantum) override;
+    void init() override;
+    void run() override;
+    void runQuantum(long long timeQuantum) override;
+    void execute() override;
+    void executeQuantum(long long timeQuantum) override;
 };

@@ -10,161 +10,74 @@
 #include "GlobalScheduler.h"
 #include "Utils.h"
 
-Process::Process(int pid, std::string processName, long long minIns, long long maxIns) {
-	this->pid = pid;
-	this->processName = processName;
-
-	// Random number generator helper lines of code
-	unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
-	std::mt19937_64 rng(seed);
-
-	this->totalLineOfInstruction = rng() % (maxIns - minIns + 1) + minIns;
-
-	this->timestampCreated = getCurrentTimestamp();
+// Constructor
+Process::Process(int pid, std::string processName, long long minIns, long long maxIns, int memorySize)
+    : pid(pid), processName(processName), memorySize(memorySize) {
+    timestampCreated = std::time(nullptr);
+    totalLineOfInstruction = minIns + (std::rand() % (maxIns - minIns + 1)); // Randomize between min and max
+    state = State::READY;
 }
 
-std::string Process::getName() const
-{
-	return this->processName;
-
+// Executes the process (basic implementation, assuming it increments the instruction counter)
+void Process::execute() {
+    if (state == State::RUNNING && currentLineOfInstruction < totalLineOfInstruction) {
+        ++currentLineOfInstruction;
+    }
+    if (currentLineOfInstruction >= totalLineOfInstruction) {
+        state = State::TERMINATED;
+        timestampFinished = std::time(nullptr);
+    }
 }
 
+// Executes for a specific quantum time
+void Process::executeQuantum(int timeQuantum) {
+    if (state == State::RUNNING) {
+        for (int i = 0; i < timeQuantum && currentLineOfInstruction < totalLineOfInstruction; ++i) {
+            ++currentLineOfInstruction;
+        }
+        if (currentLineOfInstruction >= totalLineOfInstruction) {
+            state = State::TERMINATED;
+            timestampFinished = std::time(nullptr);
+        }
+    }
+}
+
+// Getters
+std::string Process::getName() const { return processName; }
+bool Process::isFinished() const { return state == State::TERMINATED; }
+long long Process::getRemainingTime() const { return totalLineOfInstruction - currentLineOfInstruction; }
+long long Process::getCommandCounter() const { return currentLineOfInstruction; }
+long long Process::getLinesOfCode() const { return totalLineOfInstruction; }
+int Process::getPID() const { return pid; }
+int Process::getCPUCoreID() const { return cpuCoreID; }
+Process::State Process::getState() const { return state; }
+int Process::getMemorySize() const { return memorySize; } // NEW: Returns the memory size of the process
+
+// Timestamp methods
 std::string Process::getTimestampStarted() const
 {
-	return convertTimestampToString(this->timestampStarted);
+    return convertTimestampToString(this->timestampStarted);
 }
 
 std::string Process::getTimestampFinished() const
 {
-	return convertTimestampToString(this->timestampFinished);
+    return convertTimestampToString(this->timestampFinished);
 }
 
+// Setters
+void Process::setCPUCoreID(int coreID) { cpuCoreID = coreID; }
+void Process::setMemoryBlockIndex(int index) { memoryBlockIndex = index; }
+int Process::getMemoryBlockIndex() const { return memoryBlockIndex; }
+
+// Updates the process state
 void Process::update() {
-	if (this->isFinished()) {
-		this->state = Process::State::TERMINATED;
-		this->timestampFinished = getCurrentTimestamp();
-	}
-	else if (this->cpuCoreID != -1) {
-		this->state = Process::State::RUNNING;
-		this->timestampStarted = getCurrentTimestamp();
-	}
-	else {
-		this->state = Process::State::READY;
-	}
+    if (state == State::READY && timestampStarted == 0) {
+        timestampStarted = std::time(nullptr);
+    }
 }
 
-
-bool Process::isFinished() const {
-	return this->currentLineOfInstruction >= this->totalLineOfInstruction;
-}
-
+// Resets the ticks of instruction execution, useful for re-scheduling
 void Process::resetTicksLineOfInstruction() {
-	this->ticksLineOfInstruction = 0;
-}
-
-long long Process::getCommandCounter() const {
-	return this->currentLineOfInstruction;
-}
-
-long long Process::getRemainingTime() const {
-	return this->totalLineOfInstruction - this->currentLineOfInstruction;
-}
-
-long long Process::getLinesOfCode() const {
-	return this->totalLineOfInstruction;
-}
-
-int Process::getPID() const {
-	return this->pid;
-}
-
-int Process::getCPUCoreID() const {
-	return this->cpuCoreID;
-}
-
-void Process::setCPUCoreID(int coreID) {
-	this->cpuCoreID = coreID;
-}
-
-Process::State Process::getState() const {
-	return this->state;
-}
-
-void Process::execute() { // FOR FCFS
-
-	//std::ofstream outFile(this->processName + ".txt");
-
-	//if (!outFile) {
-	//	std::cerr << "Error: Could not open the file for writing." << std::endl;
-	//	return;
-	//}
-
-	//outFile << "Process name: " << this->processName << std::endl;
-	//outFile << "Logs: \n" << std::endl;
-
-	for (long long i = 0; i < this->totalLineOfInstruction; i++)
-	{
-		this->currentLineOfInstruction++;
-		//outFile << "(" << convertTimestampToString(getCurrentTimestamp()) << ")" << " Core:" << this->getCPUCoreID() << " 'Hello world from " << this->processName << "!'" << std::endl;
-		Sleep(200);
-
-		// CPU Ticks
-		GlobalScheduler::getInstance()->scheduler->coreList[this->getCPUCoreID()].tick(); 
-		GlobalScheduler::getInstance()->scheduler->delay(this->getCPUCoreID());
-	}
-
-	//outFile.close();
-
-	Sleep(200);
-}
-
-void Process::executeQuantum(int timeQuantum) { // FOR RRScheduler
-	//std::ofstream outFile(this->processName + ".txt");
-
-	//if (!outFile) {
-	//	std::cerr << "Error: Could not open the file for writing." << std::endl;
-	//	return;
-	//}
-
-	//outFile << "Process name: " << this->processName << std::endl;
-	//outFile << "Logs: \n" << std::endl;
-
-
-	long long instructionsToRun;
-	long long remainingInstructions = this->totalLineOfInstruction - this->currentLineOfInstruction;
-
-	// RRScheduler-specific lines of code:
-	if (timeQuantum > remainingInstructions) {
-		// If time quantum is larger than the remaining instructions, just use the remaining instructions.
-		instructionsToRun = remainingInstructions;
-	}
-	else {
-		// Otherwise, use the maxInstructions value.
-		instructionsToRun = timeQuantum;
-	}
-
-
-	for (long long i = 0; i < instructionsToRun; i++) {
-		if (this->currentLineOfInstruction >= this->totalLineOfInstruction) {
-			break;
-		}
-
-		this->currentLineOfInstruction++;
-		this->ticksLineOfInstruction++;
-		//outFile << "(" << convertTimestampToString(getCurrentTimestamp()) << ") Core:"
-		//	<< this->getCPUCoreID() << " 'Hello world from "
-		//	<< this->processName << "!'" << std::endl;
-
-		// CPU Ticks
-		GlobalScheduler::getInstance()->scheduler->coreList[this->getCPUCoreID()].tick();
-		GlobalScheduler::getInstance()->scheduler->delay(this->getCPUCoreID());
-		Sleep(200);
-		
-	}
-	
-	if (this->isFinished()) {
-		this->state = Process::State::TERMINATED;
-		this->timestampFinished = getCurrentTimestamp();
-		//outFile.close();
-	}
+    currentLineOfInstruction = 0;
+    state = State::READY;
 }

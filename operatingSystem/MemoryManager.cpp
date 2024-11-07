@@ -2,6 +2,9 @@
 #include "Process.h"  // Include only in .cpp to access Process methods
 #include <iostream>
 #include <iomanip>
+#include <sstream> 
+#include <vector>  
+#include "Core.h"
 
 // Constructor initializes the memory frames as all empty
 MemoryManager::MemoryManager() : frames(FRAMES, false) {}
@@ -77,66 +80,61 @@ int MemoryManager::calculateExternalFragmentation() const {
 
     return maxFreeBlock * MEM_PER_FRAME;
 }
-
 // Function to generate a detailed report at each quantum cycle
-void MemoryManager::generateReport(const std::vector<std::shared_ptr<Process>>& activeProcessesList) const {
+void MemoryManager::generateReport(const std::vector<Core>& coreList) const {
     std::ofstream reportFile("memory_report_cycle.txt", std::ios::app);  // Open in append mode to add each cycle's info
 
     // Timestamp for the report
     std::time_t now = std::time(0);
-    char buffer[26];  // Standard buffer size for date-time strings
-    ctime_s(buffer, sizeof(buffer), &now);  // Use ctime_s for safe conversion
+    char buffer[26];
+    ctime_s(buffer, sizeof(buffer), &now);
     reportFile << "\nTimestamp: " << buffer;
 
-    // Number of processes currently in memory
-    reportFile << "Processes in Memory: " << processesInMemory << "\n";
-
-    // Calculate and display external fragmentation
-    reportFile << "External Fragmentation: " << calculateExternalFragmentation() << " KB\n";
-
+    int processesInMemoryCount = 0;
+    int externalFragmentation = calculateExternalFragmentation();
+    reportFile << "Processes in Memory: " << processesInMemoryCount << "\n";
+    reportFile << "External Fragmentation: " << externalFragmentation << " KB\n";
     reportFile << "\n----end---- = " << MAX_MEMORY << "\n\n";
 
-    int currentAddress = MAX_MEMORY;
-    int frameSizeInBytes = MEM_PER_FRAME;
-    int processMemorySize = MEM_PER_PROC;
+    // Temporary vector to hold each report entry for reverse output
+    std::vector<std::string> reportEntries;
 
-    for (int i = FRAMES - 1; i >= 0; ) {
-        bool occupied = frames[i];
-        int blockStart = i;
+    // Iterate over coreList to capture running processes
+    for (const auto& core : coreList) {
+        if (core.process != nullptr) {  // Only consider processes running on cores
+            processesInMemoryCount++;
+            std::shared_ptr<Process> runningProcess = core.process;
 
-        // Identify contiguous occupied or free frames
-        while (i >= 0 && frames[i] == occupied) {
-            i--;
-        }
+            int blockStartAddr = runningProcess->getMemoryBlockIndex() * MemoryManager::MEM_PER_FRAME;
+            int blockEndAddr = blockStartAddr + runningProcess->getMemorySize();
 
-        int blockEnd = blockStart;
-        int blockStartAddress = currentAddress - ((blockEnd + 1) * frameSizeInBytes);
-        int blockSize = (blockEnd - i) * frameSizeInBytes;
-        currentAddress -= blockSize;
+            // Prepare the entry and add to the vector
+            std::ostringstream entry;
+            entry << blockEndAddr << "\n";
+            entry << "P" << runningProcess->getPID() << "\n";
+            entry << blockStartAddr << "\n\n";
+            reportEntries.push_back(entry.str());
 
-        if (occupied) {
-            // Find the process occupying this block (assumes unique block for each process)
-            for (const auto& process : activeProcessesList) {
-                if (process->getMemoryBlockIndex() == i + 1) {
-                    reportFile << blockStartAddress << "\n";
-                    reportFile << "P" << process->getPID() << "\n";
-                    reportFile << blockStartAddress + blockSize << "\n\n";
-                    break;
-                }
-            }
-        }
-        else {
-            // Print free memory block
-            reportFile << blockStartAddress << "\n\n";
-            reportFile << currentAddress << "\n\n";
+            // Debug output to verify process allocation in report
+            std::cout << "Reporting running process " << runningProcess->getName() << " with PID "
+                << runningProcess->getPID() << " from address " << blockStartAddr
+                << " to " << blockEndAddr << "\n";
         }
     }
 
-    reportFile << "----start---- = 0\n";
+    // Output entries in reverse order to match the descending format
+    for (auto it = reportEntries.rbegin(); it != reportEntries.rend(); ++it) {
+        reportFile << *it;
+    }
 
+    reportFile << "----start---- = 0\n";
     reportFile << "---------------------------------------------------\n";
     reportFile.close();
+
+    // Update processes in memory count in the report
+    std::cout << "Processes in memory: " << processesInMemoryCount << "\n";
 }
+
 
 
 // Prints an ASCII representation of memory layout in 64-frame rows

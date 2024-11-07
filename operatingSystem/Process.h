@@ -36,6 +36,7 @@ class Process
 		void setMemoryBlockIndex(int index); // NEW: Set the memory block index for this process
 		int getMemoryBlockIndex() const; // NEW: Get the memory block index
 		int getMemorySize() const;           // NEW: Get the memory size of the process
+
 		//void setState(State state);
 
 		void update();
@@ -53,7 +54,7 @@ class Process
 		State state = State::READY;
 
 		long long memorySize = 4096; // NEW: Memory size in KB, using MEM_PER_PROC as default
-		long long memoryBlockIndex = -1; // NEW: Tracks the index of the allocated memory block, -1 if not allocated
+		int memoryBlockIndex = -1; // NEW: Tracks the index of the allocated memory block, -1 if not allocated
 };
 
 

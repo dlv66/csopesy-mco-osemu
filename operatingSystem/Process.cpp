@@ -52,7 +52,9 @@ int Process::getPID() const { return pid; }
 int Process::getCPUCoreID() const { return cpuCoreID; }
 Process::State Process::getState() const { return state; }
 int Process::getMemorySize() const { return memorySize; } // NEW: Returns the memory size of the process
-
+int Process::getMemoryBlockIndex() const {  // Define as a member function
+    return memoryBlockIndex;
+}
 // Timestamp methods
 std::string Process::getTimestampStarted() const
 {
@@ -66,8 +68,9 @@ std::string Process::getTimestampFinished() const
 
 // Setters
 void Process::setCPUCoreID(int coreID) { cpuCoreID = coreID; }
-void Process::setMemoryBlockIndex(int index) { memoryBlockIndex = index; }
-int Process::getMemoryBlockIndex() const { return memoryBlockIndex; }
+void Process::setMemoryBlockIndex(int index) {
+    memoryBlockIndex = index;
+}
 
 // Updates the process state
 void Process::update() {

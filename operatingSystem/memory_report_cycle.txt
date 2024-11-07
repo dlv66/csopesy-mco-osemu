@@ -1,0 +1,214 @@
+
+Timestamp: Fri Nov  8 04:03:34 2024
+Processes in Memory: 0
+External Fragmentation: 16384 KB
+
+----end---- = 16384
+
+----start---- = 0
+---------------------------------------------------
+
+Timestamp: Fri Nov  8 04:03:35 2024
+Processes in Memory: 1
+External Fragmentation: 12288 KB
+
+----end---- = 16384
+
+4096
+P0
+0
+
+----start---- = 0
+---------------------------------------------------
+
+Timestamp: Fri Nov  8 04:03:36 2024
+Processes in Memory: 2
+External Fragmentation: 8192 KB
+
+----end---- = 16384
+
+8192
+P2
+4096
+
+4096
+P1
+0
+
+----start---- = 0
+---------------------------------------------------
+
+Timestamp: Fri Nov  8 04:03:37 2024
+Processes in Memory: 2
+External Fragmentation: 8192 KB
+
+----end---- = 16384
+
+8192
+P4
+4096
+
+4096
+P3
+0
+
+----start---- = 0
+---------------------------------------------------
+
+Timestamp: Fri Nov  8 04:03:38 2024
+Processes in Memory: 2
+External Fragmentation: 8192 KB
+
+----end---- = 16384
+
+8192
+P5
+4096
+
+4096
+P0
+0
+
+----start---- = 0
+---------------------------------------------------
+
+Timestamp: Fri Nov  8 04:03:39 2024
+Processes in Memory: 2
+External Fragmentation: 8192 KB
+
+----end---- = 16384
+
+8192
+P7
+4096
+
+4096
+P6
+0
+
+----start---- = 0
+---------------------------------------------------
+
+Timestamp: Fri Nov  8 04:08:23 2024
+Processes in Memory: 0
+External Fragmentation: 16384 KB
+
+----end---- = 16384
+
+----start---- = 0
+---------------------------------------------------
+
+Timestamp: Fri Nov  8 04:08:24 2024
+Processes in Memory: 1
+External Fragmentation: 12288 KB
+
+----end---- = 16384
+
+4095
+P0
+0
+
+----start---- = 0
+---------------------------------------------------
+
+Timestamp: Fri Nov  8 04:08:25 2024
+Processes in Memory: 2
+External Fragmentation: 8192 KB
+
+----end---- = 16384
+
+8191
+P2
+4096
+
+4095
+P1
+0
+
+----start---- = 0
+---------------------------------------------------
+
+Timestamp: Fri Nov  8 04:08:26 2024
+Processes in Memory: 2
+External Fragmentation: 8192 KB
+
+----end---- = 16384
+
+8191
+P4
+4096
+
+4095
+P3
+0
+
+----start---- = 0
+---------------------------------------------------
+
+Timestamp: Fri Nov  8 04:08:27 2024
+Processes in Memory: 2
+External Fragmentation: 8192 KB
+
+----end---- = 16384
+
+8191
+P5
+4096
+
+4095
+P0
+0
+
+----start---- = 0
+---------------------------------------------------
+
+Timestamp: Fri Nov  8 04:08:28 2024
+Processes in Memory: 2
+External Fragmentation: 8192 KB
+
+----end---- = 16384
+
+8191
+P7
+4096
+
+4095
+P6
+0
+
+----start---- = 0
+---------------------------------------------------
+
+Timestamp: Fri Nov  8 04:08:29 2024
+Processes in Memory: 2
+External Fragmentation: 8192 KB
+
+----end---- = 16384
+
+8191
+P9
+4096
+
+4095
+P8
+0
+
+----start---- = 0
+---------------------------------------------------
+
+Timestamp: Fri Nov  8 04:08:30 2024
+Processes in Memory: 2
+External Fragmentation: 8192 KB
+
+----end---- = 16384
+
+8191
+P2
+4096
+
+4095
+P1
+0
+
+----start---- = 0
+---------------------------------------------------

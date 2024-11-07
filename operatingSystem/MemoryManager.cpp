@@ -92,9 +92,7 @@ void MemoryManager::generateReport(const std::vector<Core>& coreList) const {
 
     int processesInMemoryCount = 0;
     int externalFragmentation = calculateExternalFragmentation();
-    reportFile << "Processes in Memory: " << processesInMemoryCount << "\n";
-    reportFile << "External Fragmentation: " << externalFragmentation << " KB\n";
-    reportFile << "\n----end---- = " << MAX_MEMORY << "\n\n";
+
 
     // Temporary vector to hold each report entry for reverse output
     std::vector<std::string> reportEntries;
@@ -106,7 +104,7 @@ void MemoryManager::generateReport(const std::vector<Core>& coreList) const {
             std::shared_ptr<Process> runningProcess = core.process;
 
             int blockStartAddr = runningProcess->getMemoryBlockIndex() * MemoryManager::MEM_PER_FRAME;
-            int blockEndAddr = blockStartAddr + runningProcess->getMemorySize();
+            int blockEndAddr = blockStartAddr + runningProcess->getMemorySize() -1;
 
             // Prepare the entry and add to the vector
             std::ostringstream entry;
@@ -121,6 +119,10 @@ void MemoryManager::generateReport(const std::vector<Core>& coreList) const {
                 << " to " << blockEndAddr << "\n";
         }
     }
+
+    reportFile << "Processes in Memory: " << processesInMemoryCount << "\n";
+    reportFile << "External Fragmentation: " << externalFragmentation << " KB\n";
+    reportFile << "\n----end---- = " << MAX_MEMORY << "\n\n";
 
     // Output entries in reverse order to match the descending format
     for (auto it = reportEntries.rbegin(); it != reportEntries.rend(); ++it) {

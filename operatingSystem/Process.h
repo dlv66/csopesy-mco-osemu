@@ -57,3 +57,33 @@ class Process
 };
 
 
+
+
+
+
+//OTHER CODE
+/*
+#pragma once
+#include "ICommand.h"
+#include "TypedefRepo.h"
+#include "MemoryManager.h"
+#include <chrono>
+#include <string>
+#include <vector>
+@@ -44,6 +45,9 @@ class Process {
+	// setters
+	void setState(ProcessState state);
+	void setCpuCoreId(int _cpuCoreId);
+	bool allocateMemory();
+	void deallocateMemory();
+	bool hasMemory() const;
+
+private:
+	int pid;
+@@ -59,4 +63,5 @@ class Process {
+	// RequirementFlags requirements;
+	// friend class ResourceEmulator
+	friend class FCFSScheduler;
+	bool hasMemoryAllocated = false;
+};
+*/

@@ -81,3 +81,28 @@ void Process::resetTicksLineOfInstruction() {
     currentLineOfInstruction = 0;
     state = State::READY;
 }
+
+
+
+
+
+
+
+//OTHER CODE
+/*
+bool Process::allocateMemory() {
+    if (!hasMemoryAllocated) {
+        hasMemoryAllocated = MemoryManager::getInstance()->allocateMemory(name);
+    }
+    return hasMemoryAllocated;
+}
+void Process::deallocateMemory() {
+    if (hasMemoryAllocated) {
+        MemoryManager::getInstance()->deallocateMemory(name);
+        hasMemoryAllocated = false;
+    }
+}
+bool Process::hasMemory() const {
+    return hasMemoryAllocated;
+}
+*/

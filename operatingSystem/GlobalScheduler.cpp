@@ -99,11 +99,10 @@ void GlobalScheduler::getCPUUtilization() const
 		cpuUtilPercentage = (static_cast<double>(coresUsed) / this->scheduler->nCores) * 100.0;
 	}
 
-	int coresAvailble = this->scheduler->nCores - coresUsed;
-
+	int coresAvailable = this->scheduler->nCores - coresUsed;
 	std::cout << "\nCPU Utilization: " << cpuUtilPercentage << "%\n";
 	std::cout << "Cores Used: " << coresUsed << "\n";
-	std::cout << "Cores Available: " << coresAvailble << "\n";
+	std::cout << "Cores Available: " << coresAvailable << "\n";
 }
 
 void GlobalScheduler::getCPUUtilizationReport(std::ofstream& reportUtilFile) const
@@ -115,6 +114,9 @@ void GlobalScheduler::getCPUUtilizationReport(std::ofstream& reportUtilFile) con
         if (this->scheduler->coreList[i].process != nullptr)
         {
             coresUsed++;
+        } else
+        {
+			std::cout << "Core " << i << " is not being used.\n";
         }
     }
     double cpuUtilPercentage = 0.0;
@@ -123,11 +125,11 @@ void GlobalScheduler::getCPUUtilizationReport(std::ofstream& reportUtilFile) con
         cpuUtilPercentage = (static_cast<double>(coresUsed) / this->scheduler->nCores) * 100.0;
     }
 
-    int coresAvailble = this->scheduler->nCores - coresUsed;
+    int coresAvailable = this->scheduler->nCores - coresUsed;
 
     reportUtilFile << "\nCPU Utilization: " << cpuUtilPercentage << "%\n";
 	reportUtilFile << "Cores Used: " << coresUsed << "\n";
-	reportUtilFile << "Cores Available: " << coresAvailble << "\n";
+	reportUtilFile << "Cores Available: " << coresAvailable << "\n";
 }
 
 void GlobalScheduler::incrementProcessID()

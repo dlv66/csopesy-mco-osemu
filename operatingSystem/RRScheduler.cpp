@@ -12,10 +12,10 @@
 
 // Constructor with MemoryManager initialization
 RRScheduler::RRScheduler(long long quantum, long long delayExec, int nCores)
-    : AScheduler(SchedulingAlgorithm::RR), timeQuantum(quantum), delayPerExec(delayExec), nCores(nCores) {
+    : AScheduler(SchedulingAlgorithm::RR), timeQuantum(quantum), delayPerExec(delayExec)/*, nCores(nCores)*/ {
 
     std::cout << "RRScheduler created with quantum: " << quantum << ", delayExec: " << delayExec << ", nCores: " << nCores << std::endl;
-
+	this->nCores = nCores;
     // Initialize memory manager as a persistent instance
     memoryManager = std::make_shared<MemoryManager>();
 
@@ -28,13 +28,14 @@ RRScheduler::RRScheduler(long long quantum, long long delayExec, int nCores)
 void RRScheduler::executeQuantum(long long timeQuantum) {
     while (GlobalScheduler::getInstance()->isRunning()) {
         // Iterate over each core and manage process scheduling and memory
+		
         for (int i = 0; i < nCores; i++) {
             Core& core = coreList[i];
 
             // Release memory for terminated processes
             if (core.terminatedProcess != nullptr) {
                 memoryManager->releaseMemoryForProcess(core.terminatedProcess);
-                terminatedProcessesList.push_back(core.terminatedProcess);
+                this->terminatedProcessesList.push_back(core.terminatedProcess);
                 core.terminatedProcess = nullptr;
                 std::cout << "Memory released for terminated process.\n";
             }
@@ -45,7 +46,7 @@ void RRScheduler::executeQuantum(long long timeQuantum) {
                 if (!core.isRunningBool()) {
                     if (!core.process->isFinished()) {
                         // Process exceeded its quantum but is not yet finished: preempt it
-                        activeProcessesList.push_back(core.process);
+                        this->activeProcessesList.push_back(core.process);
                         core.process->setCPUCoreID(-1);
                         std::cout << "Process " << core.process->getName()
                             << " preempted and returned to active queue.\n";
@@ -56,12 +57,12 @@ void RRScheduler::executeQuantum(long long timeQuantum) {
 
             // Assign a new process to the core if it's empty and the queue is not empty
             if (core.process == nullptr && !activeProcessesList.empty()) {
-                std::shared_ptr<Process> newProcess = activeProcessesList.front();
+                std::shared_ptr<Process> newProcess = this->activeProcessesList.front();
 
                 // Manually specify a starting index for memory allocation for testing purposes
                 int manualStartIndex = (i * (MemoryManager::MEM_PER_PROC / MemoryManager::MEM_PER_FRAME)) % MemoryManager::FRAMES;  // calculation
                 if (memoryManager->allocateMemoryForProcess(newProcess, manualStartIndex)) {  // Attempt to allocate memory
-                    activeProcessesList.erase(activeProcessesList.begin());
+                    this->activeProcessesList.erase(this->activeProcessesList.begin());
                     core.setProcess(newProcess);  // Set the new process to the core
                     std::cout << "Process " << newProcess->getName()
                         << " assigned to Core " << i << " with starting memory index " << manualStartIndex << "\n";

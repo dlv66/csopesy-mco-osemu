@@ -52,8 +52,8 @@ class Process
 		int cpuCoreID = -1; // the cpu core where a process is assigned
 		State state = State::READY;
 
-		int memorySize = 4096; // NEW: Memory size in KB, using MEM_PER_PROC as default
-		int memoryBlockIndex = -1; // NEW: Tracks the index of the allocated memory block, -1 if not allocated
+		long long memorySize = 4096; // NEW: Memory size in KB, using MEM_PER_PROC as default
+		long long memoryBlockIndex = -1; // NEW: Tracks the index of the allocated memory block, -1 if not allocated
 };
 
 

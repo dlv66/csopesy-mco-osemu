@@ -14,6 +14,10 @@ void AScheduler::addProcess(std::shared_ptr<Process> process)
 {
 	GlobalScheduler::getInstance()->addProcessToProcessTable(process);
 	this->activeProcessesList.push_back(process);
+	auto it = std::find(activeProcessesList.begin(), activeProcessesList.end(), process);
+	if (it == activeProcessesList.end()) {
+		std::cout << "Process " << process->getName() << " not added in the list." << std::endl;
+	}
 }
 
 std::shared_ptr<Process> AScheduler::findProcess(std::string processName) {

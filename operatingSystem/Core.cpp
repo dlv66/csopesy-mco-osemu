@@ -104,7 +104,7 @@ void Core::runQuantum(long long timeQuantum) {
 
 			// Check if the process needs preemption
 			if (executedTime >= timeQuantum) {
-				// std::cout << "Preempting process: " << this->process->getName() << std::endl;
+				//std::cout << "Preempting process: " << this->process->getName() << std::endl;
 
 				this->process->update(); // To note preemption
 				this->update(false); // Core is now available

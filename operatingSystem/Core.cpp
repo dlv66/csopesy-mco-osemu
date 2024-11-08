@@ -95,8 +95,8 @@ void Core::runQuantum(long long timeQuantum) {
 
 			if (this->process && this->process->isFinished()) {
 				this->terminatedProcess = this->process;
+				this->process->update(); // To note preemption
 				this->update(false);
-				this->process = nullptr;
 				break;
 			} else if (!this->process)
 			{
@@ -120,8 +120,8 @@ void Core::runQuantum(long long timeQuantum) {
 		// if the process IS ALREADY FINISHED
 		else {
 			this->terminatedProcess = this->process;
+			this->process->update(); // To note preemption
 			this->update(false);
-			this->process = nullptr;
 			break; // Exit if process finished
 		}
 	}

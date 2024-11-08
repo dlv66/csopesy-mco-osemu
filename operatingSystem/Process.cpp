@@ -34,6 +34,7 @@ void Process::executeQuantum(int timeQuantum) {
     if (state == State::RUNNING) {
         for (int i = 0; i < timeQuantum && currentLineOfInstruction < totalLineOfInstruction; ++i) {
             ++currentLineOfInstruction;
+			//std::cout << "Process " << processName << " executing instruction " << currentLineOfInstruction << std::endl;
         }
         if (currentLineOfInstruction >= totalLineOfInstruction) {
             state = State::TERMINATED;
@@ -77,6 +78,11 @@ void Process::update() {
     if (state == State::READY && timestampStarted == 0) {
         timestampStarted = std::time(nullptr);
     }
+}
+
+void Process::setRunningState()
+{
+	this->state = State::RUNNING;
 }
 
 // Resets the ticks of instruction execution, useful for re-scheduling

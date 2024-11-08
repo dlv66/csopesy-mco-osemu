@@ -15,16 +15,16 @@ bool MemoryManager::allocateMemoryForProcess(std::shared_ptr<Process> process, i
 
     // Check if there is enough room from startIndex to allocate memory
     if (startIndex < 0 || startIndex + requiredFrames > FRAMES) {
-        std::cout << "Invalid starting index or not enough frames from the specified index." << std::endl;
+        /*std::cout << "Invalid starting index or not enough frames from the specified index." << std::endl;*/
         return false;
     }
 
     // Check if the frames from startIndex are free
     for (int i = startIndex; i < startIndex + requiredFrames; i++) {
         if (frames[i]) {
-            std::cout << "Memory allocation failed: frames from " << startIndex
+           /* std::cout << "Memory allocation failed: frames from " << startIndex
                 << " to " << startIndex + requiredFrames - 1
-                << " are not all free." << std::endl;
+                << " are not all free." << std::endl;*/
             return false;
         }
     }
@@ -37,8 +37,8 @@ bool MemoryManager::allocateMemoryForProcess(std::shared_ptr<Process> process, i
     // Set process's memory block index and increment process count
     process->setMemoryBlockIndex(startIndex);
     processesInMemory++;
-    std::cout << "Manually allocated memory for process " << process->getName()
-        << " from frame " << startIndex << " to " << startIndex + requiredFrames - 1 << std::endl;
+    /*std::cout << "Manually allocated memory for process " << process->getName()
+        << " from frame " << startIndex << " to " << startIndex + requiredFrames - 1 << std::endl;*/
     return true;
 }
 
@@ -54,8 +54,8 @@ void MemoryManager::releaseMemoryForProcess(std::shared_ptr<Process> process) {
         }
         process->setMemoryBlockIndex(-1);  // Reset the memory block index
         processesInMemory--;
-        std::cout << "Released memory for process " << process->getName()
-            << " from block index " << blockIndex << std::endl;
+        /*std::cout << "Released memory for process " << process->getName()
+            << " from block index " << blockIndex << std::endl;*/
     }
 }
 
@@ -114,9 +114,9 @@ void MemoryManager::generateReport(const std::vector<Core>& coreList) const {
             reportEntries.push_back(entry.str());
 
             // Debug output to verify process allocation in report
-            std::cout << "Reporting running process " << runningProcess->getName() << " with PID "
+            /*std::cout << "Reporting running process " << runningProcess->getName() << " with PID "
                 << runningProcess->getPID() << " from address " << blockStartAddr
-                << " to " << blockEndAddr << "\n";
+                << " to " << blockEndAddr << "\n";*/
         }
     }
 
@@ -134,7 +134,7 @@ void MemoryManager::generateReport(const std::vector<Core>& coreList) const {
     reportFile.close();
 
     // Update processes in memory count in the report
-    std::cout << "Processes in memory: " << processesInMemoryCount << "\n";
+    //std::cout << "Processes in memory: " << processesInMemoryCount << "\n";
 }
 
 

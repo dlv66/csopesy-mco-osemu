@@ -41,19 +41,19 @@ void RRScheduler::executeQuantum(long long timeQuantum) {
                     // Process exceeded its quantum but is not yet finished: preempt it
                     this->activeProcessesList.push_back(core.process);
                     core.process->setCPUCoreID(-1);
-                    std::cout << "Process " << core.process->getName()
-                        << " preempted and returned to active queue.\n";
+                    /*std::cout << "Process " << core.process->getName()
+                        << " preempted and returned to active queue.\n";*/
                 }
                 else {
                     // Process has completed
                     this->terminatedProcessesList.push_back(core.process);
-                    std::cout << "Process " << core.process->getName() << " completed.\n";
+                    //std::cout << "Process " << core.process->getName() << " completed.\n";
                 }
 
                 // Release memory for the process, whether it was preempted or completed
                 memoryManager->releaseMemoryForProcess(core.process);
                 core.process->setMemoryBlockIndex(-1);  // Mark as no memory assigned
-                std::cout << "Memory released for process: " << core.process->getName() << "\n";
+                //std::cout << "Memory released for process: " << core.process->getName() << "\n";
 
                 core.process = nullptr;  // Clear the core to allow new process assignment
             }
@@ -70,11 +70,11 @@ void RRScheduler::executeQuantum(long long timeQuantum) {
                     newProcess->setMemoryBlockIndex(manualStartIndex);  // Set starting memory block index
                     this->activeProcessesList.erase(this->activeProcessesList.begin());
                     core.setProcess(newProcess);  // Set the new process to the core
-                    std::cout << "Process " << newProcess->getName()
+                    /*std::cout << "Process " << newProcess->getName()
                         << " assigned to Core " << i
                         << " with starting memory index " << manualStartIndex << "\n";
                     std::cout << "Memory allocated from frame " << manualStartIndex
-                        << " to frame " << (manualStartIndex + framesNeeded - 1) << "\n";
+                        << " to frame " << (manualStartIndex + framesNeeded - 1) << "\n";*/
 
                     if (core.process) {
                         core.startQuantum(timeQuantum);
@@ -84,9 +84,9 @@ void RRScheduler::executeQuantum(long long timeQuantum) {
                     }
                 }
                 else {
-                    std::cout << "Unable to schedule process " << newProcess->getName()
+                    /*std::cout << "Unable to schedule process " << newProcess->getName()
                         << " on Core " << i << " due to insufficient memory at index "
-                        << manualStartIndex << ".\n";
+                        << manualStartIndex << ".\n";*/
                 }
             }
         }

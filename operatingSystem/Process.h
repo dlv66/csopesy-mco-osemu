@@ -26,6 +26,7 @@ class Process
 		long long getLinesOfCode() const;
 		int getPID() const;
 		int getCPUCoreID() const;
+		void setRunningState();
 		State getState() const;
 
 		std::string getTimestampStarted() const;

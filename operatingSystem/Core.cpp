@@ -77,9 +77,9 @@ void Core::runQuantum(long long timeQuantum) {
 
 		// if the process is NOT FINISHED
 		if (!this->process->isFinished()) {
-
 			// Execute the process for the time quantum or until it finishes
 			long long remainingTime = this->process->getRemainingTime();
+
 			long long timeToExecute = timeQuantum;
 
 			// Adjust timeToExecute if remaining time is less than time quantum
@@ -88,6 +88,7 @@ void Core::runQuantum(long long timeQuantum) {
 			}
 
 			// Execute the process for the time quantum or until it finishes
+			this->process->setRunningState(); // sets to RUNNING state
 			this->process->executeQuantum(timeToExecute);
 			this->process->update(); // To note running
 			executedTime += timeToExecute;

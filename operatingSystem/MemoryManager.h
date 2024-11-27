@@ -17,14 +17,23 @@ public:
     void releaseMemoryForProcess(std::shared_ptr<Process> process);   // Releases memory of a terminated process
     int calculateExternalFragmentation() const;                       // Calculates external fragmentation
     void generateReport(const std::vector<Core>& coreList) const;
+	void addToBackingStore() const;                                   // Adds terminated processes to the backing store
 
     static const int MAX_MEMORY = 16384;     // Max memory in KB
     static const int MEM_PER_FRAME = 16;     // Frame size in KB
-    static const int MEM_PER_PROC = 4096;    // Fixed memory required per process in KB
+    static const int MEM_PER_PROC = 5120;    // Fixed memory required per process in KB
     static const int FRAMES = MAX_MEMORY / MEM_PER_FRAME;  // Number of frames in memory
+    static const std::string backingStoreFile; // Backing store file path
+
+	void addToBackingStore(std::shared_ptr<Process> process); // Adds a process to the backing store
+    std::shared_ptr<Process> fetchFromBackingStore(); // Fetches a process from the backing store
+	bool isBackingStoreEmpty() const; // Checks if the backing store is empty
+	std::string serializeProcess(const std::shared_ptr<Process>& process); // Serializes a process to a string
+	std::shared_ptr<Process> deserializeProcess(const std::string& processString); // Deserializes a process from a string
 
 
 private:
+
     std::vector<bool> frames;  // Tracks which frames are occupied
     int processesInMemory = 0; // Tracks the number of active processes in memory
 

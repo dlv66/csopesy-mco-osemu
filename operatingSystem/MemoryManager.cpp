@@ -6,8 +6,15 @@
 #include <vector>  
 #include "Core.h"
 
+const std::string MemoryManager::backingStoreFile = "backing_store.txt";
+
 // Constructor initializes the memory frames as all empty
-MemoryManager::MemoryManager() : frames(FRAMES, false) {}
+MemoryManager::MemoryManager() : frames(FRAMES, false)
+{
+    // Clear the backing store file on initialization
+    std::ofstream ofs(backingStoreFile, std::ofstream::out | std::ofstream::trunc);
+    ofs.close();
+}
 
 // Allocates memory for a process. Returns true if successful, false if insufficient memory.
 bool MemoryManager::allocateMemoryForProcess(std::shared_ptr<Process> process, int startIndex) {
@@ -149,6 +156,78 @@ void MemoryManager::printMemoryState(std::ofstream& reportFile) const {
     reportFile << "\n";
 }
 
+void MemoryManager::addToBackingStore(std::shared_ptr<Process> process) {
+    std::ofstream ofs(MemoryManager::backingStoreFile, std::ios::app);
+    if (ofs.is_open()) {
+        ofs << serializeProcess(process) << "\n"; // Serialize process state
+        //std::cout << "Process " << process->getName() << " added to backing store.\n";
+    }
+    else {
+        std::cerr << "Error: Unable to open backing store file.\n";
+    }
+    ofs.close();
+}
+
+std::shared_ptr<Process> MemoryManager::fetchFromBackingStore() {
+    std::ifstream ifs(MemoryManager::backingStoreFile);
+    if (!ifs.is_open()) {
+        std::cerr << "Error: Unable to open backing store file.\n";
+        return nullptr;
+    }
+
+    std::string line;
+    std::ostringstream remainingData;
+    std::shared_ptr<Process> process = nullptr;
+
+    if (std::getline(ifs, line)) {
+        process = deserializeProcess(line); // Deserialize the first process
+    }
+
+    // Write remaining processes back to the file
+    while (std::getline(ifs, line)) {
+        remainingData << line << "\n";
+    }
+    ifs.close();
+
+    std::ofstream ofs(MemoryManager::backingStoreFile, std::ios::out | std::ios::trunc);
+    ofs << remainingData.str();
+    ofs.close();
+
+    if (process) {
+        //std::cout << "Process " << process->getName() << " fetched from backing store.\n";
+    }
+    return process;
+}
+
+bool MemoryManager::isBackingStoreEmpty() const {
+    std::ifstream ifs(MemoryManager::backingStoreFile);
+    return ifs.peek() == std::ifstream::traits_type::eof();
+}
+
+std::string MemoryManager::serializeProcess(const std::shared_ptr<Process>& process) {
+    // Example: Serialize process attributes as a comma-separated string
+    std::ostringstream oss;
+    oss << process->getPID() << "," << process->getName() << ","
+        << process->getMemorySize() << "," << process->getCPUCoreID();
+    return oss.str();
+}
+
+std::shared_ptr<Process> MemoryManager::deserializeProcess(const std::string& data) {
+    // Example: Deserialize process attributes from a comma-separated string
+    std::istringstream iss(data);
+    std::string token;
+    int id, memorySize, cpuCoreID;
+    std::string name;
+
+    if (std::getline(iss, token, ',')) id = std::stoi(token);
+    if (std::getline(iss, token, ',')) name = token;
+    if (std::getline(iss, token, ',')) memorySize = std::stoi(token);
+    if (std::getline(iss, token, ',')) cpuCoreID = std::stoi(token);
+
+    auto process = std::make_shared<Process>(id, name, memorySize);
+    process->setCPUCoreID(cpuCoreID);
+    return process;
+}
 
 
 

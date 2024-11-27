@@ -101,6 +101,7 @@ void Core::runQuantum(long long timeQuantum) {
 			} else if (!this->process)
 			{
 				std::cout << "Process is null" << std::endl;
+				break;
 			}
 
 			// Check if the process needs preemption

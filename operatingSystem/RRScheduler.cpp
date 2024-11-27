@@ -66,15 +66,11 @@ void RRScheduler::executeQuantum(long long timeQuantum) {
                 int framesNeeded = newProcess->getMemorySize() / MemoryManager::MEM_PER_FRAME;
                 int manualStartIndex = (i * framesNeeded) % MemoryManager::FRAMES;
 
-                if (memoryManager->allocateMemoryForProcess(newProcess, manualStartIndex)) {  // Attempt to allocate memory
-                    newProcess->setMemoryBlockIndex(manualStartIndex);  // Set starting memory block index
-                    this->activeProcessesList.erase(this->activeProcessesList.begin());
-                    core.setProcess(newProcess);  // Set the new process to the core
-                    /*std::cout << "Process " << newProcess->getName()
-                        << " assigned to Core " << i
-                        << " with starting memory index " << manualStartIndex << "\n";
-                    std::cout << "Memory allocated from frame " << manualStartIndex
-                        << " to frame " << (manualStartIndex + framesNeeded - 1) << "\n";*/
+                // assuming the backing store is a higher priority than the readyqueue
+				// check backing store for waiting processes
+                if (!memoryManager->isBackingStoreEmpty()) {
+                    newProcess = memoryManager->fetchFromBackingStore();
+					core.setProcess(newProcess);
 
                     if (core.process) {
                         core.startQuantum(timeQuantum);
@@ -83,11 +79,69 @@ void RRScheduler::executeQuantum(long long timeQuantum) {
                         std::cout << "Error: Process not set to Core " << core.coreID << " successfully.\n";
                     }
                 }
-                else {
-                    /*std::cout << "Unable to schedule process " << newProcess->getName()
-                        << " on Core " << i << " due to insufficient memory at index "
-                        << manualStartIndex << ".\n";*/
+                else
+                {
+					bool memoryAvailable = memoryManager->allocateMemoryForProcess(newProcess, manualStartIndex);
+
+                    if(memoryAvailable)
+                    {
+                        newProcess->setMemoryBlockIndex(manualStartIndex);  // Set starting memory block index
+                        this->activeProcessesList.erase(this->activeProcessesList.begin());
+                        core.setProcess(newProcess);  // Set the new process to the core
+                        /*std::cout << "Process " << newProcess->getName()
+                            << " assigned to Core " << i
+                            << " with starting memory index " << manualStartIndex << "\n";
+                        std::cout << "Memory allocated from frame " << manualStartIndex
+                            << " to frame " << (manualStartIndex + framesNeeded - 1) << "\n";*/
+
+                        if (core.process) {
+                            core.startQuantum(timeQuantum);
+                        }
+                        else {
+                            std::cout << "Error: Process not set to Core " << core.coreID << " successfully.\n";
+                        }
+                    } else
+                    {
+                        // find oldest process to terminate
+                        std::shared_ptr<Process> oldestProcess = nullptr;
+                        int oldestProcessIndex = -1;
+                        for (int j = 0; j < nCores; j++) {
+                            if (coreList[j].process != nullptr) {
+                                if (oldestProcess == nullptr ||
+                                    coreList[j].process->getTimestampStarted() < oldestProcess->getTimestampStarted()) {
+                                    oldestProcess = coreList[j].process;
+                                    oldestProcessIndex = j;
+                                }
+                            }
+                        }
+
+                        // add oldest process to backing store
+                        if (oldestProcess) {
+                            memoryManager->addToBackingStore(oldestProcess);
+							memoryManager->releaseMemoryForProcess(oldestProcess);
+							oldestProcess->setMemoryBlockIndex(-1);  // Mark as no memory assigned
+
+                            // remove the oldest process from the core
+                            coreList[oldestProcessIndex].process = nullptr;
+
+                            // add the new process to the core
+                            newProcess->setMemoryBlockIndex(manualStartIndex);  // Set starting memory block index
+                            this->activeProcessesList.erase(this->activeProcessesList.begin());
+                            core.setProcess(newProcess);
+                            if (core.process) {
+                                core.startQuantum(timeQuantum);
+                            }
+                            else {
+                                std::cout << "Error: Process not set to Core " << core.coreID << " successfully.\n";
+                            }
+                        }
+                        else
+                        {
+                            std::cout << "Error: Oldest process not successfully killed or found.\n";
+                        }
+                    }
                 }
+                
             }
         }
 

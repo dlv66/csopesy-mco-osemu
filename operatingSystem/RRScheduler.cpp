@@ -11,13 +11,14 @@
 // Constructor, function definitions, and logic remain the same
 
 // Constructor with MemoryManager initialization
-RRScheduler::RRScheduler(long long quantum, long long delayExec, int nCores)
+RRScheduler::RRScheduler(long long quantum, long long delayExec, int nCores, 
+                         long long maxOverallMem, long long memPerFrame)
     : AScheduler(SchedulingAlgorithm::RR), timeQuantum(quantum), delayPerExec(delayExec)/*, nCores(nCores)*/ {
 
     std::cout << "RRScheduler created with quantum: " << quantum << ", delayExec: " << delayExec << ", nCores: " << nCores << std::endl;
 	this->nCores = nCores;
     // Initialize memory manager as a persistent instance
-    memoryManager = std::make_shared<MemoryManager>();
+    memoryManager = std::make_shared<MemoryManager>(maxOverallMem, memPerFrame);
 
     // Initialize each core and add it to coreList
     for (int i = 0; i < nCores; i++) {
@@ -63,8 +64,8 @@ void RRScheduler::executeQuantum(long long timeQuantum) {
                 std::shared_ptr<Process> newProcess = this->activeProcessesList.front();
 
                 // Manually specify a starting index for memory allocation for testing purposes
-                int framesNeeded = newProcess->getMemorySize() / MemoryManager::MEM_PER_FRAME;
-                int manualStartIndex = (i * framesNeeded) % MemoryManager::FRAMES;
+                int framesNeeded = newProcess->getMemorySize() / memoryManager->memPerFrame;
+                int manualStartIndex = (i * framesNeeded) % memoryManager->FRAMES;
 
                 // assuming the backing store is a higher priority than the readyqueue
 				// check backing store for waiting processes

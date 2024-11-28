@@ -43,6 +43,10 @@ void Process::executeQuantum(int timeQuantum) {
     }
 }
 
+
+
+
+
 // Getters
 std::string Process::getName() const { return processName; }
 bool Process::isFinished() const { return state == State::TERMINATED; }
@@ -67,11 +71,17 @@ std::string Process::getTimestampFinished() const
     return convertTimestampToString(this->timestampFinished);
 }
 
+
+
+
+
 // Setters
 void Process::setCPUCoreID(int coreID) { cpuCoreID = coreID; }
-void Process::setMemoryBlockIndex(int index) {
-    memoryBlockIndex = index;
-}
+void Process::setMemoryBlockIndex(int index) { memoryBlockIndex = index; }
+
+
+
+
 
 // Updates the process state
 void Process::update() {
@@ -89,6 +99,53 @@ void Process::setRunningState()
 void Process::resetTicksLineOfInstruction() {
     currentLineOfInstruction = 0;
     state = State::READY;
+}
+
+
+
+
+
+// Memory Management
+void Process::setMemoryRequired(int memoryRequired) {
+    this->memoryRequired = memoryRequired;
+}
+
+int Process::getMemoryRequired() const {
+    return memoryRequired;
+}
+
+
+void Process::setMemoryPtr(void* ptr) {
+    memoryPtr = ptr;
+}
+
+void* Process::getMemoryPtr() {
+    return memoryPtr;
+}
+
+
+Process::TimePoint Process::getMemoryAllocatedTime()
+{
+    return memoryAllocatedTime;
+}
+
+void Process::setMemoryAllocatedTime(Process::TimePoint time)
+{
+    memoryAllocatedTime = time;
+}
+
+bool Process::isMemoryAllocatedTimeNull() const {
+    return memoryAllocatedTime == Process::TimePoint();
+}
+
+
+void Process::setNumOfPages(int numberOfPages)
+{
+    numOfPages = numberOfPages;
+}
+
+int Process::getNumOfPages() const {
+    return numOfPages;
 }
 
 

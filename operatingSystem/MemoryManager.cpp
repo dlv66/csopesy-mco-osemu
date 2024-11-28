@@ -9,16 +9,19 @@
 const std::string MemoryManager::backingStoreFile = "backing_store.txt";
 
 // Constructor initializes the memory frames as all empty
-MemoryManager::MemoryManager() : frames(FRAMES, false)
+MemoryManager::MemoryManager(long long maxOverallMem, 
+                             long long memPerFrame 
+                             ) : frames(FRAMES, false), maxOverallMem(maxOverallMem), memPerFrame(memPerFrame)
 {
     // Clear the backing store file on initialization
     std::ofstream ofs(backingStoreFile, std::ofstream::out | std::ofstream::trunc);
     ofs.close();
+    FRAMES = maxOverallMem / memPerFrame;
 }
 
 // Allocates memory for a process. Returns true if successful, false if insufficient memory.
 bool MemoryManager::allocateMemoryForProcess(std::shared_ptr<Process> process, int startIndex) {
-    int requiredFrames = MEM_PER_PROC / MEM_PER_FRAME;
+    int requiredFrames = MEM_PER_PROC / memPerFrame;
 
     // Check if there is enough room from startIndex to allocate memory
     if (startIndex < 0 || startIndex + requiredFrames > FRAMES) {
@@ -55,7 +58,7 @@ bool MemoryManager::allocateMemoryForProcess(std::shared_ptr<Process> process, i
 void MemoryManager::releaseMemoryForProcess(std::shared_ptr<Process> process) {
     int blockIndex = process->getMemoryBlockIndex();
     if (blockIndex >= 0) {
-        int releasedFrames = MEM_PER_PROC / MEM_PER_FRAME;
+        int releasedFrames = MEM_PER_PROC / memPerFrame;
         for (int i = blockIndex; i < blockIndex + releasedFrames; i++) {
             frames[i] = false;  // Free the frames
         }
@@ -85,7 +88,7 @@ int MemoryManager::calculateExternalFragmentation() const {
     }
     if (contiguousFreeFrames > maxFreeBlock) maxFreeBlock = contiguousFreeFrames;
 
-    return maxFreeBlock * MEM_PER_FRAME;
+    return maxFreeBlock * memPerFrame;
 }
 // Function to generate a detailed report at each quantum cycle
 void MemoryManager::generateReport(const std::vector<Core>& coreList) const {
@@ -110,7 +113,7 @@ void MemoryManager::generateReport(const std::vector<Core>& coreList) const {
             processesInMemoryCount++;
             std::shared_ptr<Process> runningProcess = core.process;
 
-            int blockStartAddr = runningProcess->getMemoryBlockIndex() * MemoryManager::MEM_PER_FRAME;
+            int blockStartAddr = runningProcess->getMemoryBlockIndex() * memPerFrame;
             int blockEndAddr = blockStartAddr + runningProcess->getMemorySize() -1;
 
             // Prepare the entry and add to the vector
@@ -129,7 +132,7 @@ void MemoryManager::generateReport(const std::vector<Core>& coreList) const {
 
     reportFile << "Processes in Memory: " << processesInMemoryCount << "\n";
     reportFile << "External Fragmentation: " << externalFragmentation << " KB\n";
-    reportFile << "\n----end---- = " << MAX_MEMORY << "\n\n";
+    reportFile << "\n----end---- = " << maxOverallMem << "\n\n";
 
     // Output entries in reverse order to match the descending format
     for (auto it = reportEntries.rbegin(); it != reportEntries.rend(); ++it) {

@@ -2,10 +2,14 @@
 #include <ctime>
 #include <string>
 #include <vector>
+#include <memory>
+#include <chrono>
 
 class Process
 {
 	public:
+		using TimePoint = std::chrono::time_point<std::chrono::system_clock>;
+
 		Process(int pid = -1, std::string processName = "DefaultProcess", long long minIns = 1, long long maxIns = 1, int memorySize = 4096);
 		enum class State {
 			RUNNING, // Process is currently running
@@ -34,13 +38,32 @@ class Process
 
 		void setCPUCoreID(int coreID);
 
+		// Memory Management (Week 8 + MO2)
 		void setMemoryBlockIndex(int index); // NEW: Set the memory block index for this process
 		int getMemoryBlockIndex() const; // NEW: Get the memory block index
-		int getMemorySize() const;           // NEW: Get the memory size of the process
+
+		void setMemoryRequired(int memoryRequired); // NEW: Set the memory required for this process
+		int getMemoryRequired() const; // NEW: Get the memory required for this process
+
+		void setMemoryPtr(void* ptr); // NEW: Set the memory pointer for this process
+		void* getMemoryPtr(); // NEW: Get the memory pointer for this process
+
+		int getMemorySize() const; // NEW: Get the memory size of the process
+
+		TimePoint getMemoryAllocatedTime();
+		void setMemoryAllocatedTime(TimePoint time);
+
+		void setNumOfPages(int numOfPages);
+		int getNumOfPages() const;
+
+		bool isMemoryAllocatedTimeNull() const;
 
 		//void setState(State state);
 
+
 		void update();
+
+
 
 	private:
 		int pid = -1;
@@ -54,7 +77,12 @@ class Process
 		int cpuCoreID = -1; // the cpu core where a process is assigned
 		State state = State::READY;
 
+		// Memory Management (Week 8 + MO2)
 		long long memorySize = 4096; // NEW: Memory size in KB, using MEM_PER_PROC as default
+		int memoryRequired = 0; // NEW: Memory required for the process
+		void* memoryPtr = nullptr; // NEW: Pointer to the allocated memory block
+		TimePoint memoryAllocatedTime; // NEW: Time when the memory was allocated
+		int numOfPages = 0; // NEW: Number of pages required for the process
 		int memoryBlockIndex = -1; // NEW: Tracks the index of the allocated memory block, -1 if not allocated
 };
 

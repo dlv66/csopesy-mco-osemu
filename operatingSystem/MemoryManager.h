@@ -10,7 +10,8 @@ class Process;
 
 class MemoryManager {
 public:
-    MemoryManager();  // Constructor to initialize memory frames
+    MemoryManager(long long maxOverallMem, 
+                  long long memPerFrame);  // Constructor to initialize memory frames
 
     // Updated declaration to include startIndex parameter
     bool allocateMemoryForProcess(std::shared_ptr<Process> process, int startIndex);
@@ -19,10 +20,20 @@ public:
     void generateReport(const std::vector<Core>& coreList) const;
 	void addToBackingStore() const;                                   // Adds terminated processes to the backing store
 
-    static const int MAX_MEMORY = 16384;     // Max memory in KB
-    static const int MEM_PER_FRAME = 16;     // Frame size in KB
+    long long maxOverallMem;
+    long long memPerFrame;
+
+    // OLD CODE FROM WEEK 8 HOMEWORK:
+    // static const int MAX_MEMORY = 16384;     // Max memory in KB
+    // static const int MEM_PER_FRAME = 16;     // Frame size in KB
+
     static const int MEM_PER_PROC = 5120;    // Fixed memory required per process in KB
-    static const int FRAMES = MAX_MEMORY / MEM_PER_FRAME;  // Number of frames in memory
+    
+	// OLD CODE FROM WEEK 8 HOMEWORK:
+    //static const int FRAMES = maxOverallMem / memPerFrame;  // Number of frames in memory
+
+	int FRAMES = 0;  // Number of frames in memory
+
     static const std::string backingStoreFile; // Backing store file path
 
 	void addToBackingStore(std::shared_ptr<Process> process); // Adds a process to the backing store

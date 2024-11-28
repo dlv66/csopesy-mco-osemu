@@ -25,7 +25,8 @@ private:
 
 public:
     // Constructor
-    RRScheduler(long long quantum, long long delayExec, int nCores);
+    RRScheduler(long long quantum, long long delayExec, int nCores, 
+                long long maxOverallMem, long long memPerFrame);
 
     void init() override;
     void run() override;

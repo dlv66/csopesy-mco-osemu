@@ -19,11 +19,13 @@ RRScheduler::RRScheduler(long long quantum, long long delayExec, int nCores,
 	this->nCores = nCores;
     // Initialize memory manager as a persistent instance
     memoryManager = std::make_shared<MemoryManager>(maxOverallMem, memPerFrame);
+    memoryManager->initializePagingAllocator();
 
     // Initialize each core and add it to coreList
     for (int i = 0; i < nCores; i++) {
         coreList.push_back(Core(i));
     }
+
 }
 
 void RRScheduler::executeQuantum(long long timeQuantum) {
@@ -52,7 +54,7 @@ void RRScheduler::executeQuantum(long long timeQuantum) {
                 }
 
                 // Release memory for the process, whether it was preempted or completed
-                memoryManager->releaseMemoryForProcess(core.process);
+                memoryManager->deallocateFlatMemoryForProcess(core.process);
                 core.process->setMemoryBlockIndex(-1);  // Mark as no memory assigned
                 //std::cout << "Memory released for process: " << core.process->getName() << "\n";
 
@@ -64,8 +66,8 @@ void RRScheduler::executeQuantum(long long timeQuantum) {
                 std::shared_ptr<Process> newProcess = this->activeProcessesList.front();
 
                 // Manually specify a starting index for memory allocation for testing purposes
-                int framesNeeded = newProcess->getMemorySize() / memoryManager->memPerFrame;
-                int manualStartIndex = (i * framesNeeded) % memoryManager->FRAMES;
+                /*int framesNeeded = newProcess->getMemorySize() / MemoryManager::MEM_PER_FRAME;
+                int manualStartIndex = (i * framesNeeded) % MemoryManager::FRAMES;*/
 
                 // assuming the backing store is a higher priority than the readyqueue
 				// check backing store for waiting processes
@@ -82,11 +84,19 @@ void RRScheduler::executeQuantum(long long timeQuantum) {
                 }
                 else
                 {
-					bool memoryAvailable = memoryManager->allocateMemoryForProcess(newProcess, manualStartIndex);
+                    bool memoryAvailable = false;
+                    void* allocatedMemory = nullptr;
+					if (memoryManager->memoryAllocator == MemoryManager::MemoryAllocator::FlatMemory)
+					{
+                        memoryAvailable = memoryManager->allocateFlatMemoryForProcess(newProcess);
+					} else
+					{
+                        allocatedMemory = memoryManager->allocatePagingMemoryForProcess(newProcess);
+					}
 
-                    if(memoryAvailable)
+                    if(memoryAvailable || allocatedMemory != nullptr)
                     {
-                        newProcess->setMemoryBlockIndex(manualStartIndex);  // Set starting memory block index
+                        //newProcess->setMemoryBlockIndex(manualStartIndex);  // Set starting memory block index
                         this->activeProcessesList.erase(this->activeProcessesList.begin());
                         core.setProcess(newProcess);  // Set the new process to the core
                         /*std::cout << "Process " << newProcess->getName()
@@ -101,53 +111,15 @@ void RRScheduler::executeQuantum(long long timeQuantum) {
                         else {
                             std::cout << "Error: Process not set to Core " << core.coreID << " successfully.\n";
                         }
-                    } else
-                    {
-                        // find oldest process to terminate
-                        std::shared_ptr<Process> oldestProcess = nullptr;
-                        int oldestProcessIndex = -1;
-                        for (int j = 0; j < nCores; j++) {
-                            if (coreList[j].process != nullptr) {
-                                if (oldestProcess == nullptr ||
-                                    coreList[j].process->getTimestampStarted() < oldestProcess->getTimestampStarted()) {
-                                    oldestProcess = coreList[j].process;
-                                    oldestProcessIndex = j;
-                                }
-                            }
-                        }
-
-                        // add oldest process to backing store
-                        if (oldestProcess) {
-                            memoryManager->addToBackingStore(oldestProcess);
-							memoryManager->releaseMemoryForProcess(oldestProcess);
-							oldestProcess->setMemoryBlockIndex(-1);  // Mark as no memory assigned
-
-                            // remove the oldest process from the core
-                            coreList[oldestProcessIndex].process = nullptr;
-
-                            // add the new process to the core
-                            newProcess->setMemoryBlockIndex(manualStartIndex);  // Set starting memory block index
-                            this->activeProcessesList.erase(this->activeProcessesList.begin());
-                            core.setProcess(newProcess);
-                            if (core.process) {
-                                core.startQuantum(timeQuantum);
-                            }
-                            else {
-                                std::cout << "Error: Process not set to Core " << core.coreID << " successfully.\n";
-                            }
-                        }
-                        else
-                        {
-                            std::cout << "Error: Oldest process not successfully killed or found.\n";
-                        }
                     }
+       
                 }
                 
             }
         }
 
         // Simulate the passage of one quantum cycle
-        std::this_thread::sleep_for(std::chrono::milliseconds(950));
+        std::this_thread::sleep_for(std::chrono::milliseconds(50));
     }
 }
 
@@ -184,7 +156,7 @@ void RRScheduler::init() {
 }
 
 void RRScheduler::execute() {
-    size_t quantumCycles = GlobalConfig::getInstance()->getQuantumCycles();
+    int quantumCycles = GlobalConfig::getInstance()->getQuantumCycles();
     while (running) {
         std::this_thread::sleep_for(std::chrono::milliseconds(3000)); // Simulate waiting or other periodic tasks
         // Process management section
@@ -206,7 +178,7 @@ void RRScheduler::execute() {
                 // Update process state to running
                 process->setState(Process::RUNNING);
                 // Execute for quantum duration
-                size_t cycleCount = 0;
+                int cycleCount = 0;
                 while (cycleCount < quantumCycles && !process->isFinished() && running) {
                     process->executeCurrentCommand();
                     process->moveToNextLine();

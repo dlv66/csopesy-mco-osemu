@@ -275,13 +275,16 @@ void GlobalScheduler::handleReportUtil() const
 	std::cout << "Report Util file created through file 'csopesy-log.txt'.\n\n";
 }
 
-void GlobalScheduler::startSchedulerTestInBackground(long long minIns, long long maxIns, long long batchProcessFreq) {
-	std::thread schedulerTestThread([this, minIns, maxIns, batchProcessFreq]() { handleSchedulerTest(minIns, maxIns, batchProcessFreq); });
+void GlobalScheduler::startSchedulerTestInBackground(long long minIns, long long maxIns, long long batchProcessFreq, long long minMemPerProc, long long maxMemPerProc, int memPerFrame) {
+	std::thread schedulerTestThread([this, minIns, maxIns, batchProcessFreq, minMemPerProc, maxMemPerProc, memPerFrame]()
+	{
+		handleSchedulerTest(minIns, maxIns, batchProcessFreq, minMemPerProc, maxMemPerProc, memPerFrame);
+	});
 
 	schedulerTestThread.detach(); // Detach the thread to run independently
 }
 
-void GlobalScheduler::handleSchedulerTest(long long minIns, long long maxIns, long long batchProcessFreq)
+void GlobalScheduler::handleSchedulerTest(long long minIns, long long maxIns, long long batchProcessFreq, long long minMemPerProc, long long maxMemPerProc, int memPerFrame)
 {
 	long long i = 0;
 	batchScheduler = true;
@@ -300,7 +303,7 @@ void GlobalScheduler::handleSchedulerTest(long long minIns, long long maxIns, lo
 			}
 			
 			std::string screenName = "process" + std::to_string(this->processID);
-			std::shared_ptr<Process> process = std::make_shared<Process>(this->processID, screenName, minIns, maxIns); // create process
+			std::shared_ptr<Process> process = std::make_shared<Process>(this->processID, screenName, minIns, maxIns, minMemPerProc, maxMemPerProc, memPerFrame); // create process
 			std::shared_ptr <BaseScreen> screen = std::make_shared <BaseScreen>(process, screenName); // create screen for process
 			GlobalScheduler::getInstance()->scheduler->addProcess(process); // add process to scheduler queue
 			ConsoleManager::getInstance()->registerScreenNoCout(screen); // register screen to table of layouts/screens, NO COUT IMPORTANT.

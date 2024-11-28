@@ -83,7 +83,7 @@ void MainConsole::process()
 				std::string screenName = sInput.substr(10);
 				int processID = GlobalScheduler::getInstance()->processID;
 				GlobalScheduler::getInstance()->incrementProcessID();
-				std::shared_ptr<Process> process = std::make_shared<Process>(processID, screenName, init.minIns, init.maxIns);
+				std::shared_ptr<Process> process = std::make_shared<Process>(processID, screenName, init.minIns, init.maxIns, init.minMemPerProc, init.maxMemPerProc, init.memPerFrame);
 				std::shared_ptr <BaseScreen> screen = std::make_shared <BaseScreen>(process, screenName);
 				GlobalScheduler::getInstance()->scheduler->addProcess(process);
 				ConsoleManager::getInstance()->registerScreen(screen);
@@ -103,7 +103,7 @@ void MainConsole::process()
 			}
 			else if (sInput == "scheduler-test")
 			{
-				GlobalScheduler::getInstance()->startSchedulerTestInBackground(init.minIns, init.maxIns, init.batchProcessFreq);
+				GlobalScheduler::getInstance()->startSchedulerTestInBackground(init.minIns, init.maxIns, init.batchProcessFreq, init.minMemPerProc, init.maxMemPerProc, init.memPerFrame);
 				std::cout << "\nDummy process creation running in the background..." << std::endl;
 			}
 			else {

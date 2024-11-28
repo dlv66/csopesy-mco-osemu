@@ -11,10 +11,12 @@
 #include "Utils.h"
 
 // Constructor
-Process::Process(int pid, std::string processName, long long minIns, long long maxIns, int memorySize)
-    : pid(pid), processName(processName), memorySize(memorySize) {
+Process::Process(int pid, std::string processName, long long minIns, long long maxIns, long long minMemPerProc, long long maxMemPerProc, int memPerFrame)
+    : pid(pid), processName(processName) {
     timestampCreated = std::time(nullptr);
     totalLineOfInstruction = minIns + (std::rand() % (maxIns - minIns + 1)); // Randomize between min and max
+	memorySize = minMemPerProc + (std::rand() % (maxMemPerProc - minMemPerProc + 1)); // Randomize between min and max
+    numOfPages = memorySize / memPerFrame;
     state = State::READY;
 }
 

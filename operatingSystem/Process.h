@@ -10,7 +10,10 @@ class Process
 	public:
 		using TimePoint = std::chrono::time_point<std::chrono::system_clock>;
 
-		Process(int pid = -1, std::string processName = "DefaultProcess", long long minIns = 1, long long maxIns = 1, int memorySize = 4096);
+		Process(int pid = -1, std::string processName = "DefaultProcess",
+				long long minIns = 1, long long maxIns = 1, 
+				long long minMemPerProc = 1, long long maxMemPerProc = 1,
+				int memPerFrame = 1);
 		enum class State {
 			RUNNING, // Process is currently running
 			WAITING, // Process is waiting for an event to occur
@@ -63,7 +66,8 @@ class Process
 
 		void update();
 
-
+		int frameStart;
+		int frameEnd;
 
 	private:
 		int pid = -1;

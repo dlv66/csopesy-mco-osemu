@@ -29,9 +29,9 @@ public:
 	void addProcessToProcessTable(std::shared_ptr<Process> process);
 	void handleScreenLS() const;
 	void handleReportUtil() const;
-	void startSchedulerTestInBackground(long long minIns, long long maxIns, long long batchProcessFreq);
+	void startSchedulerTestInBackground(long long minIns, long long maxIns, long long batchProcessFreq, long long minMemPerProc, long long maxMemPerProc, int memPerFrame);
 	void handleSchedulerStop();
-	void handleSchedulerTest(long long minIns, long long maxIns, long long batchProcessFreq);
+	void handleSchedulerTest(long long minIns, long long maxIns, long long batchProcessFreq, long long minMemPerProc, long long maxMemPerProc, int memPerFrame);
 	void getCPUUtilization() const;
 	void getCPUUtilizationReport(std::ofstream& reportUtilFile) const;
 	void incrementProcessID();

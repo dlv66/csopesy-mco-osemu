@@ -21,6 +21,10 @@ public:
 	long long minIns;
 	long long maxIns;
 	long long delayPerExec;
+	long long maxOverallMem;
+	long long memPerFrame;
+	long long minMemPerProc;
+	long long maxMemPerProc;
 
 	// Functions
 	void start();

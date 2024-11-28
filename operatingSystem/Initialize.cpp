@@ -14,7 +14,10 @@ Initialize::Initialize()
 	minIns = 0;
 	maxIns = 0;
 	delayPerExec = 0;
-
+	maxOverallMem = 0;
+	memPerFrame = 0;
+	minMemPerProc = 0;
+	maxMemPerProc = 0;
 }
 
 void Initialize::start()
@@ -48,6 +51,20 @@ void Initialize::start()
 		}
 		else if (myText.find("delay-per-exec") != std::string::npos) {
 			delayPerExec = std::stoll(myText.substr(myText.find("delay-per-exec") + 15));
+		}
+
+		// NEW FOR MO2:
+		else if (myText.find("max-overall-mem") != std::string::npos) {
+			maxOverallMem = std::stoll(myText.substr(myText.find("max-overall-mem") + 16));
+		}
+		else if (myText.find("mem-per-frame") != std::string::npos) {
+			memPerFrame = std::stoll(myText.substr(myText.find("mem-per-frame") + 14));
+		}
+		else if (myText.find("min-mem-per-proc") != std::string::npos) {
+			minMemPerProc = std::stoll(myText.substr(myText.find("min-mem-per-proc") + 17));
+		}
+		else if (myText.find("max-mem-per-proc") != std::string::npos) {
+			maxMemPerProc = std::stoll(myText.substr(myText.find("max-mem-per-proc") + 17));
 		}
 	}
 	configFile.close();

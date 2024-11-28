@@ -314,9 +314,9 @@ void GlobalScheduler::handleSchedulerStop()
 {
 	if (batchScheduler) {
 		batchScheduler = false;
-		std::cout << "Dummy processes creation HALTED.\n";
+		std::cout << "SUCCESS: Dummy processes creation HALTED.\n";
 	}
 	else {
-		std::cout << "No such process creation currently running.\n";
+		std::cout << "ERROR: No such process creation currently running.\n";
 	}
 }

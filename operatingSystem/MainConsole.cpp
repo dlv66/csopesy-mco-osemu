@@ -67,6 +67,12 @@ void MainConsole::process()
 			{
 				std::cout << "ERROR: System has already been initialized. Please try again.\n\n";
 			}
+			else if (sInput == "process-smi") {
+				// TODO: ADD PROCESS-SMI CODE HERE
+			}
+			else if (sInput == "vmstat") {
+				// TODO: ADD VMSTAT CODE HERE
+			}
 			else if (sInput == "report-util")
 			{
 				GlobalScheduler::getInstance()->handleReportUtil();

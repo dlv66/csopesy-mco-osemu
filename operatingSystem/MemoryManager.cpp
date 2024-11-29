@@ -101,8 +101,8 @@ bool MemoryManager::allocateFlatMemoryForProcess(std::shared_ptr<Process> proces
         }
 
         processesInMemory++;
-        std::cout << "Manually allocated memory for process " << process->getName()
-            << " from frame " << startIndex << " to " << startIndex + size - 1 << std::endl;
+        //std::cout << "Manually allocated memory for process " << process->getName()
+        //    << " from frame " << startIndex << " to " << startIndex + size - 1 << std::endl;
         return true;
 
     }
@@ -235,7 +235,7 @@ int MemoryManager::calculateExternalFragmentation() const {
     }
     if (contiguousFreeFrames > maxFreeBlock) maxFreeBlock = contiguousFreeFrames;
 
-    return maxFreeBlock * memPerFrame;
+    return maxFreeBlock;
 }
 // Function to generate a detailed report at each quantum cycle
 void MemoryManager::generateReport(const std::vector<Core>& coreList) const {

@@ -6,6 +6,11 @@
 #include <sstream> 
 #include <vector>  
 #include "Core.h"
+#include "FlatMemoryAllocator.h"
+#include "PagingAllocator.h"
+
+
+MemoryManager* MemoryManager::instance = nullptr;
 
 const std::string MemoryManager::backingStoreFile = "backing_store.txt";
 
@@ -23,17 +28,64 @@ MemoryManager::MemoryManager(long long maxOverallMem,
 
 }
 
-void MemoryManager::allocate(std::shared_ptr<Process> process)
-{
-	if (this->memoryAllocator == MemoryAllocator::FlatMemory)
-	{
-		allocateFlatMemoryForProcess(process);
-	}
-	else
-	{
-		allocatePagingMemoryForProcess(process);
-	}
+//NEW
+void MemoryManager::initialize(long long maxOverallMem, long long memPerFrame) {
+    if (!instance) {
+        instance = new MemoryManager(maxOverallMem, memPerFrame);
+    }
 }
+
+//NEW
+MemoryManager* MemoryManager::getInstance() {
+    return instance;
+}
+
+//NEW
+MemoryManager::MemoryManager(long long maxOverallMem, long long memPerFrame)
+    : maxOverallMem(maxOverallMem), memPerFrame(memPerFrame) {
+
+    // Determine the memory allocation strategy based on maxOverallMem and memPerFrame
+    if (maxOverallMem == memPerFrame) {
+        // Use Flat Memory Allocator
+        allocator = std::make_unique<FlatMemoryAllocator>(maxOverallMem);
+        std::cout << "Initialized Flat Memory Allocator (maxOverallMem == memPerFrame).\n";
+    }
+    else if (maxOverallMem > memPerFrame) {
+        // Use Paging Allocator
+        allocator = std::make_unique<PagingAllocator>(maxOverallMem, memPerFrame);
+        std::cout << "Initialized Paging Allocator (maxOverallMem > memPerFrame).\n";
+    }
+    else {
+        std::cerr << "Error: maxOverallMem must be greater than or equal to memPerFrame.\n";
+    }
+}
+
+//NEW
+void* MemoryManager::allocate(std::shared_ptr<Process> process) {
+    void* memoryPtr = allocator->allocate(process);
+    if (memoryPtr) {
+        processCount++;
+    }
+    return memoryPtr;
+}
+//NEW
+void MemoryManager::deallocate(std::shared_ptr<Process> process) {
+    allocator->deallocate(process);
+    processCount--;
+}
+//NEW
+std::string MemoryManager::visualizeMemory() const {
+    return allocator->visualizeMemory();
+}
+//NEW
+int MemoryManager::getProcessCount() const {
+    return processCount;
+}
+//NEW
+void MemoryManager::setProcessCount(int count) {
+    processCount = count;
+}
+
 
 void MemoryManager::initializePagingAllocator()
 {

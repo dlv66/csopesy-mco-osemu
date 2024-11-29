@@ -11,6 +11,8 @@
 GlobalScheduler* GlobalScheduler::sharedInstance = nullptr;
 
 GlobalScheduler::GlobalScheduler(const Initialize& initConfig) : running(true) {
+	// NEW Initialize MemoryManager
+	MemoryManager::initialize(initConfig.maxOverallMem, initConfig.memPerFrame);
 	// Choose the scheduler based on the config file's scheduler value
 	if (initConfig.scheduler == "rr" || initConfig.scheduler == "RR") {
 		// Instantiate Round-Robin Scheduler with quantum, delayExec, and numCPU from Initialize

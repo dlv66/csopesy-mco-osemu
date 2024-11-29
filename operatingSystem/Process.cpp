@@ -15,10 +15,11 @@ Process::Process(int pid, std::string processName, long long minIns, long long m
     : pid(pid), processName(processName) {
     timestampCreated = std::time(nullptr);
     totalLineOfInstruction = minIns + (std::rand() % (maxIns - minIns + 1)); // Randomize between min and max
-	memorySize = minMemPerProc + (std::rand() % (maxMemPerProc - minMemPerProc + 1)); // Randomize between min and max
+    memorySize = minMemPerProc + (std::rand() % (maxMemPerProc - minMemPerProc + 1)); // Randomize between min and max
     numOfPages = memorySize / memPerFrame;
     state = State::READY;
 }
+
 
 // Executes the process (basic implementation, assuming it increments the instruction counter)
 void Process::execute() {

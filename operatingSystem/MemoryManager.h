@@ -75,12 +75,27 @@ public:
     int allocateFrames(int numFrames, int processId);
     void deallocateFrames(int frameIndex);
 
+    //NEW
+    static void initialize(long long maxOverallMem, long long memPerFrame);
+    void deallocate(std::shared_ptr<Process> process);
+    std::string visualizeMemory() const;
+    int getProcessCount() const;
+    void setProcessCount(int count);
+
 private:
 
     std::vector<bool> frames;  // Tracks which frames are occupied
     int processesInMemory = 0; // Tracks the number of active processes in memory
 
     void printMemoryState(std::ofstream& reportFile) const; // Prints the ASCII memory layout
+
+    //NEW
+    MemoryManager(long long maxOverallMem, long long memPerFrame);
+    static MemoryManager* instance;
+    long long maxOverallMem;
+    long long memPerFrame;
+    int processCount = 0;
+    std::unique_ptr<IMemoryAllocator> allocator;
 };
 
 

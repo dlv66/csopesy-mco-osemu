@@ -115,12 +115,8 @@ void* MemoryManager::allocatePagingMemoryForProcess(std::shared_ptr<Process> pro
     int processId = process->getPID();
     int numFramesNeeded = process->getNumOfPages();
 
-    // print pid and numFramesNeeded
-    //std::cout << "Process ID: " << processId << " Number of Frames Needed: " << numFramesNeeded << std::endl;
-    //std::cout << "Allocating " << numFramesNeeded << " frames for process " << processId << std::endl;
 
     if (numFramesNeeded > freeFrameList.size()) {
-        //std::cout << "numFramesNeeded > freeFrameList.size()";
         return nullptr;
     }
 
@@ -170,10 +166,6 @@ void MemoryManager::deallocatePagingMemoryForProcess(std::shared_ptr<Process> pr
         deallocateFrames(frameIndex);
     }
 
-    // list deallocated frames
-    /*for (int frameIndex : framesToDeallocate) {
-        std::cout << "Deallocated Frame: " << frameIndex << std::endl;
-    }*/
 
     process->setMemoryPtr(nullptr);
 
@@ -192,12 +184,6 @@ int MemoryManager::allocateFrames(int numFrames, int processId) {
         setNumPagedIn(this->numPagedIn + 1);
     }
 
-    // print allocated frames
-    /*for (int frameIndex : allocatedFrames) {
-        std::cout << "Allocated Frame: " << frameIndex << std::endl;
-    }*/
-
-    // Map allocated frames to the process ID
     for (int frameIndex : allocatedFrames) {
         frameMap[frameIndex] = processId;
     }
@@ -207,7 +193,6 @@ int MemoryManager::allocateFrames(int numFrames, int processId) {
 }
 
 void MemoryManager::deallocateFrames(int frameIndex) {
-    // Set frame to UNALLOCATED_FRAME to "deallocate"
     frameMap[frameIndex] = -1;
 
     // Add frame to the free frame list

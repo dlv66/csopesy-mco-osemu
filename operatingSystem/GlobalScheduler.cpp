@@ -37,10 +37,13 @@ GlobalScheduler::GlobalScheduler(const Initialize& initConfig) : running(true) {
 
 int GlobalScheduler::getUsedMemory()
 {
-	int memoryUsage;
+	int memoryUsage = 0;
 	for (int i = 0; i < this->scheduler->nCores; i++)
 	{
-		memoryUsage += this->scheduler->coreList[0].process->getMemorySize();
+		if(this->scheduler->coreList[0].process)
+		{
+			memoryUsage += this->scheduler->coreList[0].process->getMemorySize();
+		}
 	}
 
 	return memoryUsage;

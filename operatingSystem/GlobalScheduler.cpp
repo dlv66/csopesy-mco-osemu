@@ -23,7 +23,7 @@ GlobalScheduler::GlobalScheduler(const Initialize& initConfig) : running(true) {
 	}
 	else if (initConfig.scheduler == "fcfs" || initConfig.scheduler == "FCFS") {
 		// Instantiate First-Come, First-Served Scheduler
-		auto fcfsScheduler = std::make_shared<FCFSScheduler>(initConfig.numCPU, initConfig.delayPerExec);
+		auto fcfsScheduler = std::make_shared<FCFSScheduler>(initConfig.numCPU, initConfig.delayPerExec, initConfig.maxOverallMem, initConfig.memPerFrame);
 		this->schedulerTable[FCFS_SCHEDULER_NAME] = fcfsScheduler;
 		this->scheduler = fcfsScheduler;
 		std::cout << "GlobalScheduler initialized with FCFS Scheduler.\n";

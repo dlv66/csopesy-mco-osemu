@@ -35,6 +35,7 @@ void Core::setProcess(std::shared_ptr<Process> process) {
 	if (!this->isRunning) {
 		this->process = process;
 		this->process->setCPUCoreID(this->coreID);
+		this->process->setRunningState();
 		this->update(true);
 	}
 }

@@ -23,6 +23,7 @@ Process::Process(int pid, std::string processName, long long minIns, long long m
 // Executes the process (basic implementation, assuming it increments the instruction counter)
 void Process::execute() {
     if (state == State::RUNNING && currentLineOfInstruction < totalLineOfInstruction) {
+		std::cout << "Process " << processName << " executing instruction " << currentLineOfInstruction << std::endl;
         ++currentLineOfInstruction;
     }
     if (currentLineOfInstruction >= totalLineOfInstruction) {

@@ -20,6 +20,16 @@ MemoryManager::MemoryManager(long long maxOverallMem,
     FRAMES = maxOverallMem / memPerFrame;
     // set frames size
 	frames.resize(FRAMES, false);
+	if (maxOverallMem == memPerFrame)
+	{
+        this->memoryAllocator = MemoryAllocator::FlatMemory;
+        FRAMES = maxOverallMem;
+        frames.resize(FRAMES, false);
+	}
+	else
+	{
+        this->memoryAllocator = MemoryAllocator::Paging;
+	}
 
 }
 
@@ -49,20 +59,21 @@ void MemoryManager::initializePagingAllocator()
 
 // Allocates memory for a process. Returns true if successful, false if insufficient memory.
 bool MemoryManager::allocateFlatMemoryForProcess(std::shared_ptr<Process> process) {
-    int requiredFrames = process->getMemorySize() / memPerFrame;
+	std::cout << "Allocating memory for process " << process->getName() << "...\n";
+    int size = process->getMemorySize();
     int startIndex = process->getMemoryBlockIndex();
 
        // Check if there is enough room from startIndex to allocate memory
-    if (requiredFrames > FRAMES) {
+    if (size > FRAMES) {
         std::cout << "Invalid starting index or not enough frames from the specified index." << std::endl;
         return false;
     }
 
 	// Check for blocks that can allocate memory
-	for (int i = 0; i < FRAMES - requiredFrames + 1; i++) {
+	for (int i = 0; i < FRAMES - size + 1; i++) {
 		if (!frames[i]) {
 			bool canAllocate = true;
-			for (int j = i; j < i + requiredFrames; j++) {
+			for (int j = i; j < i + size; j++) {
 				if (frames[j]) {
 					canAllocate = false;
 					break;
@@ -83,15 +94,15 @@ bool MemoryManager::allocateFlatMemoryForProcess(std::shared_ptr<Process> proces
 
     	// Mark the frames as occupied
 		process->frameStart = startIndex;
-		process->frameEnd = startIndex + requiredFrames - 1;
+		process->frameEnd = startIndex + size - 1;
 
-        for (int i = startIndex; i < startIndex + requiredFrames; i++) {
+        for (int i = startIndex; i < startIndex + size; i++) {
             frames[i] = true;
         }
 
         processesInMemory++;
-        /*std::cout << "Manually allocated memory for process " << process->getName()
-            << " from frame " << startIndex << " to " << startIndex + requiredFrames - 1 << std::endl;*/
+        std::cout << "Manually allocated memory for process " << process->getName()
+            << " from frame " << startIndex << " to " << startIndex + size - 1 << std::endl;
         return true;
 
     }
@@ -249,7 +260,7 @@ void MemoryManager::generateReport(const std::vector<Core>& coreList) const {
             processesInMemoryCount++;
             std::shared_ptr<Process> runningProcess = core.process;
 
-            int blockStartAddr = runningProcess->getMemoryBlockIndex() * memPerFrame;
+            int blockStartAddr = runningProcess->getMemoryBlockIndex();
             int blockEndAddr = blockStartAddr + runningProcess->getMemorySize() -1;
 
             // Prepare the entry and add to the vector

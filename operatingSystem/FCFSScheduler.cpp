@@ -5,8 +5,9 @@
 #include <chrono>
 
 #include "GlobalScheduler.h"
+#include "MemoryManager.h"
 
-FCFSScheduler::FCFSScheduler(int nCores, long long delayPerExec) :
+FCFSScheduler::FCFSScheduler(int nCores, long long delayPerExec, long long maxOverallMem, long long memPerFrame) :
 	AScheduler(SchedulingAlgorithm::FCFS),
 	IThread()
 {
@@ -16,6 +17,9 @@ FCFSScheduler::FCFSScheduler(int nCores, long long delayPerExec) :
     for (int i = 0; i < nCores; i++) { // for all the cores
         coreList.push_back(Core(i)); // add core to the list
     }
+
+    memoryManager = std::make_shared<MemoryManager>(maxOverallMem, memPerFrame);
+
 }
 
 void FCFSScheduler::execute()
@@ -29,6 +33,7 @@ void FCFSScheduler::execute()
         for (int i = 0; i < nCores; i++) {
             if (this->coreList[i].terminatedProcess != nullptr) {
                 this->terminatedProcessesList.push_back(this->coreList[i].terminatedProcess);
+				memoryManager->deallocateFlatMemoryForProcess(this->coreList[i].terminatedProcess);
                 this->coreList[i].terminatedProcess = nullptr;
             }
         }
@@ -39,7 +44,7 @@ void FCFSScheduler::execute()
             for (int i = 0; i < nCores; i++)
             {
                 // if the current core is empty/finished
-                if (this->coreList[i].process == nullptr) {
+                if (this->coreList[i].process == nullptr && this->memoryManager->allocateFlatMemoryForProcess(process)) {
 
                     this->coreList[i].setProcess(process); // set the new process to the core
                     this->activeProcessesList.erase(this->activeProcessesList.begin()); // remove the new process from the waiting queue

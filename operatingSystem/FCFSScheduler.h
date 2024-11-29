@@ -7,11 +7,13 @@
 #include "AScheduler.h"
 
 
+class MemoryManager;
+
 class FCFSScheduler : public AScheduler, public IThread
 {
 public:
     // Constructor
-    FCFSScheduler(int nCores, long long delayPerExec);
+    FCFSScheduler(int nCores, long long delayPerExec, long long maxOverallMem, long long memPerFrame);
 
 	// Instantiates core list based on given number of cores
 	void instantiateCoreList();
@@ -24,5 +26,7 @@ public:
 	void executeQuantum(long long timeQuantum) override;
 
 	void delay(int coreID);
+
+	std::shared_ptr<MemoryManager> memoryManager;
 };
 

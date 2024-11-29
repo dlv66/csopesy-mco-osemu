@@ -34,6 +34,11 @@ public:
 	void handleSchedulerTest(long long minIns, long long maxIns, long long batchProcessFreq, long long minMemPerProc, long long maxMemPerProc, int memPerFrame);
 	void getCPUUtilization() const;
 	void getCPUUtilizationReport(std::ofstream& reportUtilFile) const;
+
+	void getMemoryReport(int maxOverallMem);
+	int getUsedMemory();
+
+
 	void incrementProcessID();
 
 	bool isRunning() const;

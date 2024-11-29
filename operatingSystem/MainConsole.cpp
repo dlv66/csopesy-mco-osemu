@@ -68,10 +68,17 @@ void MainConsole::process()
 				std::cout << "ERROR: System has already been initialized. Please try again.\n\n";
 			}
 			else if (sInput == "process-smi") {
-				// TODO: ADD PROCESS-SMI CODE HERE
+				std::cout << "Process SMI." << std::endl;
+				GlobalScheduler::getInstance()->getCPUUtilization();
+				GlobalScheduler::getInstance()->getMemoryReport(init.maxOverallMem);
 			}
 			else if (sInput == "vmstat") {
 				// TODO: ADD VMSTAT CODE HERE
+				std::cout << "VMSTAT." << std::endl;
+				std::cout << "Total memory: " << init.maxOverallMem << "KB" << std::endl;
+				std::cout << "Memory used: " << GlobalScheduler::getInstance()->getUsedMemory() << "KB" << std::endl;
+				std::cout << "Memory free: " << init.maxOverallMem - GlobalScheduler::getInstance()->getUsedMemory() << "KB" << std::endl;
+				std::cout << "CPU Ticks: " << GlobalScheduler::getInstance()->globalCPUCycles << std::endl;
 			}
 			else if (sInput == "report-util")
 			{

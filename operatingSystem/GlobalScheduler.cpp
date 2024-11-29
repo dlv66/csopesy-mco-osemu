@@ -14,8 +14,8 @@ GlobalScheduler::GlobalScheduler(const Initialize& initConfig) : running(true) {
 	// Choose the scheduler based on the config file's scheduler value
 	if (initConfig.scheduler == "rr" || initConfig.scheduler == "RR") {
 		// Instantiate Round-Robin Scheduler with quantum, delayExec, and numCPU from Initialize
-		auto rrScheduler = std::make_shared<RRScheduler>(initConfig.quantumCycles, initConfig.delayPerExec, initConfig.numCPU, 
-														 initConfig.maxOverallMem, initConfig.memPerFrame);
+		auto rrScheduler = std::make_shared<RRScheduler>(initConfig.quantumCycles, initConfig.delayPerExec, initConfig.numCPU, initConfig.maxOverallMem, initConfig.memPerFrame
+														 );
 		this->schedulerTable[RR_SCHEDULER_NAME] = rrScheduler;
 		this->scheduler = rrScheduler;
 		std::cout << "GlobalScheduler initialized with Round-Robin Scheduler.\n";
@@ -34,6 +34,28 @@ GlobalScheduler::GlobalScheduler(const Initialize& initConfig) : running(true) {
 		std::cerr << "Unknown scheduler type in config: " << initConfig.scheduler << std::endl;
 	}
 }
+
+int GlobalScheduler::getUsedMemory()
+{
+	int memoryUsage;
+	for (int i = 0; i < this->scheduler->nCores; i++)
+	{
+		memoryUsage += this->scheduler->coreList[0].process->getMemorySize();
+	}
+
+	return memoryUsage;
+}
+
+void GlobalScheduler::getMemoryReport(int maxOverallMem)
+{
+	
+	int memoryUsage = this->getUsedMemory();
+
+	std::cout << "Memory Usage: " << memoryUsage << "MiB / " << maxOverallMem << "MiB\n";
+	std::cout << "Memory Utilization: " << (memoryUsage / maxOverallMem) * 100 << "%\n";
+
+}
+
 
 void GlobalScheduler::initialize(const Initialize& initConfig) {
 	if (!sharedInstance) {

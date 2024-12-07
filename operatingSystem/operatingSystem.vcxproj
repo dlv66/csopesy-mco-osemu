@@ -128,7 +128,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="AScheduler.cpp" />
     <ClCompile Include="BaseScreen.cpp" />
     <ClCompile Include="Config.cpp" />
     <ClCompile Include="ConsoleManager.cpp" />

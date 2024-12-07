@@ -142,6 +142,7 @@
     <ClCompile Include="MainConsole.cpp" />
     <ClCompile Include="MemoryManager.cpp" />
     <ClCompile Include="OSEmulator.cpp" />
+    <ClCompile Include="PrintCommand.cpp" />
     <ClCompile Include="Process.cpp" />
     <ClCompile Include="RRScheduler.cpp" />
     <ClCompile Include="Utils.cpp" />
@@ -161,6 +162,7 @@
     <ClInclude Include="IThread.h" />
     <ClInclude Include="MainConsole.h" />
     <ClInclude Include="MemoryManager.h" />
+    <ClInclude Include="PrintCommand.h" />
     <ClInclude Include="Process.h" />
     <ClInclude Include="RRScheduler.h" />
     <ClInclude Include="Utils.h" />

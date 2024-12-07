@@ -147,7 +147,6 @@
     <ClCompile Include="RRScheduler.cpp" />
     <ClCompile Include="SchedulerRR.cpp" />
     <ClCompile Include="Source.cpp" />
-    <ClCompile Include="Utils.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AConsole.h" />
@@ -172,7 +171,6 @@
     <ClInclude Include="Scheduler.h" />
     <ClInclude Include="SchedulerRR.h" />
     <ClInclude Include="ThreadSafeQueue.h" />
-    <ClInclude Include="Utils.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="config.txt" />

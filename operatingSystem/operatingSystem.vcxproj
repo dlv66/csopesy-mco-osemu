@@ -137,7 +137,6 @@
     <ClCompile Include="OSEmulator.cpp" />
     <ClCompile Include="PrintCommand.cpp" />
     <ClCompile Include="Process.cpp" />
-    <ClCompile Include="RRScheduler.cpp" />
     <ClCompile Include="SchedulerRR.cpp" />
     <ClCompile Include="Source.cpp" />
   </ItemGroup>

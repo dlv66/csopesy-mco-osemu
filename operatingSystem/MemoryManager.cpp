@@ -1,528 +1,404 @@
 #include "MemoryManager.h"
-#include "Process.h"  // Include only in .cpp to access Process methods
+#include <fstream>
 #include <iostream>
-#include <iomanip>
-#include <mutex>
-#include <sstream> 
-#include <vector>  
-#include "Core.h"
+#include <algorithm>
 
-const std::string MemoryManager::backingStoreFile = "backing_store.txt";
+MemoryManager::MemoryManager()
+    : maxMemory(0), memPerFrame(0), totalFrames(0), flatMemory(true),
+    usedMemory(0), numPagedIn(0), numPagedOut(0),
+    idleCpuTicks(0), activeCpuTicks(0), totalCpuTicks(0) {}
 
-// Constructor initializes the memory frames as all empty
-MemoryManager::MemoryManager(long long maxOverallMem, 
-                             long long memPerFrame 
-                             ) : frames(FRAMES), maxOverallMem(maxOverallMem), memPerFrame(memPerFrame)
-{
-    // Clear the backing store file on initialization
-    std::ofstream ofs(backingStoreFile, std::ofstream::out | std::ofstream::trunc);
-    ofs.close();
-    FRAMES = maxOverallMem / memPerFrame;
-    // set frames size
-	frames.resize(FRAMES, false);
-	if (maxOverallMem == memPerFrame)
-	{
-        this->memoryAllocator = MemoryAllocator::FlatMemory;
-        FRAMES = maxOverallMem;
-        frames.resize(FRAMES, false);
-	}
-	else
-	{
-        this->memoryAllocator = MemoryAllocator::Paging;
-	}
+MemoryManager::~MemoryManager() {}
 
+void MemoryManager::initialize(unsigned int maxMem, unsigned int memPerFrame) {
+    std::lock_guard<std::mutex> lock(memoryMutex);
+
+    maxMemory = maxMem;
+    this->memPerFrame = memPerFrame;
+    totalFrames = maxMemory / memPerFrame;
+    flatMemory = (maxMemory == memPerFrame);
+
+    if (flatMemory) {
+        // Initialize single block of free memory
+        memoryBlocks.clear();
+        memoryBlocks.push_back({ 0, maxMemory, nullptr });
+    }
+    else {
+        // Initialize frames for paging
+        frames.resize(totalFrames);
+        for (auto& frame : frames) {
+            frame.allocated = false;
+            frame.owner = nullptr;
+            frame.pageNumber = -1;
+        }
+    }
 }
 
-void MemoryManager::allocate(std::shared_ptr<Process> process)
-{
-	if (this->memoryAllocator == MemoryAllocator::FlatMemory)
-	{
-		allocateFlatMemoryForProcess(process);
-	}
-	else
-	{
-		allocatePagingMemoryForProcess(process);
-	}
-}
+/*
+void MemoryManager::compactMemory() {
+    if (!flatMemory) return;
 
-void MemoryManager::initializePagingAllocator()
-{
-    for (int i = 0; i < FRAMES; ++i) {
-        freeFrameList.push(i);
+    std::vector<MemoryBlock> newBlocks;
+    size_t currentOffset = 0;
 
-        // initialize the unordered map with frames
-        frameMap[i] = -1;
+    // Move all allocated blocks to the front
+    for (const auto& block : memoryBlocks) {
+        if (block.process != nullptr) {
+            newBlocks.push_back({ currentOffset, block.size, block.process });
+            currentOffset += block.size;
+        }
     }
 
+    // Add remaining space as a single free block
+    if (currentOffset < maxMemory) {
+        newBlocks.push_back({ currentOffset, maxMemory - currentOffset, nullptr });
+    }
+
+    memoryBlocks = std::move(newBlocks);
+}
+*/
+
+bool MemoryManager::findFreeFrames(unsigned int numFramesNeeded, std::vector<int>& frameNumbers) {
+    frameNumbers.clear();
+    for (size_t i = 0; i < frames.size() && frameNumbers.size() < numFramesNeeded; ++i) {
+        if (!frames[i].allocated) {
+            frameNumbers.push_back(i);
+        }
+    }
+    return frameNumbers.size() == numFramesNeeded;
 }
 
+void MemoryManager::removeOldestProcess() {
+    if (memoryQueue.empty()) return;
 
-// Allocates memory for a process. Returns true if successful, false if insufficient memory.
-bool MemoryManager::allocateFlatMemoryForProcess(std::shared_ptr<Process> process) {
-	std::cout << "Allocating memory for process " << process->getName() << "...\n";
-    int size = process->getMemorySize();
-    int startIndex = process->getMemoryBlockIndex();
+    Process* oldestProcess = memoryQueue.front();
+    memoryQueue.pop_front();
 
-       // Check if there is enough room from startIndex to allocate memory
-    if (size > FRAMES) {
-        std::cout << "Invalid starting index or not enough frames from the specified index." << std::endl;
+    if (flatMemory) {
+        for (auto& block : memoryBlocks) {
+            if (block.process == oldestProcess) {
+                block.process = nullptr;
+                usedMemory -= block.size;
+                break; // Assuming one block per process
+            }
+        }
+        // Merge adjacent free blocks
+        mergeAdjacentFreeBlocks();
+
+        // Mark process as swapped out
+        swappedOutProcesses.insert(oldestProcess);
+        oldestProcess->setInMemory(false);
+
+        int processId = oldestProcess->getId();
+        std::string filename = std::to_string(processId) + ".txt";
+        std::ofstream outfile(filename);
+        if (outfile.is_open()) {
+            outfile << processId;
+            outfile.close();
+        }
+        else {
+            std::cerr << "Failed to create backing store file for process " << processId << std::endl;
+        }
+    }
+    else {
+        auto it = pageTables.find(oldestProcess);
+        if (it != pageTables.end()) {
+            for (const auto& entry : it->second) {
+                if (entry.present) {
+                    frames[entry.frameNumber].allocated = false;
+                    frames[entry.frameNumber].owner = nullptr;
+                    frames[entry.frameNumber].pageNumber = -1;
+                    numPagedOut++;
+                }
+            }
+            pageTables.erase(it);
+        }
+        // Mark process as swapped out
+        swappedOutProcesses.insert(oldestProcess);
+        oldestProcess->setInMemory(false);
+    }
+}
+
+void MemoryManager::mergeAdjacentFreeBlocks() {
+    for (size_t i = 0; i < memoryBlocks.size() - 1; ) {
+        if (memoryBlocks[i].process == nullptr && memoryBlocks[i + 1].process == nullptr) {
+            // Merge blocks
+            memoryBlocks[i].size += memoryBlocks[i + 1].size;
+            memoryBlocks.erase(memoryBlocks.begin() + i + 1);
+        }
+        else {
+            ++i;
+        }
+    }
+}
+
+bool MemoryManager::allocateMemory(Process* process, unsigned int size) {
+    std::lock_guard<std::mutex> lock(memoryMutex);
+
+    if (size > maxMemory) {
         return false;
     }
 
-	// Check for blocks that can allocate memory
-	for (int i = 0; i < FRAMES - size + 1; i++) {
-		if (!frames[i]) {
-			bool canAllocate = true;
-			for (int j = i; j < i + size; j++) {
-				if (frames[j]) {
-					canAllocate = false;
-					break;
-				}
-			}
-			if (canAllocate) {
-				startIndex = i;
-				break;
-			}
-		}
-	}
+    if (flatMemory) {
+        // Try to find a suitable free block or merge adjacent free blocks
+        while (true) {
+            for (size_t i = 0; i < memoryBlocks.size(); ++i) {
+                if (memoryBlocks[i].process == nullptr) {
+                    size_t combinedSize = memoryBlocks[i].size;
+                    size_t startIndex = i;
+                    size_t endIndex = i;
 
+                    // Check if current block is large enough
+                    if (combinedSize >= size) {
+                        // Allocate within this block
+                        if (combinedSize > size) {
+                            // Split the block
+                            MemoryBlock newBlock = {
+                                memoryBlocks[i].offset + size,
+                                memoryBlocks[i].size - size,
+                                nullptr
+                            };
+                            memoryBlocks.insert(memoryBlocks.begin() + i + 1, newBlock);
+                        }
 
-    if (startIndex >= 0)
-    {
-        // Set process's memory block index and increment process count
-        process->setMemoryBlockIndex(startIndex);
+                        // Assign process to block
+                        memoryBlocks[i].size = size;
+                        memoryBlocks[i].process = process;
+                        usedMemory += size;
+                        memoryQueue.push_back(process);
+                        process->setInMemory(true);
+                        return true;
+                    }
 
-    	// Mark the frames as occupied
-		process->frameStart = startIndex;
-		process->frameEnd = startIndex + size - 1;
+                    // Try to merge adjacent free blocks
+                    for (size_t j = i + 1; j < memoryBlocks.size(); ++j) {
+                        if (memoryBlocks[j].process == nullptr &&
+                            memoryBlocks[j].offset == memoryBlocks[endIndex].offset + memoryBlocks[endIndex].size) {
+                            combinedSize += memoryBlocks[j].size;
+                            endIndex = j;
 
-        for (int i = startIndex; i < startIndex + size; i++) {
-            frames[i] = true;
-        }
+                            if (combinedSize >= size) {
+                                // Merge blocks from startIndex to endIndex
+                                memoryBlocks[startIndex].size = combinedSize;
+                                memoryBlocks[startIndex].process = process;
+                                usedMemory += size;
+                                memoryQueue.push_back(process);
+                                process->setInMemory(true);
 
-        processesInMemory++;
-        //std::cout << "Manually allocated memory for process " << process->getName()
-        //    << " from frame " << startIndex << " to " << startIndex + size - 1 << std::endl;
-        return true;
+                                // Remove merged blocks except the first one
+                                memoryBlocks.erase(memoryBlocks.begin() + startIndex + 1, memoryBlocks.begin() + endIndex + 1);
 
-    }
+                                // If there's extra space, split the block
+                                if (combinedSize > size) {
+                                    MemoryBlock newBlock = {
+                                        memoryBlocks[startIndex].offset + size,
+                                        combinedSize - size,
+                                        nullptr
+                                    };
+                                    memoryBlocks.insert(memoryBlocks.begin() + startIndex + 1, newBlock);
+                                    memoryBlocks[startIndex].size = size;
+                                }
 
-	return false;
-}
-
-// Allocates memory for a process using the paging strategy
-void* MemoryManager::allocatePagingMemoryForProcess(std::shared_ptr<Process> process) {
-    int processId = process->getPID();
-    int numFramesNeeded = process->getNumOfPages();
-
-
-    if (numFramesNeeded > freeFrameList.size()) {
-        return nullptr;
-    }
-
-    // Allocate frames for the process
-    int frameIndex = allocateFrames(numFramesNeeded, processId);
-    void* memoryPtr = &frameMap[frameIndex];
-    process->setMemoryPtr(memoryPtr);
-
-    processesInMemory++;
-
-    return memoryPtr;
-}
-
-// Releases memory allocated to a specific process by marking frames as free
-void MemoryManager::deallocateFlatMemoryForProcess(std::shared_ptr<Process> process) {
-    int blockIndex = process->getMemoryBlockIndex();
-    if (blockIndex >= 0) {
-        int releasedFrames = process->getMemorySize() / memPerFrame;
-        for (int i = blockIndex; i < process->frameEnd + 1; i++) {
-            frames[i] = false;  // Free the frames
-        }
-        process->setMemoryBlockIndex(-1);  // Reset the memory block index
-        processesInMemory--;
-        /*std::cout << "Released memory for process " << process->getName()
-            << " from block index " << blockIndex << std::endl;*/
-    }
-}
-
-void MemoryManager::deallocatePagingMemoryForProcess(std::shared_ptr<Process> process)
-{
-    int processId = process->getPID();
-    std::vector<int> framesToDeallocate;
-
-    // Find frames allocated to the process
-    for (const auto& entry : frameMap) {
-        if (entry.second == processId) {
-            framesToDeallocate.push_back(entry.first);
-        }
-    }
-
-    if (framesToDeallocate.size() == 0) {
-        return;
-    }
-
-    // Deallocate the frames
-    for (int frameIndex : framesToDeallocate) {
-        deallocateFrames(frameIndex);
-    }
-
-
-    process->setMemoryPtr(nullptr);
-
-    // decrement processCount
-    processesInMemory--;
-}
-
-int MemoryManager::allocateFrames(int numFrames, int processId) {
-    std::vector<int> allocatedFrames;
-
-    // Collect the required number of frames from the freeFrameList
-    for (int i = 0; i < numFrames; ++i) {
-        allocatedFrames.push_back(freeFrameList.front());
-        freeFrameList.pop();
-
-        setNumPagedIn(this->numPagedIn + 1);
-    }
-
-    for (int frameIndex : allocatedFrames) {
-        frameMap[frameIndex] = processId;
-    }
-
-    // Return the index of the first allocated frame
-    return allocatedFrames.front();
-}
-
-void MemoryManager::deallocateFrames(int frameIndex) {
-    frameMap[frameIndex] = -1;
-
-    // Add frame to the free frame list
-    freeFrameList.push(frameIndex);
-
-    // increment numPagedIn
-    this->setNumPagedOut(this->numPagedOut + 1);
-}
-
-// Calculates external fragmentation by finding the largest contiguous free block
-int MemoryManager::calculateExternalFragmentation() const {
-    int maxFreeBlock = 0;
-    int contiguousFreeFrames = 0;
-
-    for (bool frame : frames) {
-        if (!frame) {
-            contiguousFreeFrames++;
-        }
-        else {
-            if (contiguousFreeFrames > maxFreeBlock) {
-                maxFreeBlock = contiguousFreeFrames;
+                                return true;
+                            }
+                        }
+                        else {
+                            // Can't merge non-adjacent blocks
+                            break;
+                        }
+                    }
+                }
             }
-            contiguousFreeFrames = 0;
+
+            // No suitable contiguous free space found
+            // Attempt to remove oldest process
+            if (!memoryQueue.empty()) {
+                removeOldestProcess();
+            }
+            else {
+                // No processes to remove, allocation fails
+                return false;
+            }
         }
-    }
-    if (contiguousFreeFrames > maxFreeBlock) maxFreeBlock = contiguousFreeFrames;
-
-    return maxFreeBlock;
-}
-// Function to generate a detailed report at each quantum cycle
-void MemoryManager::generateReport(const std::vector<Core>& coreList) const {
-    std::ofstream reportFile("memory_report_cycle.txt", std::ios::app);  // Open in append mode to add each cycle's info
-
-    // Timestamp for the report
-    std::time_t now = std::time(0);
-    char buffer[26];
-    ctime_s(buffer, sizeof(buffer), &now);
-    reportFile << "\nTimestamp: " << buffer;
-
-    int processesInMemoryCount = 0;
-    int externalFragmentation = calculateExternalFragmentation();
-
-
-    // Temporary vector to hold each report entry for reverse output
-    std::vector<std::string> reportEntries;
-
-    // Iterate over coreList to capture running processes
-    for (const auto& core : coreList) {
-        if (core.process != nullptr) {  // Only consider processes running on cores
-            processesInMemoryCount++;
-            std::shared_ptr<Process> runningProcess = core.process;
-
-            int blockStartAddr = runningProcess->getMemoryBlockIndex();
-            int blockEndAddr = blockStartAddr + runningProcess->getMemorySize() -1;
-
-            // Prepare the entry and add to the vector
-            std::ostringstream entry;
-            entry << blockEndAddr << "\n";
-            entry << "P" << runningProcess->getPID() << "\n";
-            entry << blockStartAddr << "\n\n";
-            reportEntries.push_back(entry.str());
-
-            // Debug output to verify process allocation in report
-            /*std::cout << "Reporting running process " << runningProcess->getName() << " with PID "
-                << runningProcess->getPID() << " from address " << blockStartAddr
-                << " to " << blockEndAddr << "\n";*/
-        }
-    }
-
-    reportFile << "Processes in Memory: " << processesInMemoryCount << "\n";
-    reportFile << "External Fragmentation: " << externalFragmentation << " KB\n";
-    reportFile << "\n----end---- = " << maxOverallMem << "\n\n";
-
-    // Output entries in reverse order to match the descending format
-    for (auto it = reportEntries.rbegin(); it != reportEntries.rend(); ++it) {
-        reportFile << *it;
-    }
-
-    reportFile << "----start---- = 0\n";
-    reportFile << "---------------------------------------------------\n";
-    reportFile.close();
-
-    // Update processes in memory count in the report
-    //std::cout << "Processes in memory: " << processesInMemoryCount << "\n";
-}
-
-
-
-// Prints an ASCII representation of memory layout in 64-frame rows
-void MemoryManager::printMemoryState(std::ofstream& reportFile) const {
-    reportFile << "\nMemory Layout:\n";
-    for (int i = 0; i < FRAMES; i++) {
-        if (i % 64 == 0) reportFile << "\n";  // New line every 64 frames
-        reportFile << (frames[i] ? "#" : ".");
-    }
-    reportFile << "\n";
-}
-
-void MemoryManager::addToBackingStore(std::shared_ptr<Process> process) {
-    std::ofstream ofs(MemoryManager::backingStoreFile, std::ios::app);
-    if (ofs.is_open()) {
-        ofs << serializeProcess(process) << "\n"; // Serialize process state
-        //std::cout << "Process " << process->getName() << " added to backing store.\n";
     }
     else {
-        std::cerr << "Error: Unable to open backing store file.\n";
-    }
-    ofs.close();
-}
+        // Paging allocation remains unchanged
+        unsigned int numPages = (size + memPerFrame - 1) / memPerFrame;
+        std::vector<int> freeFrames;
 
-std::shared_ptr<Process> MemoryManager::fetchFromBackingStore() {
-    std::ifstream ifs(MemoryManager::backingStoreFile);
-    if (!ifs.is_open()) {
-        std::cerr << "Error: Unable to open backing store file.\n";
-        return nullptr;
-    }
-
-    std::string line;
-    std::ostringstream remainingData;
-    std::shared_ptr<Process> process = nullptr;
-
-    if (std::getline(ifs, line)) {
-        process = deserializeProcess(line); // Deserialize the first process
-    }
-
-    // Write remaining processes back to the file
-    while (std::getline(ifs, line)) {
-        remainingData << line << "\n";
-    }
-    ifs.close();
-
-    std::ofstream ofs(MemoryManager::backingStoreFile, std::ios::out | std::ios::trunc);
-    ofs << remainingData.str();
-    ofs.close();
-
-    if (process) {
-        //std::cout << "Process " << process->getName() << " fetched from backing store.\n";
-    }
-    return process;
-}
-
-bool MemoryManager::isBackingStoreEmpty() const {
-    std::ifstream ifs(MemoryManager::backingStoreFile);
-    return ifs.peek() == std::ifstream::traits_type::eof();
-}
-
-std::string MemoryManager::serializeProcess(const std::shared_ptr<Process>& process) {
-    // Example: Serialize process attributes as a comma-separated string
-    std::ostringstream oss;
-    oss << process->getPID() << "," << process->getName() << ","
-        << process->getMemorySize() << "," << process->getCPUCoreID();
-    return oss.str();
-}
-
-std::shared_ptr<Process> MemoryManager::deserializeProcess(const std::string& data) {
-    // Example: Deserialize process attributes from a comma-separated string
-    std::istringstream iss(data);
-    std::string token;
-    int id, memorySize, cpuCoreID;
-    std::string name;
-
-    if (std::getline(iss, token, ',')) id = std::stoi(token);
-    if (std::getline(iss, token, ',')) name = token;
-    if (std::getline(iss, token, ',')) memorySize = std::stoi(token);
-    if (std::getline(iss, token, ',')) cpuCoreID = std::stoi(token);
-
-    auto process = std::make_shared<Process>(id, name, memorySize);
-    process->setCPUCoreID(cpuCoreID);
-    return process;
-}
-
-void MemoryManager::setNumPagedIn(int numPagedIn) {
-    this->numPagedIn = numPagedIn;
-}
-
-void MemoryManager::setNumPagedOut(int numPagedOut) {
-    this->numPagedOut = numPagedOut;
-}
-
-
-
-
-
-
-
-
-
-
-
-//OTHER CODE
-/*
-#include "MemoryManager.h"
-#include <algorithm>
-#include <filesystem>
-MemoryManager* MemoryManager::sharedInstance = nullptr;
-MemoryManager* MemoryManager::getInstance() {
-    return sharedInstance;
-}
-void MemoryManager::initialize() {
-    if (sharedInstance == nullptr) {
-        sharedInstance = new MemoryManager();
-    }
-}
-void MemoryManager::destroy() {
-    delete sharedInstance;
-    sharedInstance = nullptr;
-}
-void MemoryManager::initMemory(int totalMem, int frameSize, int procMemSize) {
-    std::lock_guard<std::mutex> lock(memoryMutex);
-    totalMemory = totalMem;
-    this->frameSize = frameSize;
-    processMemorySize = procMemSize;
-    currentQuantum = 0;
-    // Initialize with one free block spanning all memory
-    memoryBlocks.clear();
-    memoryBlocks.emplace_back(0, totalMemory, true);
-}
-bool MemoryManager::allocateMemory(const std::string& processName) {
-    std::lock_guard<std::mutex> lock(memoryMutex);
-    // First-fit allocation
-    for (auto& block : memoryBlocks) {
-        if (block.isFree && block.size >= processMemorySize) {
-            // If block is exactly the right size
-            if (block.size == processMemorySize) {
-                block.isFree = false;
-                block.processName = processName;
-                return true;
+        while (!findFreeFrames(numPages, freeFrames)) {
+            if (!memoryQueue.empty()) {
+                removeOldestProcess();
             }
-            // Split block
-            int remainingSize = block.size - processMemorySize;
-            block.size = processMemorySize;
-            block.isFree = false;
-            block.processName = processName;
-            // Create new free block with remaining space
-            memoryBlocks.emplace(
-                std::next(std::find_if(memoryBlocks.begin(), memoryBlocks.end(),
-                    [&](const MemoryBlock& b) { return b.startAddress == block.startAddress; })),
-                block.startAddress + processMemorySize,
-                remainingSize,
-                true
-            );
-            return true;
+            else {
+                // No processes to remove, allocation fails
+                return false;
+            }
         }
+
+        // Allocate frames
+        std::vector<PageTableEntry> pageTable(numPages);
+        for (size_t i = 0; i < numPages; ++i) {
+            int frameNum = freeFrames[i];
+            frames[frameNum].allocated = true;
+            frames[frameNum].owner = process;
+            frames[frameNum].pageNumber = i;
+
+            pageTable[i].frameNumber = frameNum;
+            pageTable[i].present = true;
+            numPagedIn++;
+        }
+
+        pageTables[process] = std::move(pageTable);
+        memoryQueue.push_back(process);
+
+        process->setInMemory(true);
+        if (swappedOutProcesses.erase(process) > 0) {
+            // Process was in the backing store, so clear the content of the .txt file
+            int processId = process->getId();
+            std::string filename = std::to_string(processId) + ".txt";
+            std::ofstream outfile(filename, std::ios::trunc);
+            if (!outfile.is_open()) {
+                std::cerr << "Failed to open backing store file for process " << processId << " to empty it" << std::endl;
+            }
+            outfile.close();
+        }
+
+        return true;
     }
-    return false;
 }
-void MemoryManager::deallocateMemory(const std::string& processName) {
+
+void MemoryManager::deallocateMemory(Process* process) {
     std::lock_guard<std::mutex> lock(memoryMutex);
-    for (auto it = memoryBlocks.begin(); it != memoryBlocks.end(); ++it) {
-        if (!it->isFree && it->processName == processName) {
-            it->isFree = true;
-            it->processName.clear();
+
+    if (flatMemory) {
+        bool found = false;
+
+        for (size_t i = 0; i < memoryBlocks.size(); ++i) {
+            if (memoryBlocks[i].process == process) {
+                usedMemory -= memoryBlocks[i].size;
+                memoryBlocks[i].process = nullptr;
+                found = true;
+                break;  // Assuming process occupies a single block
+            }
+        }
+
+        if (found) {
+            // Merge adjacent free blocks
             mergeAdjacentFreeBlocks();
-            break;
         }
     }
-}
-int MemoryManager::getFreeMemory() const {
-    int freeMemory = 0;
-    for (const auto& block : memoryBlocks) {
-        if (block.isFree) {
-            freeMemory += block.size;
+    else {
+        // Paging deallocation remains unchanged
+        auto it = pageTables.find(process);
+        if (it != pageTables.end()) {
+            for (const auto& entry : it->second) {
+                if (entry.present) {
+                    frames[entry.frameNumber].allocated = false;
+                    frames[entry.frameNumber].owner = nullptr;
+                    frames[entry.frameNumber].pageNumber = -1;
+                    numPagedOut++;
+                }
+            }
+            pageTables.erase(it);
         }
     }
-    return freeMemory;
+
+    memoryQueue.remove(process);
+    swappedOutProcesses.erase(process);
+    process->setInMemory(false);
 }
-int MemoryManager::getExternalFragmentation() const {
-    int fragmentation = 0;
-    for (const auto& block : memoryBlocks) {
-        if (block.isFree && block.size < processMemorySize) {
-            fragmentation += block.size;
-        }
-    }
-    return fragmentation;
-}
-int MemoryManager::getProcessCount() const {
-    return std::count_if(memoryBlocks.begin(), memoryBlocks.end(),
-        [](const MemoryBlock& block) { return !block.isFree; });
-}
-void MemoryManager::mergeAdjacentFreeBlocks() {
-    auto it = memoryBlocks.begin();
-    while (it != memoryBlocks.end() && std::next(it) != memoryBlocks.end()) {
-        if (it->isFree && std::next(it)->isFree) {
-            it->size += std::next(it)->size;
-            memoryBlocks.erase(std::next(it));
-        }
-        else {
-            ++it;
-        }
-    }
-}
-std::string MemoryManager::generateTimestamp() const {
-    auto now = std::chrono::system_clock::now();
-    auto now_c = std::chrono::system_clock::to_time_t(now);
-    std::tm tm_buf;
-    localtime_s(&tm_buf, &now_c);
-    std::stringstream ss;
-    ss << std::put_time(&tm_buf, "%m/%d/%Y %H:%M:%S");
-    return ss.str();
-}
-void MemoryManager::generateMemorySnapshot(int quantumNumber) {
+
+unsigned int MemoryManager::getUsedMemory() const {
     std::lock_guard<std::mutex> lock(memoryMutex);
-    std::stringstream filename;
-    filename << "memory_stamp_" << std::setw(2) << std::setfill('0') << quantumNumber << ".txt";
-    std::ofstream outFile(filename.str());
-    if (!outFile.is_open()) {
-        throw std::runtime_error("Could not create memory snapshot file");
+
+    if (flatMemory) {
+        return usedMemory;
     }
-    // Write header information
-    outFile << "Timestamp: " << generateTimestamp() << "\n";
-    outFile << "Number of processes in memory: " << getProcessCount() << "\n";
-    outFile << "Total external fragmentation in KB: " << getExternalFragmentation() / 1024 << "\n\n";
-    // Write memory map
-    outFile << "----end---- = " << totalMemory << "\n";
-    // Print each memory block
-    for (const auto& block : memoryBlocks) {
-        outFile << block.startAddress + block.size << "\n";
-        if (!block.isFree) {
-            outFile << block.processName << "\n";
+    else {
+        unsigned int usedFrames = 0;
+        for (const auto& frame : frames) {
+            if (frame.allocated) {
+                usedFrames++;
+            }
+        }
+        return usedFrames * memPerFrame;
+    }
+}
+
+unsigned int MemoryManager::getTotalMemory() const {
+    return maxMemory;
+}
+
+unsigned int MemoryManager::getFreeMemory() const {
+    return getTotalMemory() - getUsedMemory();
+}
+
+double MemoryManager::getMemoryUtilization() const {
+    return (static_cast<double>(getUsedMemory()) / getTotalMemory()) * 100.0;
+}
+
+std::vector<std::pair<Process*, unsigned int>> MemoryManager::getProcessesInMemory() const {
+    std::lock_guard<std::mutex> lock(memoryMutex);
+    std::vector<std::pair<Process*, unsigned int>> result;
+
+    if (flatMemory) {
+        for (const auto& block : memoryBlocks) {
+            if (block.process != nullptr) {
+                result.emplace_back(block.process, block.size);
+            }
         }
     }
-    outFile << "----start----- = 0\n";
-    outFile.close();
-}
-bool MemoryManager::isContiguousBlockAvailable(int size) const {
-    for (const auto& block : memoryBlocks) {
-        if (block.isFree && block.size >= size) {
-            return true;
+    else {
+        for (const auto& pair : pageTables) {
+            unsigned int numPages = 0;
+            for (const auto& entry : pair.second) {
+                if (entry.present) numPages++;
+            }
+            result.emplace_back(pair.first, numPages * memPerFrame);
         }
     }
-    return false;
+
+    return result;
 }
-*/
+
+bool MemoryManager::isProcessInMemory(Process* process) const {
+    std::lock_guard<std::mutex> lock(memoryMutex);
+    return process->isInMemory();
+}
+
+bool MemoryManager::isPaging() const {
+    return !flatMemory;
+}
+
+unsigned int MemoryManager::getIdleCpuTicks() const {
+    return idleCpuTicks;
+}
+
+unsigned int MemoryManager::getActiveCpuTicks() const {
+    return activeCpuTicks;
+}
+
+unsigned int MemoryManager::getTotalCpuTicks() const {
+    return totalCpuTicks;
+}
+
+unsigned int MemoryManager::getNumPagedIn() const {
+    return numPagedIn;
+}
+
+unsigned int MemoryManager::getNumPagedOut() const {
+    return numPagedOut;
+}
+
+void MemoryManager::incrementIdleCpuTicks() {
+    std::lock_guard<std::mutex> lock(memoryMutex);
+    idleCpuTicks++;
+    totalCpuTicks++;
+}
+
+void MemoryManager::incrementActiveCpuTicks() {
+    std::lock_guard<std::mutex> lock(memoryMutex);
+    activeCpuTicks++;
+    totalCpuTicks++;
+}

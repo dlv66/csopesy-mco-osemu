@@ -27,9 +27,6 @@
     <ClCompile Include="BaseScreen.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="IThread.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="MainConsole.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>

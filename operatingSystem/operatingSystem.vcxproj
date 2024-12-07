@@ -132,7 +132,6 @@
     <ClCompile Include="Config.cpp" />
     <ClCompile Include="ConsoleManager.cpp" />
     <ClCompile Include="FCFSScheduler.cpp" />
-    <ClCompile Include="IThread.cpp" />
     <ClCompile Include="MainConsole.cpp" />
     <ClCompile Include="MemoryManager.cpp" />
     <ClCompile Include="OSEmulator.cpp" />

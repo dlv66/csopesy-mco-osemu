@@ -1,32 +1,69 @@
 #pragma once
-#include <vector>
+
+#include "Scheduler.h"
 #include "Process.h"
-#include "Core.h"
-#include <iostream>
+#include "ConsoleManager.h"
+#include <thread>
+#include <vector>
+#include <map>
+#include <atomic>
+#include <condition_variable>
+#include <unordered_set>
+#include "ThreadSafeQueue.h"
 
-#include "AScheduler.h"
-
-
-class MemoryManager;
-
-class FCFSScheduler : public AScheduler, public IThread
-{
+class SchedulerFCFS : public Scheduler {
 public:
-    // Constructor
-    FCFSScheduler(int nCores, long long delayPerExec, long long maxOverallMem, long long memPerFrame);
+    SchedulerFCFS(int numCores, ConsoleManager& manager);
+    ~SchedulerFCFS();
 
-	// Instantiates core list based on given number of cores
-	void instantiateCoreList();
+    void addProcess(Process* process) override;
+    void start() override;
+    void stop() override;
+    void pause() override;
+    void resume() override;
+    bool isRunning() const override;
+    bool isPaused() const override;
 
-	// Runs the actual scheduler
-	void run() override;
-	void runQuantum(long long timeQuantum) override;
-	void init() override;
-	void execute() override;
-	void executeQuantum(long long timeQuantum) override;
+    int getTotalCores() const override;
+    int getBusyCores() const override;
 
-	void delay(int coreID);
+    std::map<Process*, int> getRunningProcesses() const override;
+    std::vector<Process*> getQueuedProcesses() const override;
+    std::vector<Process*> getFinishedProcesses() const override;
 
-	std::shared_ptr<MemoryManager> memoryManager;
+private:
+    void schedulerLoop();
+    void workerLoop(int coreId);
+
+    int numCores;
+    std::vector<std::thread> workerThreads;
+    std::thread schedulerThread;
+
+    ThreadSafeQueue<Process*> processQueue;
+
+    std::atomic<bool> running;
+    std::atomic<bool> paused;
+    std::mutex pauseMutex;
+    std::condition_variable pauseCV;
+
+    struct Worker {
+        int coreId = 0;
+        std::atomic<bool> busy{ false };
+        Process* currentProcess = nullptr;
+        std::thread thread;
+        std::mutex mtx;
+        std::condition_variable cv;
+    };
+
+    std::vector<Worker*> workers;
+
+    ConsoleManager& consoleManager;
+
+    std::vector<Process*> allProcesses;
+    mutable std::mutex allProcessesMutex;
+
+    std::unordered_set<Process*> queuedProcessesSet;
+    mutable std::mutex queuedProcessesMutex;
+
+    std::atomic<unsigned int> cpuCycles;
 };
-

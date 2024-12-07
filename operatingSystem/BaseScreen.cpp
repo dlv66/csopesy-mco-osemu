@@ -1,82 +1,121 @@
 #include "BaseScreen.h"
-
-#include <iostream>
-#include <ostream>
-
-#include "MainConsole.h"
 #include "ConsoleManager.h"
-// TODO: Implement this function
-BaseScreen::BaseScreen(std::shared_ptr<Process> process, std::string processName) : AConsole(processName), attachedProcess(process)
-{
-	this->attachedProcess = process;
-}
-// TODO: Implement this function
-void BaseScreen::onEnabled()
-{
-	system("CLS");
-	this->refreshed = false;
-	// execute process
-	this->display();
-}
-// TODO: Implement this function
-void BaseScreen::process()
-{
-	if (!this->refreshed)
-	{
-		this->printProcessInfo();
-		this->refreshed = true;
-	}
+#include "Process.h"
+#include "PrintCommand.h"
+#include <iostream>
+#include <sstream>
+#include <ctime>
+#include <iomanip>
 
-	while (true) {
-		// Asking for text input
-		std::string sInput;
-		std::cout << "\n";
-		std::cout << "Please type in a command: ";
-		std::getline(std::cin, sInput);
+Screen::Screen(ConsoleManager& manager, Process* process)
+    : consoleManager(manager), process(process) {}
 
-		// Input validation and conditions
-		if (sInput == "process-smi")
-		{
-			this->printProcessInfo();
-		}
-		else if (sInput == "clear") {
-			system("CLS");
-			this->printProcessInfo();
-		}
-		else if (sInput == "exit") {
-			if (this->attachedProcess->isFinished())
-			{
-				ConsoleManager::getInstance()->unregisterScreen(this->getName());
-			}
-			ConsoleManager::getInstance()->exitApplication();
-			break;
-		}
-		else
-		{
-			std::cout << "Invalid command. Please try again.\n";
-		}
-	}
+void Screen::run() {
+    displayProcessScreen();
 
-}
-// TODO: Implement this function
-void BaseScreen::display()
-{
-		this->process();
-}
-// TODO: Implement this function
-void BaseScreen::printProcessInfo() const
-{
-	std::cout << "Process: " << this->attachedProcess->getName() << std::endl;
-	std::cout << "ID: " << this->attachedProcess->getPID() << std::endl;
-	if(this->attachedProcess->isFinished())
-	{
-		std::cout << "Finished!" << std::endl;
-	}
-	else
-	{
-		std::cout << "Current instruction line: " << this->attachedProcess->getCommandCounter() << std::endl;
-		std::cout << "Lines of code: " << this->attachedProcess->getLinesOfCode() << std::endl;
-	}
-	
+    std::string input;
+    while (true) {
+        std::cout << process->getName() << "> ";
+        std::getline(std::cin, input);
+
+        if (input == "exit") {
+            break;
+        }
+        else if (input == "clear") {
+            system("CLS");
+        }
+        else {
+            std::istringstream iss(input);
+            std::string command;
+            iss >> command;
+            if (command == "print") {
+                std::string message;
+                std::getline(iss, message);
+
+                if (!message.empty() && message[0] == ' ') {
+                    message.erase(0, 1);
+                }
+
+                process->addCommand(new PrintCommand(message));
+                std::cout << "Print command added to process.\n";
+
+                // Reset completed status and reschedule if a command is added when process is already finished
+                if (process->isCompleted()) {
+                    process->resetCompleted();
+                    consoleManager.getScheduler()->addProcess(process);
+                }
+            }
+            else if (command == "process-smi") {
+                displayProcessScreen();
+            }
+            else {
+                std::cout << "Unknown command: " << command << std::endl;
+            }
+        }
+    }
 }
 
+void Screen::displayProcessScreen() {
+    std::string processName = process->getName();
+    int processId = process->getId();
+    std::time_t creationTime = process->getCreationTime();
+    int currentLine = process->getCurrentLine();
+    int totalLines = process->getTotalLines();
+
+    double progress = 0.0;
+    if (totalLines > 0) {
+        progress = ((double)currentLine / totalLines) * 100.0;
+        if (progress > 100.0) progress = 100.0;
+    }
+
+    std::string status;
+    if (process->isCompleted()) {
+        status = "Completed";
+    }
+    else {
+        Scheduler* scheduler = consoleManager.getScheduler();
+        bool isRunning = false;
+        if (scheduler) {
+            auto runningProcesses = scheduler->getRunningProcesses();
+            if (runningProcesses.find(process) != runningProcesses.end()) {
+                isRunning = true;
+            }
+        }
+
+        if (isRunning) {
+            status = "Executing";
+        }
+        else if (currentLine == 0) {
+            status = "Not started";
+        }
+        else {
+            status = "Paused";
+        }
+    }
+
+    char buffer[26];
+    ctime_s(buffer, sizeof(buffer), &creationTime);
+    std::string creationTimeStr = buffer;
+    if (!creationTimeStr.empty() && creationTimeStr.back() == '\n') {
+        creationTimeStr.pop_back();
+    }
+
+    // Display process information
+    std::cout << "Process: " << processName << "\n";
+    std::cout << "ID: " << processId << "\n";
+    std::cout << "Creation Time: " << creationTimeStr << "\n\n";
+
+    if (process->isCompleted()) {
+        // Output format for completed process
+        std::cout << "Progress: " << std::fixed << std::setprecision(2) << progress << "% "
+            << "(" << currentLine << " / " << totalLines << ")\n";
+        std::cout << "Status: " << status << "\n\n";
+    }
+    else {
+        // Output format for ongoing process
+        std::cout << "Current instruction line: " << currentLine + 1 << "\n";
+        std::cout << "Lines of code: " << totalLines << "\n";
+        std::cout << "Progress: " << std::fixed << std::setprecision(2) << progress << "%\n";
+        std::cout << "Status: " << status << "\n\n";
+    }
+}

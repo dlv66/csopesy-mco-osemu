@@ -1,16 +1,28 @@
 #pragma once
-#include "AConsole.h"
 
-class MainConsole : public AConsole
-{
+#include "Console.h"
+#include <string>
+#include <vector>
+#include <map>
+
+class ConsoleManager;
+class Process;
+
+class MainConsole : public Console {
 public:
-	MainConsole();
-	void onEnabled() override;
-	void display() override; 
-	void process() override;
+    MainConsole(ConsoleManager& manager);
+    void run() override;
 
-	void drawHeader();
+private:
+    void handleCommand(const std::string& input);
 
-	std::string name;
+    void displayProcessSmi();
+    void displayVmStat();
+    void displayRunningProcesses(const std::vector<Process*>& runningProcesses, const std::map<Process*, int>& runningProcessesMap);
+    void displayFinishedProcesses(const std::vector<Process*>& finishedProcesses);
+    void displayQueuedProcesses(const std::vector<Process*>& queuedProcesses);
+
+    void reportUtil();
+
+    ConsoleManager& consoleManager;
 };
-

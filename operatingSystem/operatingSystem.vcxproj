@@ -131,6 +131,7 @@
     <ClCompile Include="AConsole.cpp" />
     <ClCompile Include="AScheduler.cpp" />
     <ClCompile Include="BaseScreen.cpp" />
+    <ClCompile Include="Config.cpp" />
     <ClCompile Include="ConsoleManager.cpp" />
     <ClCompile Include="Core.cpp" />
     <ClCompile Include="FCFSScheduler.cpp" />
@@ -140,6 +141,7 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MainConsole.cpp" />
     <ClCompile Include="MemoryManager.cpp" />
+    <ClCompile Include="OSEmulator.cpp" />
     <ClCompile Include="Process.cpp" />
     <ClCompile Include="RRScheduler.cpp" />
     <ClCompile Include="Utils.cpp" />
@@ -148,6 +150,7 @@
     <ClInclude Include="AConsole.h" />
     <ClInclude Include="AScheduler.h" />
     <ClInclude Include="BaseScreen.h" />
+    <ClInclude Include="Config.h" />
     <ClInclude Include="ConsoleManager.h" />
     <ClInclude Include="Core.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>

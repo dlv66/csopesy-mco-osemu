@@ -1,20 +1,18 @@
 #pragma once
-#include <memory>
 
-#include "AConsole.h"
-#include "Process.h"
+#include "Console.h"
 
-class BaseScreen : public AConsole
-{
+class ConsoleManager;
+class Process;
+
+class Screen : public Console {
 public:
-	BaseScreen(std::shared_ptr<Process> attachedProcess, std::string processName);
-	void onEnabled() override;
-	void process() override;
-	void display() override;
+    Screen(ConsoleManager& manager, Process* process);
+    void run() override;
 
 private:
-	void printProcessInfo() const;
-	std::shared_ptr<Process> attachedProcess;
-	bool refreshed = false;
-};
+    void displayProcessScreen();
 
+    ConsoleManager& consoleManager;
+    Process* process;
+};

@@ -1,7 +1,7 @@
 #include "ConsoleManager.h"
 #include "MainConsole.h"
-#include "Screen.h"
-#include "SchedulerFCFS.h"
+#include "BaseScreen.h"
+#include "FCFSScheduler.h"
 #include "SchedulerRR.h"
 #include "PrintCommand.h"
 #include <iostream>

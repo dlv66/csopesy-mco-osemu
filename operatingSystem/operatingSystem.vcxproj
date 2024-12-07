@@ -153,7 +153,9 @@
     <ClInclude Include="AConsole.h" />
     <ClInclude Include="AScheduler.h" />
     <ClInclude Include="BaseScreen.h" />
+    <ClInclude Include="Command.h" />
     <ClInclude Include="Config.h" />
+    <ClInclude Include="Console.h" />
     <ClInclude Include="ConsoleManager.h" />
     <ClInclude Include="Core.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
@@ -167,7 +169,9 @@
     <ClInclude Include="PrintCommand.h" />
     <ClInclude Include="Process.h" />
     <ClInclude Include="RRScheduler.h" />
+    <ClInclude Include="Scheduler.h" />
     <ClInclude Include="SchedulerRR.h" />
+    <ClInclude Include="ThreadSafeQueue.h" />
     <ClInclude Include="Utils.h" />
   </ItemGroup>
   <ItemGroup>

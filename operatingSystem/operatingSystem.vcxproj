@@ -145,6 +145,8 @@
     <ClCompile Include="PrintCommand.cpp" />
     <ClCompile Include="Process.cpp" />
     <ClCompile Include="RRScheduler.cpp" />
+    <ClCompile Include="SchedulerRR.cpp" />
+    <ClCompile Include="Source.cpp" />
     <ClCompile Include="Utils.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -165,6 +167,7 @@
     <ClInclude Include="PrintCommand.h" />
     <ClInclude Include="Process.h" />
     <ClInclude Include="RRScheduler.h" />
+    <ClInclude Include="SchedulerRR.h" />
     <ClInclude Include="Utils.h" />
   </ItemGroup>
   <ItemGroup>

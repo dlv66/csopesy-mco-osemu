@@ -1,177 +1,159 @@
 #include "Process.h"
-
-#include <chrono>
-#include <iostream>
-#include <thread>
+#include "Command.h"
 #include <fstream>
-#include <random>
-#include <Windows.h>
+#include <iostream>
+#include <ctime>
+#include <iomanip>
+#include <mutex>
 
-#include "GlobalScheduler.h"
-#include "Utils.h"
+int Process::nextId = 1;
+bool Process::loggingEnabled = false;
 
-// Constructor
-Process::Process(int pid, std::string processName, long long minIns, long long maxIns, long long minMemPerProc, long long maxMemPerProc, int memPerFrame)
-    : pid(pid), processName(processName) {
-    timestampCreated = std::time(nullptr);
-    totalLineOfInstruction = minIns + (std::rand() % (maxIns - minIns + 1)); // Randomize between min and max
-	memorySize = minMemPerProc + (std::rand() % (maxMemPerProc - minMemPerProc + 1)); // Randomize between min and max
-    numOfPages = memorySize / memPerFrame;
-    state = State::READY;
-}
+Process::Process(const std::string& name)
+    : name(name), currentLine(0), totalLines(0), completed(false),
+    memorySize(0), inMemory(false) {
+    creationTime = std::chrono::system_clock::now();
+    id = nextId++;
 
-// Executes the process (basic implementation, assuming it increments the instruction counter)
-void Process::execute() {
-    if (state == State::RUNNING && currentLineOfInstruction < totalLineOfInstruction) {
-		std::cout << "Process " << processName << " executing instruction " << currentLineOfInstruction << std::endl;
-        ++currentLineOfInstruction;
-    }
-    if (currentLineOfInstruction >= totalLineOfInstruction) {
-        state = State::TERMINATED;
-        timestampFinished = std::time(nullptr);
-    }
-}
-
-// Executes for a specific quantum time
-void Process::executeQuantum(int timeQuantum) {
-    if (state == State::RUNNING) {
-        for (int i = 0; i < timeQuantum && currentLineOfInstruction < totalLineOfInstruction; ++i) {
-            ++currentLineOfInstruction;
-			//std::cout << "Process " << processName << " executing instruction " << currentLineOfInstruction << std::endl;
+    if (loggingEnabled) {
+        // Initialize process log file only if logging is enabled
+        std::ofstream logfile(name + ".txt", std::ios::out);
+        if (logfile.is_open()) {
+            logfile << "Process name: " << name << "\nLogs:\n";
+            logfile.close();
         }
-        if (currentLineOfInstruction >= totalLineOfInstruction) {
-            state = State::TERMINATED;
-            timestampFinished = std::time(nullptr);
+        else {
+            std::cerr << "Unable to create log file for process " << name << std::endl;
         }
     }
 }
 
-
-
-
-
-// Getters
-std::string Process::getName() const { return processName; }
-bool Process::isFinished() const { return state == State::TERMINATED; }
-long long Process::getRemainingTime() const { return totalLineOfInstruction - currentLineOfInstruction; }
-long long Process::getCommandCounter() const { return currentLineOfInstruction; }
-long long Process::getLinesOfCode() const { return totalLineOfInstruction; }
-int Process::getPID() const { return pid; }
-int Process::getCPUCoreID() const { return cpuCoreID; }
-Process::State Process::getState() const { return state; }
-int Process::getMemorySize() const { return memorySize; } // NEW: Returns the memory size of the process
-int Process::getMemoryBlockIndex() const {  // Define as a member function
-    return memoryBlockIndex;
-}
-// Timestamp methods
-std::string Process::getTimestampStarted() const
-{
-    return convertTimestampToString(this->timestampStarted);
-}
-
-std::string Process::getTimestampFinished() const
-{
-    return convertTimestampToString(this->timestampFinished);
-}
-
-
-
-
-
-// Setters
-void Process::setCPUCoreID(int coreID) { cpuCoreID = coreID; }
-void Process::setMemoryBlockIndex(int index) { memoryBlockIndex = index; }
-
-
-
-
-
-// Updates the process state
-void Process::update() {
-    if (state == State::READY && timestampStarted == 0) {
-        timestampStarted = std::time(nullptr);
+Process::~Process() {
+    while (!commandQueue.empty()) {
+        delete commandQueue.front();
+        commandQueue.pop();
     }
 }
 
-void Process::setRunningState()
-{
-	this->state = State::RUNNING;
+int Process::getId() const {
+    return id;
 }
 
-// Resets the ticks of instruction execution, useful for re-scheduling
-void Process::resetTicksLineOfInstruction() {
-    currentLineOfInstruction = 0;
-    state = State::READY;
+const std::string& Process::getName() const {
+    return name;
 }
 
-
-
-
-
-// Memory Management
-void Process::setMemoryRequired(int memoryRequired) {
-    this->memoryRequired = memoryRequired;
+void Process::setMemorySize(unsigned int size) {
+    memorySize = size;
 }
 
-int Process::getMemoryRequired() const {
-    return memoryRequired;
+unsigned int Process::getMemorySize() const {
+    return memorySize;
 }
 
-
-void Process::setMemoryPtr(void* ptr) {
-    memoryPtr = ptr;
+void Process::setInMemory(bool inMemory) {
+    this->inMemory = inMemory;
 }
 
-void* Process::getMemoryPtr() {
-    return memoryPtr;
+bool Process::isInMemory() const {
+    return inMemory;
 }
 
-
-Process::TimePoint Process::getMemoryAllocatedTime()
-{
-    return memoryAllocatedTime;
-}
-
-void Process::setMemoryAllocatedTime(Process::TimePoint time)
-{
-    memoryAllocatedTime = time;
-}
-
-bool Process::isMemoryAllocatedTimeNull() const {
-    return memoryAllocatedTime == Process::TimePoint();
-}
-
-
-void Process::setNumOfPages(int numberOfPages)
-{
-    numOfPages = numberOfPages;
-}
-
-int Process::getNumOfPages() const {
-    return numOfPages;
-}
-
-
-
-
-
-
-
-//OTHER CODE
-/*
-bool Process::allocateMemory() {
-    if (!hasMemoryAllocated) {
-        hasMemoryAllocated = MemoryManager::getInstance()->allocateMemory(name);
+void Process::addCommand(Command* cmd) {
+    {
+        std::lock_guard<std::mutex> lock(queueMutex);
+        commandQueue.push(cmd);
     }
-    return hasMemoryAllocated;
-}
-void Process::deallocateMemory() {
-    if (hasMemoryAllocated) {
-        MemoryManager::getInstance()->deallocateMemory(name);
-        hasMemoryAllocated = false;
+
+    // Store command description for display
+    {
+        std::lock_guard<std::mutex> lock(stateMutex);
+        totalLines++;
+        codeLines.push_back(cmd->getDescription());
     }
 }
-bool Process::hasMemory() const {
-    return hasMemoryAllocated;
+
+Command* Process::getNextCommand() {
+    std::lock_guard<std::mutex> lock(queueMutex);
+    if (commandQueue.empty()) {
+        return nullptr;
+    }
+    Command* cmd = commandQueue.front();
+    commandQueue.pop();
+    return cmd;
 }
-*/
+
+void Process::log(const std::string& message, int coreId) {
+    if (!loggingEnabled) return;
+
+    std::lock_guard<std::mutex> lock(logMutex);
+    // Open the process's log file and append the message
+    std::ofstream logfile(name + ".txt", std::ios::app);
+
+    if (logfile.is_open()) {
+        // Get current time
+        std::time_t now = std::time(nullptr);
+        std::tm now_tm;
+
+        localtime_s(&now_tm, &now);
+
+        logfile << "(" << std::put_time(&now_tm, "%m/%d/%Y %I:%M:%S%p") << ") ";
+        logfile << "Core:" << coreId << " \"" << message << "\"\n";
+        logfile.close();
+    }
+    else {
+        std::cerr << "Unable to open log file for process " << name << std::endl;
+    }
+}
+
+std::time_t Process::getCreationTime() const {
+    return std::chrono::system_clock::to_time_t(creationTime);
+}
+
+int Process::getCurrentLine() const {
+    std::lock_guard<std::mutex> lock(stateMutex);
+    return currentLine;
+}
+
+int Process::getTotalLines() const {
+    std::lock_guard<std::mutex> lock(stateMutex);
+    return totalLines;
+}
+
+std::string Process::getCurrentCodeLine() const {
+    std::lock_guard<std::mutex> lock(stateMutex);
+    if (currentLine > 0 && currentLine <= totalLines) {
+        return codeLines[currentLine - 1];
+    }
+    else {
+        return "No code line is currently being executed.";
+    }
+}
+
+bool Process::isCompleted() const {
+    std::lock_guard<std::mutex> lock(stateMutex);
+    return completed;
+}
+
+void Process::incrementCurrentLine() {
+    std::lock_guard<std::mutex> lock(stateMutex);
+    currentLine++;
+}
+
+void Process::setCompleted(bool value) {
+    std::lock_guard<std::mutex> lock(stateMutex);
+    completed = value;
+}
+
+void Process::resetCompleted() {
+    std::lock_guard<std::mutex> lock(stateMutex);
+    completed = false;
+}
+
+void Process::setLoggingEnabled(bool enabled) {
+    loggingEnabled = enabled;
+}
+
+bool Process::isLoggingEnabled() {
+    return loggingEnabled;
+}

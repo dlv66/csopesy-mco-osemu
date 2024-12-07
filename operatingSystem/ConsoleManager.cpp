@@ -1,151 +1,362 @@
 #include "ConsoleManager.h"
-
-#include <iostream>
-
-#include "GlobalScheduler.h"
 #include "MainConsole.h"
-
-ConsoleManager* ConsoleManager::sharedInstance = nullptr;
+#include "Screen.h"
+#include "SchedulerFCFS.h"
+#include "SchedulerRR.h"
+#include "PrintCommand.h"
+#include <iostream>
+#include <thread>
+#include <chrono>
+#include <fstream>
+#include <sstream>
 
 ConsoleManager::ConsoleManager()
-{
-	this->running = true;
-	this->consoleHandle = GetStdHandle(STD_OUTPUT_HANDLE);
-
-	const std::shared_ptr<MainConsole> mainConsole = std::make_shared<MainConsole>();
-	//const std::shared_ptr<SchedulingConsole> schedulingConsole = std::make_shared<SchedulingConsole>();
-
-	this->consoleTable["MainConsole"] = mainConsole;
-	//this->consoleTable["SchedulingConsole"] = schedulingConsole;
-
-	this->switchConsole("MainConsole");
+    : testing(false), initialized(false), scheduler(nullptr), cpuCycles(0), cpuCycleRunning(false) {
+    mainConsole = new MainConsole(*this);
 }
 
-ConsoleManager* ConsoleManager::getInstance()
-{
-	return sharedInstance;
+ConsoleManager::~ConsoleManager() {
+    stopSchedulerTest();
+    stopCpuCycleCounter();
+    if (scheduler) {
+        scheduler->stop();
+        delete scheduler;
+    }
+    delete mainConsole;
+    for (auto& pair : processes) {
+        delete pair.second;
+    }
 }
 
-void ConsoleManager::initialize()
-{
-	sharedInstance = new ConsoleManager();
+bool ConsoleManager::initialize() {
+    Config& config = Config::getInstance();
+    if (!config.loadConfig("config.txt")) {
+        std::cerr << "Failed to load configuration." << std::endl;
+        return false;
+    }
+
+    memoryManager.initialize(
+        config.getMaxOverallMem(),
+        config.getMemPerFrame()
+    );
+
+    if (config.getSchedulerType() == "fcfs") {
+        scheduler = new SchedulerFCFS(config.getNumCpu(), *this);
+    }
+    else if (config.getSchedulerType() == "rr") {
+        scheduler = new SchedulerRR(config.getNumCpu(), config.getQuantumCycles(), *this);
+    }
+    else {
+        std::cerr << "Unknown scheduler type in configuration." << std::endl;
+        return false;
+    }
+
+    startScheduler();
+    startCpuCycleCounter();
+    initialized = true;
+    return true;
 }
 
-void ConsoleManager::destroy()
-{
-	delete sharedInstance;
+bool ConsoleManager::isInitialized() const {
+    return initialized;
 }
 
-void ConsoleManager::drawConsole() const
-{
-	this->currentConsole->display();
-	this->currentConsole->process();
+void ConsoleManager::startCpuCycleCounter() {
+    std::lock_guard<std::mutex> lock(cpuCycleMutex);
+    if (cpuCycleRunning) return;
+    cpuCycleRunning = true;
+    cpuCycleThread = std::thread(&ConsoleManager::cpuCycleLoop, this);
 }
 
-// TODO: Implement this function
-void ConsoleManager::process() const
-{
-
+void ConsoleManager::stopCpuCycleCounter() {
+    {
+        std::lock_guard<std::mutex> lock(cpuCycleMutex);
+        if (!cpuCycleRunning) return;
+        cpuCycleRunning = false;
+    }
+    cpuCycleCV.notify_all();
+    if (cpuCycleThread.joinable()) {
+        cpuCycleThread.join();
+    }
 }
 
-void ConsoleManager::switchConsole(std::string consoleName)
-{
-	if (this->consoleTable.find(consoleName) != this->consoleTable.end())
-	{
-		// Key exists in the map
-		this->previousConsole = this->currentConsole;
-		this->currentConsole = this->consoleTable[consoleName];
-		this->currentConsole->onEnabled();
-	}
-	else
-	{
-		// Key does not exist in the map
-		std::cout << "Console " << consoleName << " not found.\n";
-	}
-
+void ConsoleManager::cpuCycleLoop() {
+    while (true) {
+        {
+            std::unique_lock<std::mutex> lock(cpuCycleMutex);
+            if (!cpuCycleRunning) break;
+        }
+        std::this_thread::sleep_for(std::chrono::milliseconds(1));
+        cpuCycles++;
+    }
 }
 
-void ConsoleManager::registerScreen(std::shared_ptr<BaseScreen> screenRef)
-{
-
-	if (this->consoleTable.find(screenRef->name) == this->consoleTable.end())
-	{
-		std::cout << "Screen " << screenRef->name << " registered.\n";
-		this->consoleTable[screenRef->name] = screenRef;
-		this->switchToScreen(screenRef->name);
-	}
-	else
-	{
-		std::cout << "Screen " << screenRef->name << " already exists.\n";
-	}
+void ConsoleManager::safePrint(const std::string& message) {
+    std::lock_guard<std::mutex> lock(ioMutex);
+    // Move to new line and print message
+    std::cout << message << std::endl;
+    // Reprint the prompt
+    std::cout << currentPrompt;
+    std::cout.flush();
 }
 
-void ConsoleManager::registerScreenNoCout(std::shared_ptr<BaseScreen> screenRef) // mostly used for scheduler-test
-{
-
-	if (this->consoleTable.find(screenRef->name) == this->consoleTable.end())
-	{
-		this->consoleTable[screenRef->name] = screenRef;
-	}
-	else
-	{
-		std::cout << "Screen " << screenRef->name << " already exists.\n";
-	}
+void ConsoleManager::printPrompt() {
+    std::lock_guard<std::mutex> lock(ioMutex);
+    std::cout << currentPrompt;
+    std::cout.flush();
 }
 
-void ConsoleManager::getScreens()
-{
-	for (auto const& screen : this->consoleTable)
-	{
-		std::cout << screen.first << std::endl;
-	}
+void ConsoleManager::setCurrentPrompt(const std::string& prompt) {
+    std::lock_guard<std::mutex> lock(ioMutex);
+    currentPrompt = prompt;
 }
 
-void ConsoleManager::switchToScreen(std::string screenName)
-{
-	if (this->consoleTable.find(screenName) != this->consoleTable.end())
-	{
-		// Key exists in the map
-		this->previousConsole = this->currentConsole;
-		this->currentConsole = this->consoleTable[screenName];
-		this->currentConsole->onEnabled();
-	}
-	else
-	{
-		// Key does not exist in the map
-		std::cout << "Screen " << screenName << " not found.\n";
-	}
+
+void ConsoleManager::start() {
+    mainConsole->run();
 }
 
-// TODO: Implement this function
-void ConsoleManager::unregisterScreen(std::string screenName)
-{
-	this->consoleTable.erase(screenName);
+void ConsoleManager::switchToMainConsole() {
+    system("CLS");
+    mainConsole->run();
 }
 
-// TODO: Implement this function
-void ConsoleManager::returnToPreviousConsole()
-{
-	this->currentConsole = this->previousConsole;
-	this->currentConsole->onEnabled();
+void ConsoleManager::switchToScreen(Process* process) {
+    system("CLS");
+    Screen screen(*this, process);
+    screen.run();
 }
 
-// TODO: Implement this function
-void ConsoleManager::exitApplication()
-{
-	if (this->currentConsole != this->consoleTable["MainConsole"])
-	{
-		system("CLS");
-		this->returnToPreviousConsole();
-	}
-	else if (this->currentConsole)
-	{
-		exit(0);
-	}
+bool ConsoleManager::createProcess(const std::string& name) {
+    std::lock_guard<std::mutex> lock(processMutex);
+    if (processes.find(name) == processes.end()) {
+        Process* process = new Process(name);
+
+        // Set memory size for the process
+        Config& config = Config::getInstance();
+        unsigned int minMem = config.getMinMemPerProc();
+        unsigned int maxMem = config.getMaxMemPerProc();
+        unsigned int memSize = minMem + rand() % (maxMem - minMem + 1);
+
+        // Validate memory size against total available memory
+        if (memSize > config.getMaxOverallMem()) {
+            std::cout << "Process memory requirement (" << memSize
+                << " KB) exceeds system memory ("
+                << config.getMaxOverallMem() << " KB).\n";
+            delete process;
+            return false;
+        }
+
+        process->setMemorySize(memSize);
+
+        // Try to allocate memory for the process
+        try {
+            if (memoryManager.allocateMemory(process, memSize)) {
+                processes[name] = process;
+                scheduler->addProcess(process);
+                return true;
+            }
+            else {
+                // Not enough memory, cannot create process
+                delete process;
+                std::cout << "Not enough memory to create process '" << name
+                    << "' (required: " << memSize << " KB).\n";
+                return false;
+            }
+        }
+        catch (const std::exception& e) {
+            delete process;
+            std::cout << "Error allocating memory for process '" << name
+                << "': " << e.what() << "\n";
+            return false;
+        }
+    }
+    else {
+        std::cout << "Process with name '" << name << "' already exists.\n";
+        return false;
+    }
 }
 
-bool ConsoleManager::isRunning() const
-{
-	return running;
+Process* ConsoleManager::getProcess(const std::string& name) {
+    std::lock_guard<std::mutex> lock(processMutex);
+    auto it = processes.find(name);
+    if (it != processes.end()) {
+        return it->second;
+    }
+    else {
+        std::cout << "No process found with name '" << name << "'.\n";
+        return nullptr;
+    }
 }
 
+std::map<std::string, Process*>& ConsoleManager::getProcesses() {
+    return processes;
+}
+
+MemoryManager& ConsoleManager::getMemoryManager() {
+    return memoryManager;
+}
+
+Scheduler* ConsoleManager::getScheduler() {
+    return scheduler;
+}
+
+void ConsoleManager::startScheduler() {
+    if (scheduler->isRunning()) {
+        std::cout << "Scheduler is already running.\n";
+        return;
+    }
+    scheduler->start();
+    std::cout << "Scheduler started.\n";
+}
+
+void ConsoleManager::stopScheduler() {
+    if (!scheduler) {
+        std::cout << "Scheduler is not initialized.\n";
+        return;
+    }
+    if (!scheduler->isRunning()) {
+        std::cout << "Scheduler is not running.\n";
+        return;
+    }
+    scheduler->stop();
+    std::cout << "Scheduler stopped.\n";
+}
+
+void ConsoleManager::pauseScheduler() {
+    if (!scheduler->isRunning()) {
+        std::cout << "Scheduler is not running.\n";
+        return;
+    }
+    if (scheduler->isPaused()) {
+        std::cout << "Scheduler is already paused.\n";
+        return;
+    }
+    scheduler->pause();
+    std::cout << "Scheduler paused.\n";
+}
+
+void ConsoleManager::resumeScheduler() {
+    if (!scheduler->isRunning()) {
+        std::cout << "Scheduler is not running.\n";
+        return;
+    }
+    if (!scheduler->isPaused()) {
+        std::cout << "Scheduler is not paused.\n";
+        return;
+    }
+    scheduler->resume();
+    std::cout << "Scheduler resumed.\n";
+}
+
+void ConsoleManager::startSchedulerTest() {
+    std::lock_guard<std::mutex> lock(testMutex);
+    if (testing) {
+        std::cout << "Scheduler test is already running.\n";
+        return;
+    }
+    if (!scheduler->isRunning()) {
+        std::cout << "Scheduler is not running. Starting scheduler.\n";
+        startScheduler();
+    }
+    testing = true;
+    testThread = std::thread(&ConsoleManager::schedulerTestLoop, this);
+
+    int batchProcessFreq = Config::getInstance().getBatchProcessFreq();
+    std::cout << "Scheduler test started. Generating dummy processes every " + std::to_string(batchProcessFreq) + " CPU cycles...\n";
+}
+
+void ConsoleManager::stopSchedulerTest() {
+    {
+        std::lock_guard<std::mutex> lock(testMutex);
+        if (!testing) {
+            std::cout << "Scheduler test is not running.\n";
+            return;
+        }
+        testing = false;
+        testCV.notify_all();
+    }
+    if (testThread.joinable()) {
+        testThread.join();
+        std::cout << "Scheduler test stopped.\n";
+    }
+}
+
+void ConsoleManager::schedulerTestLoop() {
+    Config& config = Config::getInstance();
+    unsigned int freq = config.getBatchProcessFreq();
+    unsigned int nextProcessCycle = cpuCycles.load() + freq;
+
+    while (true) {
+        {
+            std::unique_lock<std::mutex> lock(testMutex);
+            if (!testing) break;
+        }
+
+        // Wait until cpuCycles >= nextProcessCycle
+        while (cpuCycles.load() < nextProcessCycle) {
+            {
+                std::unique_lock<std::mutex> lock(testMutex);
+                if (!testing) return;
+            }
+        }
+
+        generateTestProcess("dummyProcess");
+
+        nextProcessCycle += freq;
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    }
+}
+
+void ConsoleManager::generateTestProcess(const std::string& baseName, std::stringstream* outputStream) {
+    // Use atomic increment to get unique process number
+    int processNum = processCounter++;
+    std::string processName = baseName + std::to_string(processNum);
+
+    if (createProcess(processName)) {
+        Process* process = getProcess(processName);
+        if (process) {
+            Config& config = Config::getInstance();
+            unsigned int numIns = config.getMinIns() + rand() % (config.getMaxIns() - config.getMinIns() + 1);
+
+            for (unsigned int j = 0; j < numIns; ++j) {
+                process->addCommand(new PrintCommand("Hello from " + processName + " Instruction " + std::to_string(j + 1)));
+            }
+
+            // Only output if we're in batch mode (-p flag)
+            if (outputStream) {
+                *outputStream << "Generated process: " << processName << " with " << numIns << " print commands.\n";
+            }
+        }
+    }
+    else if (outputStream) {
+        *outputStream << "Failed to create process '" << processName << "'. Skipping...\n";
+    }
+}
+
+void ConsoleManager::startSchedulerTestWithProcesses(int numProcesses) {
+    std::stringstream outputBuffer;
+    std::cout << "Generating " << numProcesses << " processes...\n";
+
+    for (int i = 0; i < numProcesses; ++i) {
+        generateTestProcess("process", &outputBuffer);
+    }
+
+    // Print all process generation messages at once
+    std::cout << outputBuffer.str();
+}
+
+void ConsoleManager::startSchedulerTestWithDuration(int seconds) {
+    std::cout << "Starting scheduler test for " + std::to_string(seconds) + " seconds...\n";
+    startSchedulerTest();
+
+    std::thread([this, seconds]() {
+        std::this_thread::sleep_for(std::chrono::seconds(seconds));
+        stopSchedulerTest();
+        safePrint("Scheduler test completed after " + std::to_string(seconds) + " seconds.");
+        }).detach();
+}
+
+std::mutex& ConsoleManager::getIOMutex() {
+    return ioMutex;
+}

@@ -1,52 +1,87 @@
 #pragma once
-#include <memory>
-#include <unordered_map>
-#include <Windows.h>
 
-#include "AConsole.h"
-#include "BaseScreen.h"
+#include "Config.h"
+#include "Console.h"
+#include "Process.h"
+#include "Scheduler.h"
+#include "MemoryManager.h"
+#include <map>
+#include <mutex>
+#include <string>
+#include <thread>
+#include <condition_variable>
+#include <atomic>
+#include <sstream>
 
-class ConsoleManager
-{
+class MainConsole;
+
+class ConsoleManager {
 public:
-	typedef std::unordered_map<std::string, std::shared_ptr<AConsole>> ConsoleTable;
+    ConsoleManager();
+    ~ConsoleManager();
 
-	static ConsoleManager* getInstance();
-	static void initialize();
-	static void destroy();
+    void startCpuCycleCounter();
+    void stopCpuCycleCounter();
 
-	void drawConsole() const;
-	void process() const;
-	void switchConsole(std::string consoleName);
+    void start();
+    void switchToMainConsole();
+    void switchToScreen(Process* process);
 
-	void registerScreen(std::shared_ptr<BaseScreen> console);
-	void registerScreenNoCout(std::shared_ptr<BaseScreen> console);
-	void getScreens();
-	void switchToScreen(std::string screenName);
-	void unregisterScreen(std::string screenName);
+    bool createProcess(const std::string& name);
+    Process* getProcess(const std::string& name);
+    std::map<std::string, Process*>& getProcesses();
 
-	void returnToPreviousConsole();
-	void exitApplication();
-	bool isRunning() const;
+    MemoryManager& getMemoryManager();
+    Scheduler* getScheduler();
 
-	std::shared_ptr<AConsole> getCurrentConsole() const;
+    void startScheduler();
+    void stopScheduler();
+    void pauseScheduler();
+    void resumeScheduler();
 
-	HANDLE getConsoleHandle() const;
+    // Scheduler test methods
+    void startSchedulerTest();
+    void startSchedulerTestWithProcesses(int numProcesses);
+    void startSchedulerTestWithDuration(int seconds);
+    void stopSchedulerTest();
 
-	void setCursorPosition(int posX, int posY) const;
+    // Console output management
+    void safePrint(const std::string& message);
+    void printPrompt();
+    void setCurrentPrompt(const std::string& prompt);
+    std::mutex& getIOMutex();
+
+    bool isInitialized() const;
+    bool initialize();
 
 private:
-	ConsoleManager();
-	~ConsoleManager() = default;
-	ConsoleManager(ConsoleManager const&){};
-	ConsoleManager& operator=(ConsoleManager const&) {};
-	static ConsoleManager* sharedInstance;
+    MainConsole* mainConsole;
+    std::map<std::string, Process*> processes;
+    std::mutex processMutex;
 
-	ConsoleTable consoleTable;
-	std::shared_ptr<AConsole> currentConsole;
-	std::shared_ptr<AConsole> previousConsole;
+    // For CPU cycle functionality
+    std::atomic<unsigned int> cpuCycles;
+    std::thread cpuCycleThread;
+    bool cpuCycleRunning;
+    std::mutex cpuCycleMutex;
+    std::condition_variable cpuCycleCV;
+    void cpuCycleLoop();
 
-	HANDLE consoleHandle;
-	bool running = true;
+    MemoryManager memoryManager;
+    Scheduler* scheduler;
+
+    // For scheduler test
+    void schedulerTestLoop();
+    void generateTestProcess(const std::string& baseName, std::stringstream* outputStream = nullptr);
+    std::thread testThread;
+    bool testing;
+    std::mutex testMutex;
+    std::condition_variable testCV;
+    std::atomic<int> processCounter{ 1 };
+
+    // Console output management
+    std::string currentPrompt;
+    std::mutex ioMutex;
+
+    bool initialized;
 };
-

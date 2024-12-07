@@ -136,9 +136,7 @@
     <ClCompile Include="Core.cpp" />
     <ClCompile Include="FCFSScheduler.cpp" />
     <ClCompile Include="GlobalScheduler.cpp" />
-    <ClCompile Include="Initialize.cpp" />
     <ClCompile Include="IThread.cpp" />
-    <ClCompile Include="main.cpp" />
     <ClCompile Include="MainConsole.cpp" />
     <ClCompile Include="MemoryManager.cpp" />
     <ClCompile Include="OSEmulator.cpp" />
@@ -161,7 +159,6 @@
     </ClInclude>
     <ClInclude Include="FCFSScheduler.h" />
     <ClInclude Include="GlobalScheduler.h" />
-    <ClInclude Include="Initialize.h" />
     <ClInclude Include="IThread.h" />
     <ClInclude Include="MainConsole.h" />
     <ClInclude Include="MemoryManager.h" />

@@ -128,12 +128,10 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="AConsole.cpp" />
     <ClCompile Include="AScheduler.cpp" />
     <ClCompile Include="BaseScreen.cpp" />
     <ClCompile Include="Config.cpp" />
     <ClCompile Include="ConsoleManager.cpp" />
-    <ClCompile Include="Core.cpp" />
     <ClCompile Include="FCFSScheduler.cpp" />
     <ClCompile Include="GlobalScheduler.cpp" />
     <ClCompile Include="IThread.cpp" />
@@ -147,16 +145,12 @@
     <ClCompile Include="Source.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="AConsole.h" />
     <ClInclude Include="AScheduler.h" />
     <ClInclude Include="BaseScreen.h" />
     <ClInclude Include="Command.h" />
     <ClInclude Include="Config.h" />
     <ClInclude Include="Console.h" />
     <ClInclude Include="ConsoleManager.h" />
-    <ClInclude Include="Core.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
-    </ClInclude>
     <ClInclude Include="FCFSScheduler.h" />
     <ClInclude Include="GlobalScheduler.h" />
     <ClInclude Include="IThread.h" />
